@@ -9,10 +9,12 @@ public class ActionManager : MonoBehaviour
     public MoveMenu moveMenu;
     public GameObject battleMenu;
     public AttackMenu attackMenu;
+    public GameObject skillSelect;
+    public SkillMenu skillMenu;
     public GameObject returnButton;
     public GameObject moveButton;
     public GameObject attackButton;
-    // skills later
+    public GameObject skillButton;
     public int state = 0;
 
     public void ChangeState(int newState)
@@ -29,16 +31,25 @@ public class ActionManager : MonoBehaviour
             case 0:
                 attackButton.SetActive(true);
                 moveButton.SetActive(true);
+                skillButton.SetActive(true);
                 returnButton.SetActive(false);
                 break;
             case 1:
                 attackButton.SetActive(false);
                 moveButton.SetActive(false);
+                skillButton.SetActive(false);
                 returnButton.SetActive(true);
                 break;
             case 2:
                 attackButton.SetActive(false);
                 moveButton.SetActive(false);
+                skillButton.SetActive(false);
+                returnButton.SetActive(true);
+                break;
+            case 3:
+                attackButton.SetActive(false);
+                moveButton.SetActive(false);
+                skillButton.SetActive(false);
                 returnButton.SetActive(true);
                 break;
         }
@@ -52,20 +63,27 @@ public class ActionManager : MonoBehaviour
                 terrainMap.ActorStopMoving();
                 DisableMovement();
                 DisableAttack();
-                // Show buttons.
+                DisableSkills();
                 break;
             case 1:
                 terrainMap.ActorStartMoving();
                 EnableMovement();
                 DisableAttack();
-                // Hide buttons.
+                DisableSkills();
                 break;
             case 2:
                 terrainMap.ActorStartAttacking();
                 attackMenu.UpdateTarget(terrainMap.ReturnCurrentTarget());
                 DisableMovement();
                 EnableAttack();
-                // Hide buttons.
+                DisableSkills();
+                break;
+            case 3:
+                terrainMap.ActorStartUsingSkills();
+                skillMenu.UpdateSkill(terrainMap.ReturnCurrentSkill());
+                DisableMovement();
+                DisableAttack();
+                EnableSkills();
                 break;
         }
     }
@@ -89,5 +107,15 @@ public class ActionManager : MonoBehaviour
     private void DisableAttack()
     {
         battleMenu.SetActive(false);
+    }
+
+    private void EnableSkills()
+    {
+        skillSelect.SetActive(true);
+    }
+
+    private void DisableSkills()
+    {
+        skillSelect.SetActive(false);
     }
 }

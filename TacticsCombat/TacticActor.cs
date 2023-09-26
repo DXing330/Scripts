@@ -10,27 +10,53 @@ public class TacticActor : MonoBehaviour
     // Race/class/etc.
     public int type = 0;
     public int locationIndex;
+    public int level;
     //private int movementType = 0;
     public int health;
-    public int maxHealth = 6;
+    public int baseHealth = 20;
     // Not sure if we need an initiative tracker it might make things more complex.
     //private int initiative = 0;
-    private int maxMovement = 5;
-    private int maxAttacks = 12;
-    private int attacksLeft;
-    public int attackRange = 3;
-    private int attackDamage = 1;
+    public int baseEnergy = 5;
+    private int energy;
+    public int baseMovement = 3;
+    public int baseActions = 1;
+    private int actionsLeft;
+    public int attackRange = 1;
+    public int baseAttack = 10;
+    public int attackDamage;
+    public int baseDefense = 5;
+    public int defense;
     public int movement;
     private int destinationIndex;
     private TacticActor attackTarget;
-    public Image image;
+    public SpriteRenderer spriteRenderer;
     public List<int> currentPath;
     public TerrainMap terrainMap;
+    public List<TacticBuffsStatuses> buffDebuffs;
+    public List<TacticPassiveSkill> passives;
+    public List<TacticActiveSkill> actives;
 
     void Start()
     {
-        health = maxHealth;
-        movement = maxMovement;
+        health = baseHealth;
+        movement = baseMovement;
+    }
+
+    public void SetBaseStats(string baseStats, int newLevel = 1)
+    {
+        level = newLevel;
+        string[] newBase = baseStats.Split("|");
+        baseHealth = int.Parse(newBase[0]);
+        baseMovement = int.Parse(newBase[1]);
+        baseAttack = int.Parse(newBase[2]);
+        baseDefense = int.Parse(newBase[3]);
+        baseEnergy = int.Parse(newBase[4]);
+        baseActions = int.Parse(newBase[5]);
+    }
+
+    public void SetSprite(Sprite newSprite)
+    {
+        spriteRenderer.sprite = newSprite;
     }
 
     public void InitialLocation(int location)
@@ -47,7 +73,7 @@ public class TacticActor : MonoBehaviour
 
     public void ReceiveDamage(int amount)
     {
-        health -= amount;
+        health -= Mathf.Max(amount - defense, 1);
         if (health <= 0)
         {
             Death();
@@ -57,29 +83,31 @@ public class TacticActor : MonoBehaviour
     public void RegainHealth(int amount)
     {
         health += amount;
-        if (health > maxHealth)
+        if (health > baseHealth)
         {
-            health = maxHealth;
+            health = baseHealth;
         }
     }
 
+    // Player attack.
     public void Attack(TacticActor target)
     {
-        if (target ==  null || attacksLeft <= 0)
+        if (target ==  null || actionsLeft <= 0)
         {
             return;
         }
         // Check if target is in attack range?
         target.ReceiveDamage(attackDamage);
-        attacksLeft--;
+        actionsLeft--;
     }
 
+    // NPC attack.
     private void AttackTarget()
     {
-        while (attacksLeft > 0)
+        while (actionsLeft > 0)
         {
             Attack(attackTarget);
-            attacksLeft--;
+            actionsLeft--;
         }
     }
 
@@ -118,8 +146,21 @@ public class TacticActor : MonoBehaviour
 
     public void StartTurn()
     {
-        movement = maxMovement;
-        attacksLeft = maxAttacks;
+        attackDamage =baseAttack;
+        movement = baseMovement;
+        actionsLeft = baseActions;
+        defense = baseDefense;
+        energy = Mathf.Min(energy+1, baseEnergy);
+        // Deal with buffs/debuffs/passives.
+        for (int i = 0; i < buffDebuffs.Count; i++)
+        {
+            buffDebuffs[i].AffectActor(this);
+            buffDebuffs[i].duration--;
+            if (buffDebuffs[i].duration <= 0)
+            {
+                buffDebuffs.RemoveAt(i);
+            }
+        }
     }
 
     private void CheckGoal()

@@ -41,7 +41,7 @@ public class AttackMenu : MonoBehaviour
         Color tempColor = Color.white;
         tempColor.a = 0.6f;
         targetSprite.color = tempColor;
-        targetSprite.sprite = target.image.sprite;
+        targetSprite.sprite = target.spriteRenderer.sprite;
         targetHealth.text = target.health.ToString();
     }
 

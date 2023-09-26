@@ -6,15 +6,26 @@ using UnityEngine.UI;
 public class TerrainTile : MonoBehaviour
 {
     public int cType;
+    public RectTransform rectTransform;
     public Image tileImage;
     public Image actorImage;
     public Image highlight;
     // Show the border when you're trying to select a tile.
-    public Image border;
+    public Image AOEHighlight;
 
     public void SetType(int newType)
     {
         cType = newType;
+    }
+
+    public void UpdateSize(float newSize)
+    {
+        rectTransform.localScale = new Vector3(newSize, newSize, 0);
+    }
+
+    public void UpdatePivot(float xPivot, float yPivot)
+    {
+        rectTransform.pivot = new Vector2(xPivot, yPivot);
     }
 
     public void ResetImage()
@@ -49,6 +60,24 @@ public class TerrainTile : MonoBehaviour
         }
         tempColor.a = 0.66f;
         highlight.color = tempColor;
+    }
+
+    public void ResetAOEHighlight()
+    {
+        Color tempColor = Color.white;
+        tempColor.a = 0f;
+        AOEHighlight.color = tempColor;
+    }
+
+    public void AoeHighlight(bool red = true)
+    {
+        Color tempColor = Color.red;
+        if (!red)
+        {
+            tempColor = Color.green;
+        }
+        tempColor.a = 0.9f;
+        AOEHighlight.color = tempColor;
     }
 
     public void UpdateColor(int type)

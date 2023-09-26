@@ -17,8 +17,10 @@ public class TerrainMap : MonoBehaviour
     private List<int> highlightedTiles;
     public List<int> targetableTiles;
     private int currentTarget = 0;
+    private int skillCenter;
     public List<int> currentTiles;
     public List<TerrainTile> terrainTiles;
+    public TacticTileList allTiles;
     public TerrainMaker terrainMaker;
     public TerrainPathfinder pathFinder;
     public List<TacticActor> actors;
@@ -27,6 +29,8 @@ public class TerrainMap : MonoBehaviour
 
     void Start()
     {
+        Application.targetFrameRate = 60;
+        //InitializeTiles();
         GenerateMap(0, fullSize);
         UpdateCenterTile((fullSize * 2) + 2);
         UpdateMap();
@@ -37,6 +41,26 @@ public class TerrainMap : MonoBehaviour
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
         NextTurn();
     }
+
+    /*private void InitializeTiles()
+    {
+        int tileIndex = 0;
+        float scale = 1f/gridSize;
+        float xPivot = 0f;
+        float yPivot = 1f;
+        for (int i = 0; i < gridSize; i++)
+        {
+            xPivot = 0f;
+            for (int j = 0; j < gridSize; j++)
+            {
+                terrainTiles[tileIndex].UpdatePivot(xPivot, yPivot);
+                terrainTiles[tileIndex].UpdateSize(scale);
+                tileIndex++;
+                xPivot += 1f/(gridSize - 1);
+            }
+            yPivot -= 1f/(gridSize - 1);
+        }
+    }*/
 
     public int ActorCurrentMovement()
     {
@@ -80,6 +104,48 @@ public class TerrainMap : MonoBehaviour
             currentTarget = 0;
             SeeTarget();
         }
+    }
+
+    public void ActorStartUsingSkills()
+    {
+        // Reuse it for skills.
+        currentTarget = 0;   
+    }
+
+    public void SwitchSkill(bool right = true)
+    {
+        int skillsAmount = actors[turnIndex].actives.Count;
+        if (right)
+        {
+            if (currentTarget + 1 < skillsAmount)
+            {
+                currentTarget++;
+            }
+            else
+            {
+                currentTarget = 0;
+            }
+        }
+        else
+        {
+            if (currentTarget > 0)
+            {
+                currentTarget--;
+            }
+            else
+            {
+                currentTarget = skillsAmount - 1;
+            }
+        }
+    }
+
+    public TacticActiveSkill ReturnCurrentSkill()
+    {
+        if (actors[turnIndex].actives.Count <= 0)
+        {
+            return null;
+        }
+        return (actors[turnIndex].actives[currentTarget]);
     }
 
     public void SwitchTarget(bool right = true)
@@ -172,6 +238,19 @@ public class TerrainMap : MonoBehaviour
     public void NextTurn()
     {
         turnIndex++;
+        int winners = actorManager.WinningTeam();
+        if (winners >= 0)
+        {
+            if (winners == 0)
+            {
+                GameManager.instance.GainResource(2, 1);
+            }
+            else
+            {
+                // Players lose.
+            }
+            actorManager.ReturnToHub();
+        }
         if (turnIndex >= actors.Count)
         {
             turnIndex = 0;
@@ -219,8 +298,10 @@ public class TerrainMap : MonoBehaviour
     {
         if (actors.Contains(deadActor))
         {
+            actorManager.SubtractTeamCount(deadActor.team);
             actors.Remove(deadActor);
             UpdateMap();
+            GetTargetableTiles(actors[turnIndex].attackRange);
         }
     }
 
@@ -305,6 +386,7 @@ public class TerrainMap : MonoBehaviour
         {
             terrainTiles[i].ResetImage();
             terrainTiles[i].ResetHighlight();
+            terrainTiles[i].ResetAOEHighlight();
             UpdateTile(i, currentTiles[i]);
         }
         // O(n^2)
@@ -319,7 +401,7 @@ public class TerrainMap : MonoBehaviour
 
     private void UpdateActor(int imageIndex, int actorIndex)
     {
-        terrainTiles[imageIndex].UpdateImage(actors[actorIndex].image.sprite);
+        terrainTiles[imageIndex].UpdateImage(actors[actorIndex].spriteRenderer.sprite);
     }
 
     private void UpdateTile(int imageIndex, int tileIndex)
@@ -344,6 +426,7 @@ public class TerrainMap : MonoBehaviour
     }
 
     // O(n^3)?
+    // Don't need to call it again if the center tile is moved around.
     private void HighlightTiles()
     {
         for (int i = 0; i < highlightedTiles.Count; i++)
@@ -358,6 +441,19 @@ public class TerrainMap : MonoBehaviour
     private void HighlightTile(int imageIndex, bool blue = true)
     {
         terrainTiles[imageIndex].Highlight(blue);
+    }
+
+    private void HighlightSkillAOE()
+    {
+        for (int i = 0; i < targetableTiles.Count; i++)
+        {
+            AOEHighlightTile(currentTiles.IndexOf(targetableTiles[i]));
+        }
+    }
+
+    private void AOEHighlightTile(int imageIndex, bool red = true)
+    {
+        terrainTiles[imageIndex].AoeHighlight(red);
     }
 
     private void GetTargetableTiles(int targetRange)
@@ -383,5 +479,35 @@ public class TerrainMap : MonoBehaviour
         UpdateMap();
         HighlightTile(gridSize*gridSize/2, false);
         // Update some info about the target.
+    }
+
+    // Just do this once at the beginning of skill movement to get the highlighted range of the skill.
+    private void SeeSkillRange()
+    {
+        int start = actors[turnIndex].locationIndex;
+        skillCenter = start;
+        int skillRange = actors[turnIndex].actives[currentTarget].range;
+        highlightedTiles = pathFinder.FindTilesInRange(start, skillRange, 1);
+        HighlightTiles();
+    }
+
+    // Move the skill around.
+    public void MoveSkill(int direction)
+    {
+        // Check the distance between the actor and the skill and make sure its within range.
+        // Move it around.
+        // Update the skill span, center the map around the skill center.
+        //SeeSkillSpan();
+    }
+
+    private void SeeSkillSpan()
+    {
+        //  step 0: UpdateCenterTile(skillCenter);
+        //  step 1: UpdateMap();
+        //  step 2: HighlightTiles();
+        // Need to keep track of the skill's center location.
+        // Highlight the center location and tiles around it within the span.
+        // targetableTiles = pathFinder.FindTilesInRange(skillLocation, skillSpan, 1);
+        //  step 3: HighlightSkillAOE();
     }
 }
