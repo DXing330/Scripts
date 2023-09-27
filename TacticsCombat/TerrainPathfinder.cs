@@ -34,15 +34,6 @@ public class TerrainPathfinder : MonoBehaviour
         UpdateOccupiedTiles(newOccupied);
         terrainInfo = newTerrain;
         fullSize = size;
-        moveCostList.Clear();
-        for (int i = 0; i < fullSize * fullSize; i++)
-        {
-            moveCostList.Add(terrainTile.ReturnMoveCost(terrainInfo[i], newOccupied[i]));
-            flyingMoveCosts.Add(terrainTile.ReturnFlyingMoveCost(terrainInfo[i], newOccupied[i]));
-            ridingMoveCosts.Add(terrainTile.ReturnRidingMoveCost(terrainInfo[i], newOccupied[i]));
-            swimmingMoveCosts.Add(terrainTile.ReturnSwimmingMoveCost(terrainInfo[i], newOccupied[i]));
-            scoutingMoveCosts.Add(terrainTile.ReturnScoutingMoveCost(terrainInfo[i], newOccupied[i]));
-        }
     }
 
     private void ResetHeap()
@@ -75,10 +66,18 @@ public class TerrainPathfinder : MonoBehaviour
     {
         occupiedTiles = newOccupied;
         moveCostList.Clear();
+        moveCostList.Clear();
+        flyingMoveCosts.Clear();
+        ridingMoveCosts.Clear();
+        swimmingMoveCosts.Clear();
+        scoutingMoveCosts.Clear();
         for (int i = 0; i < fullSize * fullSize; i++)
         {
             moveCostList.Add(terrainTile.ReturnMoveCost(terrainInfo[i], newOccupied[i]));
             flyingMoveCosts.Add(terrainTile.ReturnFlyingMoveCost(terrainInfo[i], newOccupied[i]));
+            ridingMoveCosts.Add(terrainTile.ReturnRidingMoveCost(terrainInfo[i], newOccupied[i]));
+            swimmingMoveCosts.Add(terrainTile.ReturnSwimmingMoveCost(terrainInfo[i], newOccupied[i]));
+            scoutingMoveCosts.Add(terrainTile.ReturnScoutingMoveCost(terrainInfo[i], newOccupied[i]));
         }
     }
 
@@ -133,6 +132,9 @@ public class TerrainPathfinder : MonoBehaviour
             int moveCost = 0;
             switch (type)
             {
+                case -1:
+                    moveCost = 1;
+                    break;
                 case 0:
                     moveCost = moveCostList[adjacentTiles[i]];
                     break;

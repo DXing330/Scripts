@@ -273,7 +273,7 @@ public class TacticActor : MonoBehaviour
 
     private bool CheckDistance(int index)
     {
-        int distance = terrainMap.ReturnMoveCost(index);
+        int distance = terrainMap.ReturnMoveCost(index, movementType);
         //Debug.Log(index);
         //Debug.Log(distance);
         if (distance <= movement)

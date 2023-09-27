@@ -317,9 +317,28 @@ public class TerrainMap : MonoBehaviour
         actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
-    public int ReturnMoveCost(int index)
+    public int ReturnMoveCost(int index, int moveType = 0)
     {
-        return pathFinder.terrainTile.ReturnMoveCost(terrainInfo[index], occupiedTiles[index]);   
+        int distance = 1;
+        switch (moveType)
+        {
+            case 0:
+                distance = pathFinder.terrainTile.ReturnMoveCost(terrainInfo[index], occupiedTiles[index]);
+                break;
+            case 1:
+                distance = pathFinder.terrainTile.ReturnFlyingMoveCost(terrainInfo[index], occupiedTiles[index]);
+                break;
+            case 2:
+                distance = pathFinder.terrainTile.ReturnRidingMoveCost(terrainInfo[index], occupiedTiles[index]);
+                break;
+            case 3:
+                distance = pathFinder.terrainTile.ReturnSwimmingMoveCost(terrainInfo[index], occupiedTiles[index]);
+                break;
+            case 4:
+                distance = pathFinder.terrainTile.ReturnScoutingMoveCost(terrainInfo[index], occupiedTiles[index]);
+                break;
+        }
+        return distance;   
     }
 
     public int RandomDestination(int currentLocation)
@@ -524,7 +543,7 @@ public class TerrainMap : MonoBehaviour
         targetableTiles.Clear();
         int start = actors[turnIndex].locationIndex;
         // Need a new list so that they don't both point to the same thing and automatically update with each other.
-        highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, targetRange, 1));
+        highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, targetRange, -1));
         // Check if the tiles in attack range have targets.
         for (int i = 0; i < highlightedTiles.Count; i++)
         {
@@ -561,7 +580,7 @@ public class TerrainMap : MonoBehaviour
     {
         int start = actors[turnIndex].locationIndex;
         int skillRange = actors[turnIndex].activeSkill.range;
-        highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, skillRange, 1));
+        highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, skillRange, -1));
         highlightedTiles.Add(start);
     }
 
@@ -600,7 +619,7 @@ public class TerrainMap : MonoBehaviour
         HighlightTiles();
         // Need to keep track of the skill's center location.
         // Highlight the center location and tiles around it within the span.
-        targetableTiles = new List<int>(pathFinder.FindTilesInRange(skillCenter, skillSpan, 1));
+        targetableTiles = new List<int>(pathFinder.FindTilesInRange(skillCenter, skillSpan, -1));
         targetableTiles.Add(skillCenter);
         HighlightSkillAOE();
     }
@@ -611,7 +630,7 @@ public class TerrainMap : MonoBehaviour
         {
             freeView = true;
             // Need something better later.
-            fixedCenter = fullSize*fullSize/2;
+            fixedCenter = actors[turnIndex].locationIndex;
         }
         int previousFixedCenter = fixedCenter;
         switch (direction)
@@ -647,5 +666,6 @@ public class TerrainMap : MonoBehaviour
         }
         UpdateCenterTile(fixedCenter);
         UpdateMap();
+        HighlightTiles();
     }
 }

@@ -147,6 +147,10 @@ public class TerrainTile : MonoBehaviour
     // Maybe make it so fliers can share tiles with other units.
     public int ReturnFlyingMoveCost(int type, int occupied = 0)
     {
+        if (type < 0 || occupied > 0)
+        {
+            return 999;
+        }
         switch (type)
         {
             case 0:
@@ -167,6 +171,10 @@ public class TerrainTile : MonoBehaviour
 
     public int ReturnRidingMoveCost(int type, int occupied = 0)
     {
+        if (type < 0 || occupied > 0)
+        {
+            return 999;
+        }
         switch (type)
         {
             case 0:
@@ -187,6 +195,10 @@ public class TerrainTile : MonoBehaviour
 
     public int ReturnSwimmingMoveCost(int type, int occupied = 0)
     {
+        if (type < 0 || occupied > 0)
+        {
+            return 999;
+        }
         switch (type)
         {
             case 0:
@@ -207,6 +219,10 @@ public class TerrainTile : MonoBehaviour
 
     public int ReturnScoutingMoveCost(int type, int occupied = 0)
     {
+        if (type < 0 || occupied > 0)
+        {
+            return 999;
+        }
         switch (type)
         {
             case 0:
