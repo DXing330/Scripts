@@ -15,6 +15,9 @@ public class TerrainPathfinder : MonoBehaviour
     // Stores the move cost for each tile.
     public List<int> moveCostList;
     public List<int> flyingMoveCosts;
+    public List<int> ridingMoveCosts;
+    public List<int> swimmingMoveCosts;
+    public List<int> scoutingMoveCosts;
     // Occupied tiles adjust move cost.
     public List<int> occupiedTiles;
     private int fullSize;
@@ -36,6 +39,9 @@ public class TerrainPathfinder : MonoBehaviour
         {
             moveCostList.Add(terrainTile.ReturnMoveCost(terrainInfo[i], newOccupied[i]));
             flyingMoveCosts.Add(terrainTile.ReturnFlyingMoveCost(terrainInfo[i], newOccupied[i]));
+            ridingMoveCosts.Add(terrainTile.ReturnRidingMoveCost(terrainInfo[i], newOccupied[i]));
+            swimmingMoveCosts.Add(terrainTile.ReturnSwimmingMoveCost(terrainInfo[i], newOccupied[i]));
+            scoutingMoveCosts.Add(terrainTile.ReturnScoutingMoveCost(terrainInfo[i], newOccupied[i]));
         }
     }
 
@@ -132,6 +138,15 @@ public class TerrainPathfinder : MonoBehaviour
                     break;
                 case 1:
                     moveCost = flyingMoveCosts[adjacentTiles[i]];
+                    break;
+                case 2:
+                    moveCost = ridingMoveCosts[adjacentTiles[i]];
+                    break;
+                case 3:
+                    moveCost = swimmingMoveCosts[adjacentTiles[i]];
+                    break;
+                case 4:
+                    moveCost = scoutingMoveCosts[adjacentTiles[i]];
                     break;
             }
             if (distances[closestTile]+moveCost < distances[adjacentTiles[i]])

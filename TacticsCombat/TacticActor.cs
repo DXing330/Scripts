@@ -11,7 +11,7 @@ public class TacticActor : MonoBehaviour
     public string typeName;
     public int locationIndex;
     public int level;
-    //private int movementType = 0;
+    public int movementType = 0;
     public int health;
     public int baseHealth = 20;
     // Not sure if we need an initiative tracker it might make things more complex.

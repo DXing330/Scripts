@@ -11,6 +11,7 @@ public class ActorManager : MonoBehaviour
     private int teamOneCount = 0;
     private int teamZeroCount = 0;
     public TerrainTile terrainTile;
+    public ActorDataManager actorData;
 
     void Start()
     {
@@ -46,10 +47,29 @@ public class ActorManager : MonoBehaviour
         }
     }
 
+    public void LoadPlayerTeam()
+    {
+        LoadActor(GameManager.instance.player.playerActor, 1);
+        LoadActor(GameManager.instance.familiar.playerActor, 0);
+    }
+
+    public void LoadActor(TacticActor actorToCopy, int location, int team = 0)
+    {
+        TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
+        newActor = actorToCopy;
+        newActor.InitialLocation(location);
+        newActor.team = team;
+        AddTeamCount(team);
+        newActor.SetMap(terrainMap);
+        terrainMap.AddActor(newActor);
+        newActor.QuickStart();
+    }
+
     public void GenerateActor(int location, string name = "Mob", int team = 0)
     {
         TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
         newActor.typeName = name;
+        actorData.LoadActorData(newActor, name);
         newActor.InitialLocation(location);
         UpdateActorSprite(newActor, name);
         newActor.team = team;
@@ -120,6 +140,11 @@ public class ActorManager : MonoBehaviour
         {
             int attackerLocationType = terrainMap.terrainInfo[attacker.locationIndex];
             int attackeePower = attackee.attackDamage*6/terrainTile.TerrainDefenseBonus(attackerLocationType);
+            // Penalty for ranged defenders.
+            if (attacker.attackRange < attackee.attackRange)
+            {
+                attackeePower/=2;
+            }
             attacker.ReceiveDamage(attackeePower);
         }
     }

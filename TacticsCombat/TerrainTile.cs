@@ -165,6 +165,66 @@ public class TerrainTile : MonoBehaviour
         return 1;
     }
 
+    public int ReturnRidingMoveCost(int type, int occupied = 0)
+    {
+        switch (type)
+        {
+            case 0:
+                return 1;
+            case 1:
+                return 3;
+            case 2:
+                return 4;
+            case 3:
+                return 2;
+            case 4:
+                return 4;
+            case 5:
+                return 1;
+        }
+        return 1;
+    }
+
+    public int ReturnSwimmingMoveCost(int type, int occupied = 0)
+    {
+        switch (type)
+        {
+            case 0:
+                return 1;
+            case 1:
+                return 2;
+            case 2:
+                return 4;
+            case 3:
+                return 1;
+            case 4:
+                return 1;
+            case 5:
+                return 4;
+        }
+        return 1;
+    }
+
+    public int ReturnScoutingMoveCost(int type, int occupied = 0)
+    {
+        switch (type)
+        {
+            case 0:
+                return 1;
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 3:
+                return 3;
+            case 4:
+                return 4;
+            case 5:
+                return 1;
+        }
+        return 1;
+    }
+
     public int TerrainDefenseBonus(int type)
     {
         // Divide the bonus by six and multiply it by defense to get the final defender defense.

@@ -7,6 +7,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public PlayerActor player;
+    public PlayerActor familiar;
     private string saveDataPath;
     private string loadedData;
 
@@ -28,15 +30,18 @@ public class GameManager : MonoBehaviour
     }
 
     public int playerLevel = 1;
-    public int familiarLevel = 1;
     public int goldCoins = 0;
     public int manaCrystals = 0;
     public int bloodCrystals = 0;
     public int time = 0;
+    public List<string> playerPassives;
+    public List<string> playerActives;
+    public List<string> familiarPassives;
+    public List<string> familiarActives;
 
     public void Save()
     {
-        string data = playerLevel+"|"+familiarLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time;
+        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time;
         File.WriteAllText(saveDataPath, data);
     }
 
@@ -47,18 +52,16 @@ public class GameManager : MonoBehaviour
             loadedData = File.ReadAllText(saveDataPath);
             string[] dataBlocks = loadedData.Split("|");
             playerLevel = int.Parse(dataBlocks[0]);
-            familiarLevel = int.Parse(dataBlocks[1]);
-            bloodCrystals = int.Parse(dataBlocks[2]);
-            manaCrystals = int.Parse(dataBlocks[3]);
-            goldCoins = int.Parse(dataBlocks[4]);
-            time = int.Parse(dataBlocks[5]);
+            bloodCrystals = int.Parse(dataBlocks[1]);
+            manaCrystals = int.Parse(dataBlocks[2]);
+            goldCoins = int.Parse(dataBlocks[3]);
+            time = int.Parse(dataBlocks[4]);
         }
     }
 
     private void NewGame()
     {
         playerLevel = 1;
-        familiarLevel = 1;
         bloodCrystals = 0;
         manaCrystals = 0;
         goldCoins = 0;

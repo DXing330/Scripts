@@ -1,18 +1,55 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ActorDataManager : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public string configData;
+    public List<string> actorClasses;
+    public List<string> actorMovetypes;
+    public List<string> actorNames;
+    public List<string> actorHealths;
+    public List<string> actorAttacks;
+    public List<string> actorDefenses;
+    public List<string> actorEnergies;
+    public List<string> actorMovements;
+    public List<string> actorActions;
+    public List<string> actorRanges;
+    public List<string> actorSkills;
+
     void Start()
     {
-        
+        string[] configBlocks = configData.Split("#");
+        actorClasses = configBlocks[0].Split("|").ToList();
+        actorMovetypes = configBlocks[1].Split("|").ToList();
+        actorNames = configBlocks[2].Split("|").ToList();
+        actorHealths = configBlocks[3].Split("|").ToList();
+        actorAttacks = configBlocks[4].Split("|").ToList();
+        actorDefenses = configBlocks[5].Split("|").ToList();
+        actorEnergies = configBlocks[6].Split("|").ToList();
+        actorMovements = configBlocks[7].Split("|").ToList();
+        actorActions = configBlocks[8].Split("|").ToList();
+        actorRanges = configBlocks[9].Split("|").ToList();
+        actorSkills = configBlocks[10].Split("|").ToList();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void LoadActorData(TacticActor actor, string newName)
     {
-        
+        int index = actorNames.IndexOf(newName);
+        if (index < 0)
+        {
+            return;
+        }
+        actor.baseHealth = int.Parse(actorHealths[index]);
+        actor.attackDamage = int.Parse(actorAttacks[index]);
+        actor.baseDefense = int.Parse(actorDefenses[index]);
+        actor.baseEnergy = int.Parse(actorEnergies[index]);
+        actor.baseMovement = int.Parse(actorMovements[index]);
+        actor.baseActions = int.Parse(actorActions[index]);
+        actor.attackRange = int.Parse(actorRanges[index]);
+        actor.movementType = int.Parse(actorMovetypes[index]);
+        actor.activeSkillNames = actorSkills[index].Split(",").ToList();
     }
+    
 }

@@ -19,6 +19,7 @@ public class TerrainType : MonoBehaviour
         march = 0,
         fly = 1,
         ride = 2,
-        swim = 3
+        swim = 3,
+        scout = 4
     };
 }

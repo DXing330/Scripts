@@ -7,6 +7,8 @@ public class TerrainMap : MonoBehaviour
 {
     private int turnIndex = 0;
     private int startIndex = 0;
+    private int fixedCenter;
+    private bool freeView = false;
     private int cornerRow;
     private int cornerColumn;
     private int gridSize = 7;
@@ -34,18 +36,18 @@ public class TerrainMap : MonoBehaviour
 
     void Start()
     {
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 30;
         //InitializeTiles();
         GenerateMap(0, fullSize);
         UpdateCenterTile((fullSize * 2) + 2);
         UpdateMap();
         //actorManager.GenerateActor(0, 0, 0);
-        GenerateActor(0, "Player", 0);
-        GenerateActor(1, "BatFamiliar", 0);
+        //GenerateActor(0, "Player", 0);
+        //GenerateActor(1, "BatFamiliar", 0);
         GenerateActor((fullSize * 2) + 2, "Wolf", 1);
         GenerateActor((fullSize * fullSize) - 2, "Bear", 1);
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
-        NextTurn();
+        //NextTurn();
     }
 
     /*private void InitializeTiles()
@@ -99,6 +101,7 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorStopMoving()
     {
+        freeView = false;
         UpdateCenterTile(actors[turnIndex].locationIndex);
         UpdateMap();
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -146,6 +149,7 @@ public class TerrainMap : MonoBehaviour
             {
                 target = ReturnActorOnTile(tileNumber);
                 skillManager.ApplySkillEffect(target, actors[turnIndex].activeSkill, actors[turnIndex]);
+                // Add hitbacks to some skills
             }
         }
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -356,6 +360,7 @@ public class TerrainMap : MonoBehaviour
             actorManager.SubtractTeamCount(deadActor.team);
             actors.Remove(deadActor);
             UpdateMap();
+            turnIndex--;
             GetTargetableTiles(actors[turnIndex].attackRange);
         }
     }
@@ -475,7 +480,7 @@ public class TerrainMap : MonoBehaviour
     {
         int start = actors[turnIndex].locationIndex;
         int movement = actors[turnIndex].movement;
-        highlightedTiles = pathFinder.FindTilesInRange(start, movement);
+        highlightedTiles = pathFinder.FindTilesInRange(start, movement, actors[turnIndex].movementType);
         HighlightTiles();
     }
 
@@ -525,9 +530,22 @@ public class TerrainMap : MonoBehaviour
         {
             if (occupiedTiles[highlightedTiles[i]] > 0)
             {
+                if (SameTeam(actors[turnIndex], ReturnActorOnTile(highlightedTiles[i])))
+                {
+                    continue;
+                }
                 targetableTiles.Add(highlightedTiles[i]);
             }
         }
+    }
+
+    private bool SameTeam(TacticActor actorOne, TacticActor actorTwo)
+    {
+        if (actorOne.team == actorTwo.team)
+        {
+            return true;
+        }
+        return false;
     }
 
     private void SeeTarget()
@@ -585,5 +603,49 @@ public class TerrainMap : MonoBehaviour
         targetableTiles = new List<int>(pathFinder.FindTilesInRange(skillCenter, skillSpan, 1));
         targetableTiles.Add(skillCenter);
         HighlightSkillAOE();
+    }
+
+    public void MoveMap(int direction)
+    {
+        if (!freeView)
+        {
+            freeView = true;
+            // Need something better later.
+            fixedCenter = fullSize*fullSize/2;
+        }
+        int previousFixedCenter = fixedCenter;
+        switch (direction)
+        {
+            case 0:
+                if (previousFixedCenter < fullSize)
+                {
+                    break;
+                }
+                fixedCenter-=fullSize;
+                break;
+            case 1:
+                if (previousFixedCenter%fullSize==fullSize-1)
+                {
+                    break;
+                }
+                fixedCenter++;
+                break;
+            case 2:
+                if (previousFixedCenter>(fullSize*(fullSize-1))-1)
+                {
+                    break;
+                }
+                fixedCenter+=fullSize;
+                break;
+            case 3:
+                if (previousFixedCenter%fullSize==0)
+                {
+                    break;
+                }
+                fixedCenter--;
+                break;
+        }
+        UpdateCenterTile(fixedCenter);
+        UpdateMap();
     }
 }
