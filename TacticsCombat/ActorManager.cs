@@ -8,7 +8,6 @@ public class ActorManager : MonoBehaviour
     public List<Sprite> actorSprites;
     public TacticActor actorPrefab;
     public TerrainMap terrainMap;
-    public List<TacticActiveSkill> allSkills;
     private int teamOneCount = 0;
     private int teamZeroCount = 0;
     public TerrainTile terrainTile;
@@ -109,17 +108,20 @@ public class ActorManager : MonoBehaviour
 
     }
 
-    public void BattleBetweenActors(TacticActor attacker, TacticActor attackee)
+    public void BattleBetweenActors(TacticActor attacker, TacticActor attackee, bool counter = true)
     {
-        int attackerLocationType = terrainMap.terrainInfo[attacker.locationIndex];
         int attackeeLocationType = terrainMap.terrainInfo[attackee.locationIndex];
         // Encourage attacking.
         int attackAdvantage = attacker.attackDamage*6/5;
         // Calculate terrain bonuses at the end then damage each other.
-        int attackeePower = attackee.attackDamage*6/terrainTile.TerrainDefenseBonus(attackerLocationType);
         int attackerPower = attackAdvantage*6/terrainTile.TerrainDefenseBonus(attackeeLocationType);
         attackee.ReceiveDamage(attackerPower);
-        attacker.ReceiveDamage(attackeePower);
+        if (counter)
+        {
+            int attackerLocationType = terrainMap.terrainInfo[attacker.locationIndex];
+            int attackeePower = attackee.attackDamage*6/terrainTile.TerrainDefenseBonus(attackerLocationType);
+            attacker.ReceiveDamage(attackeePower);
+        }
     }
 
     private Sprite SpriteDictionary(string spriteName)

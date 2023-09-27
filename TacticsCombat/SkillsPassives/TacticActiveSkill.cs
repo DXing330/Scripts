@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TacticActiveSkill : MonoBehaviour
 {
+    public SkillDataManager skillData;
     public string skillName;
     // 0 = free range move as you wish, 1 = can only move between possible targets if there are none then the skill fails/can't be used
     public int lockOn = 0;
@@ -37,5 +38,10 @@ public class TacticActiveSkill : MonoBehaviour
                 actor.RegainHealth(power);
                 break;
         }
+    }
+
+    public void LoadSkill(string newName)
+    {
+        skillData.LoadSkillData(this, newName);
     }
 }

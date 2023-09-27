@@ -32,9 +32,12 @@ public class TacticActor : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public List<int> currentPath;
     public TerrainMap terrainMap;
-    public List<TacticBuffsStatuses> buffDebuffs;
-    public List<TacticPassiveSkill> passives;
-    public List<TacticActiveSkill> activeSkills;
+    public List<string> buffDebuffNames;
+    public List<int> buffDebuffsDurations;
+    public List<string> passiveNames;
+    public List<string> activeSkillNames;
+    public TacticActiveSkill activeSkill;
+    //public List<TacticActiveSkill> activeSkills;
 
     void Start()
     {
@@ -109,7 +112,13 @@ public class TacticActor : MonoBehaviour
     public void ActivateSkill(int skillIndex)
     {
         actionsLeft--;
-        LoseEnergy(activeSkills[skillIndex].cost);
+        activeSkill.LoadSkill(activeSkillNames[skillIndex]);
+        LoseEnergy(activeSkill.cost);
+    }
+
+    public void LoadSkill(int skillIndex)
+    {
+        activeSkill.LoadSkill(activeSkillNames[skillIndex]);
     }
 
     public bool CheckActions()
@@ -121,13 +130,14 @@ public class TacticActor : MonoBehaviour
         return true;
     }
 
-    public bool CheckSkillActivatable(TacticActiveSkill usedSkill)
+    public bool CheckSkillActivatable(int skillIndex)
     {
         if (actionsLeft < 1)
         {
             return false;
         }
-        if (energy < usedSkill.cost)
+        LoadSkill(skillIndex);
+        if (energy < activeSkill.cost)
         {
             return false;
         }
@@ -197,14 +207,14 @@ public class TacticActor : MonoBehaviour
         defense = baseDefense;
         energy = Mathf.Min(energy+1, baseEnergy);
         // Deal with buffs/debuffs/passives.
-        for (int i = 0; i < buffDebuffs.Count; i++)
+        for (int i = 0; i < buffDebuffNames.Count; i++)
         {
-            buffDebuffs[i].AffectActor(this);
+            /*buffDebuffs[i].AffectActor(this);
             buffDebuffs[i].duration--;
             if (buffDebuffs[i].duration <= 0)
             {
                 buffDebuffs.RemoveAt(i);
-            }
+            }*/
         }
     }
 

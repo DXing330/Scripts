@@ -41,6 +41,7 @@ public class TerrainMap : MonoBehaviour
         UpdateMap();
         //actorManager.GenerateActor(0, 0, 0);
         GenerateActor(0, "Player", 0);
+        GenerateActor(1, "BatFamiliar", 0);
         GenerateActor((fullSize * 2) + 2, "Wolf", 1);
         GenerateActor((fullSize * fullSize) - 2, "Bear", 1);
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
@@ -122,12 +123,12 @@ public class TerrainMap : MonoBehaviour
 
     public void SelectSkill()
     {
-        if (!actors[turnIndex].CheckSkillActivatable(actors[turnIndex].activeSkills[currentTarget]))
+        if (!actors[turnIndex].CheckSkillActivatable(currentTarget))
         {
             return;
         }
         skillCenter = actors[turnIndex].locationIndex;
-        skillSpan = actors[turnIndex].activeSkills[currentTarget].span;
+        skillSpan = actors[turnIndex].activeSkill.span;
         SeeSkillRange();
         SeeSkillSpan();
     }
@@ -144,14 +145,15 @@ public class TerrainMap : MonoBehaviour
             if (occupiedTiles[tileNumber] > 0)
             {
                 target = ReturnActorOnTile(tileNumber);
-                skillManager.ApplySkillEffect(target, actors[turnIndex].activeSkills[currentTarget], actors[turnIndex]);
+                skillManager.ApplySkillEffect(target, actors[turnIndex].activeSkill, actors[turnIndex]);
             }
         }
+        actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
     public void SwitchSkill(bool right = true)
     {
-        int skillsAmount = actors[turnIndex].activeSkills.Count;
+        int skillsAmount = actors[turnIndex].activeSkillNames.Count;
         if (right)
         {
             if (currentTarget + 1 < skillsAmount)
@@ -178,11 +180,12 @@ public class TerrainMap : MonoBehaviour
 
     public TacticActiveSkill ReturnCurrentSkill()
     {
-        if (actors[turnIndex].activeSkills.Count <= 0)
+        if (actors[turnIndex].activeSkillNames.Count <= 0)
         {
             return null;
         }
-        return (actors[turnIndex].activeSkills[currentTarget]);
+        actors[turnIndex].LoadSkill(currentTarget);
+        return actors[turnIndex].activeSkill;
     }
 
     public void SwitchTarget(bool right = true)
@@ -248,8 +251,17 @@ public class TerrainMap : MonoBehaviour
             return;
         }
         actors[turnIndex].actionsLeft--;
-        actorManager.BattleBetweenActors(actors[turnIndex], ReturnCurrentTarget());
+        // Find if they can counter attack.
+        actorManager.BattleBetweenActors(actors[turnIndex], ReturnCurrentTarget(), Counterable(actors[turnIndex].locationIndex, ReturnCurrentTarget()));
         actorInfo.UpdateInfo(actors[turnIndex]);
+    }
+
+    private bool Counterable(int attackerLocation, TacticActor defender)
+    {
+        int defenderLocation = defender.locationIndex;
+        int range = defender.attackRange;
+        int distance = pathFinder.CalculateDistance(defenderLocation, attackerLocation);
+        return (distance <= range);
     }
 
     public void MoveActor(int direction)
@@ -530,7 +542,7 @@ public class TerrainMap : MonoBehaviour
     private void SeeSkillRange()
     {
         int start = actors[turnIndex].locationIndex;
-        int skillRange = actors[turnIndex].activeSkills[currentTarget].range;
+        int skillRange = actors[turnIndex].activeSkill.range;
         highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, skillRange, 1));
         highlightedTiles.Add(start);
     }
