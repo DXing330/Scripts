@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TerrainTile : MonoBehaviour
 {
     public int cType;
+    //plains=0,forest=1,mountain=2,water=3,deepWater=4,desert=5
     public RectTransform rectTransform;
     public Image tileImage;
     public Image actorImage;
@@ -54,11 +55,12 @@ public class TerrainTile : MonoBehaviour
     public void Highlight(bool cyan = true)
     {
         Color tempColor = Color.cyan;
+        tempColor.a = 0.66f;
         if (!cyan)
         {
             tempColor = Color.red;
+            tempColor.a = 0.5f;
         }
-        tempColor.a = 0.66f;
         highlight.color = tempColor;
     }
 
@@ -108,6 +110,10 @@ public class TerrainTile : MonoBehaviour
                 tempColor = Color.blue;
                 break;
             case 4:
+                tempColor = Color.blue;
+                tempColor.a = 0.8f;
+                break;
+            case 5:
                 tempColor = Color.yellow;
                 break;
         }
@@ -129,8 +135,10 @@ public class TerrainTile : MonoBehaviour
             case 2:
                 return 3;
             case 3:
-                return 3;
+                return 2;
             case 4:
+                return 4;
+            case 5:
                 return 1;
         }
         return 999;
@@ -151,7 +159,30 @@ public class TerrainTile : MonoBehaviour
                 return 1;
             case 4:
                 return 1;
+            case 5:
+                return 1;
         }
         return 1;
+    }
+
+    public int TerrainDefenseBonus(int type)
+    {
+        // Divide the bonus by six and multiply it by defense to get the final defender defense.
+        switch (type)
+        {
+            case 0:
+                return 6;
+            case 1:
+                return 7;
+            case 2:
+                return 8;
+            case 3:
+                return 6;
+            case 4:
+                return 6;
+            case 5:
+                return 6;
+        }
+        return 6;
     }
 }

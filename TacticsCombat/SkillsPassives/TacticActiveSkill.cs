@@ -11,7 +11,7 @@ public class TacticActiveSkill : MonoBehaviour
     public int range;
     // 0/1/2 implies total squares covered =
     // 1/5/13/etc. always diamond shaped
-    public int area = 0;
+    public int span = 0;
     // Ally/enemy/all/etc.
     public int target;
     // Energy cost.
@@ -20,10 +20,14 @@ public class TacticActiveSkill : MonoBehaviour
     public string effect;
     public string effectSpecifics;
     // Based on caster?
-    public int power;
+    public int basePower;
 
-    public void AffectActor(TacticActor actor)
+    public void AffectActor(TacticActor actor, int power = 0)
     {
+        if (power < basePower)
+        {
+            power = basePower;
+        }
         switch (effect)
         {
             case "Damage":

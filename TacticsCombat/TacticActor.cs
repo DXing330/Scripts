@@ -8,7 +8,7 @@ public class TacticActor : MonoBehaviour
     // 0 is player's team, other teams are NPCs.
     public int team = 0;
     // Race/class/etc.
-    public int type = 0;
+    public string typeName;
     public int locationIndex;
     public int level;
     //private int movementType = 0;
@@ -17,10 +17,10 @@ public class TacticActor : MonoBehaviour
     // Not sure if we need an initiative tracker it might make things more complex.
     //private int initiative = 0;
     public int baseEnergy = 5;
-    private int energy;
+    public int energy;
     public int baseMovement = 3;
     public int baseActions = 1;
-    private int actionsLeft;
+    public int actionsLeft;
     public int attackRange = 1;
     public int baseAttack = 10;
     public int attackDamage;
@@ -34,9 +34,16 @@ public class TacticActor : MonoBehaviour
     public TerrainMap terrainMap;
     public List<TacticBuffsStatuses> buffDebuffs;
     public List<TacticPassiveSkill> passives;
-    public List<TacticActiveSkill> actives;
+    public List<TacticActiveSkill> activeSkills;
 
     void Start()
+    {
+        health = baseHealth;
+        movement = baseMovement;
+    }
+
+    // Since the text is loading before start is called.
+    public void QuickStart()
     {
         health = baseHealth;
         movement = baseMovement;
@@ -87,6 +94,44 @@ public class TacticActor : MonoBehaviour
         {
             health = baseHealth;
         }
+    }
+
+    public void LoseEnergy(int amount)
+    {
+        energy -= Mathf.Min(energy, amount);
+    }
+
+    public void GainEnergy(int amount)
+    {
+        energy += amount;
+    }
+
+    public void ActivateSkill(int skillIndex)
+    {
+        actionsLeft--;
+        LoseEnergy(activeSkills[skillIndex].cost);
+    }
+
+    public bool CheckActions()
+    {
+        if (actionsLeft < 1)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public bool CheckSkillActivatable(TacticActiveSkill usedSkill)
+    {
+        if (actionsLeft < 1)
+        {
+            return false;
+        }
+        if (energy < usedSkill.cost)
+        {
+            return false;
+        }
+        return true;
     }
 
     // Player attack.

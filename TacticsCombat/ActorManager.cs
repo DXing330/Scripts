@@ -11,6 +11,15 @@ public class ActorManager : MonoBehaviour
     public List<TacticActiveSkill> allSkills;
     private int teamOneCount = 0;
     private int teamZeroCount = 0;
+    public TerrainTile terrainTile;
+
+    void Start()
+    {
+        /*for (int i = 0; i < actorSprites.Count; i++)
+        {
+            Debug.Log(actorSprites[i].name);
+        }*/
+    }
 
     public void AddTeamCount(int team)
     {
@@ -38,15 +47,17 @@ public class ActorManager : MonoBehaviour
         }
     }
 
-    public void GenerateActor(int location, int type = 0, int team = 0)
+    public void GenerateActor(int location, string name = "Mob", int team = 0)
     {
         TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
+        newActor.typeName = name;
         newActor.InitialLocation(location);
-        UpdateActorSprite(newActor, type);
+        UpdateActorSprite(newActor, name);
         newActor.team = team;
         AddTeamCount(team);
         newActor.SetMap(terrainMap);
         terrainMap.AddActor(newActor);
+        newActor.QuickStart();
     }
 
     public TacticActor ReturnCurrentTarget()
@@ -54,9 +65,18 @@ public class ActorManager : MonoBehaviour
         return terrainMap.ReturnCurrentTarget();
     }
 
-    private void UpdateActorSprite(TacticActor actor, int spriteIndex)
+    private void UpdateActorSprite(TacticActor actor, string spriteName)
     {
-        actor.SetSprite(actorSprites[spriteIndex]);
+        // Need the sprite dictionary later.
+        Sprite tempSprite = SpriteDictionary(spriteName);
+        if (tempSprite != null)
+        {
+            actor.SetSprite(tempSprite);
+        }
+        else
+        {
+            actor.SetSprite(actorSprites[0]);
+        }
     }
 
     public void ReturnToHub()
@@ -79,7 +99,6 @@ public class ActorManager : MonoBehaviour
 
     public void SetActorStats(TacticActor tacticActor)
     {
-        int type = tacticActor.type;
         // health|move|attack|defense|energy|actions
         // excel time.
     }
@@ -88,5 +107,30 @@ public class ActorManager : MonoBehaviour
     public void AddBuffDebuff(TacticActor tacticActor, string name)
     {
 
+    }
+
+    public void BattleBetweenActors(TacticActor attacker, TacticActor attackee)
+    {
+        int attackerLocationType = terrainMap.terrainInfo[attacker.locationIndex];
+        int attackeeLocationType = terrainMap.terrainInfo[attackee.locationIndex];
+        // Encourage attacking.
+        int attackAdvantage = attacker.attackDamage*6/5;
+        // Calculate terrain bonuses at the end then damage each other.
+        int attackeePower = attackee.attackDamage*6/terrainTile.TerrainDefenseBonus(attackerLocationType);
+        int attackerPower = attackAdvantage*6/terrainTile.TerrainDefenseBonus(attackeeLocationType);
+        attackee.ReceiveDamage(attackerPower);
+        attacker.ReceiveDamage(attackeePower);
+    }
+
+    private Sprite SpriteDictionary(string spriteName)
+    {
+        for (int i = 0; i < actorSprites.Count; i++)
+        {
+            if (actorSprites[i].name == spriteName)
+            {
+                return actorSprites[i];
+            }
+        }
+        return null;
     }
 }

@@ -10,7 +10,8 @@ public class TerrainType : MonoBehaviour
         forest = 1,
         mountain = 2,
         water = 3,
-        desert = 4
+        deepWater = 4,
+        desert = 5
     };
 
     enum moveTypes

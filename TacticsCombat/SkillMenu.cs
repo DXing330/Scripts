@@ -32,10 +32,10 @@ public class SkillMenu : MonoBehaviour
     private void UpdateSkillInfo()
     {
         string skillDetailsText = "";
-        skillName.text = activeSkill.name;
+        skillName.text = activeSkill.skillName;
         skillDetailsText += "Effect: "+activeSkill.effect;
         skillDetailsText += ", Range: "+activeSkill.range;
-        skillDetailsText += ", Span: "+activeSkill.area;
+        skillDetailsText += ", Span: "+activeSkill.span;
         skillDetailsText += ", Cost: "+activeSkill.cost;
         skillDetails.text = skillDetailsText;
     }

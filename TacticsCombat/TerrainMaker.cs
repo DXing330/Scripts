@@ -75,9 +75,9 @@ public class TerrainMaker : MonoBehaviour
             case 3:
                 return 0;
             case 4:
-                return 0;
-            case 5:
                 return 3;
+            case 5:
+                return 4;
         }
         return 1;
     }
@@ -96,9 +96,9 @@ public class TerrainMaker : MonoBehaviour
             case 3:
                 return 1;
             case 4:
-                return 0;
-            case 5:
                 return 3;
+            case 5:
+                return 4;
         }
         return 2;
     }
@@ -113,9 +113,9 @@ public class TerrainMaker : MonoBehaviour
             case 1:
                 return 3;
             case 2:
-                return 3;
+                return 4;
             case 3:
-                return 3;
+                return 4;
             case 4:
                 return 0;
             case 5:
@@ -130,13 +130,13 @@ public class TerrainMaker : MonoBehaviour
         switch (rng)
         {
             case 0:
-                return 4;
+                return 5;
             case 1:
-                return 4;
+                return 5;
             case 2:
-                return 4;
+                return 5;
             case 3:
-                return 4;
+                return 5;
             case 4:
                 return 0;
             case 5:
