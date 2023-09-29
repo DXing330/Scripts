@@ -15,10 +15,16 @@ public class ActionManager : MonoBehaviour
     public GameObject moveButton;
     public GameObject attackButton;
     public GameObject skillButton;
+    public GameObject viewButton;
+    public GameObject viewMenu;
     public int state = 0;
 
     public void ChangeState(int newState)
     {
+        if (!terrainMap.battleStarted)
+        {
+            return;
+        }
         state = newState;
         UpdateState();
         AdjustButtons();
@@ -26,32 +32,21 @@ public class ActionManager : MonoBehaviour
 
     private void AdjustButtons()
     {
-        switch (state)
+        if (state == 0)
         {
-            case 0:
-                attackButton.SetActive(true);
-                moveButton.SetActive(true);
-                skillButton.SetActive(true);
-                returnButton.SetActive(false);
-                break;
-            case 1:
-                attackButton.SetActive(false);
-                moveButton.SetActive(false);
-                skillButton.SetActive(false);
-                returnButton.SetActive(true);
-                break;
-            case 2:
-                attackButton.SetActive(false);
-                moveButton.SetActive(false);
-                skillButton.SetActive(false);
-                returnButton.SetActive(true);
-                break;
-            case 3:
-                attackButton.SetActive(false);
-                moveButton.SetActive(false);
-                skillButton.SetActive(false);
-                returnButton.SetActive(true);
-                break;
+            viewButton.SetActive(true);
+            attackButton.SetActive(true);
+            moveButton.SetActive(true);
+            skillButton.SetActive(true);
+            returnButton.SetActive(false);
+        }
+        else
+        {
+            viewButton.SetActive(false);
+            attackButton.SetActive(false);
+            moveButton.SetActive(false);
+            skillButton.SetActive(false);
+            returnButton.SetActive(true);
         }
     }
 
@@ -64,12 +59,14 @@ public class ActionManager : MonoBehaviour
                 DisableMovement();
                 DisableAttack();
                 DisableSkills();
+                DisableViewing();
                 break;
             case 1:
                 terrainMap.ActorStartMoving();
                 EnableMovement();
                 DisableAttack();
                 DisableSkills();
+                DisableViewing();
                 break;
             case 2:
                 terrainMap.ActorStartAttacking();
@@ -77,6 +74,7 @@ public class ActionManager : MonoBehaviour
                 DisableMovement();
                 EnableAttack();
                 DisableSkills();
+                DisableViewing();
                 break;
             case 3:
                 terrainMap.ActorStartUsingSkills();
@@ -84,6 +82,14 @@ public class ActionManager : MonoBehaviour
                 DisableMovement();
                 DisableAttack();
                 EnableSkills();
+                DisableViewing();
+                break;
+            case 4:
+                terrainMap.StartViewingActorInfo();
+                DisableMovement();
+                DisableAttack();
+                DisableSkills();
+                EnableViewing();
                 break;
         }
     }
@@ -117,5 +123,15 @@ public class ActionManager : MonoBehaviour
     private void DisableSkills()
     {
         skillSelect.SetActive(false);
+    }
+
+    private void EnableViewing()
+    {
+        viewMenu.SetActive(true);
+    }
+
+    private void DisableViewing()
+    {
+        viewMenu.SetActive(false);
     }
 }

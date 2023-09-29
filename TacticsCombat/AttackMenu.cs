@@ -11,7 +11,7 @@ public class AttackMenu : MonoBehaviour
     public TacticActor target;
     public TerrainMap terrainMap;
 
-    public void UpdateTarget(TacticActor newTarget)
+    public void UpdateTarget(TacticActor newTarget, bool name = false)
     {
         target = newTarget;
         if (target == null)
@@ -19,7 +19,7 @@ public class AttackMenu : MonoBehaviour
             ResetTargetInfo();
             return;
         }
-        UpdateTargetInfo();
+        UpdateTargetInfo(name);
     }
 
     private void ResetTargetInfo()
@@ -31,7 +31,7 @@ public class AttackMenu : MonoBehaviour
         targetHealth.text = "";
     }
 
-    private void UpdateTargetInfo()
+    private void UpdateTargetInfo(bool name = false)
     {
         if (target.health <= 0)
         {
@@ -43,6 +43,11 @@ public class AttackMenu : MonoBehaviour
         targetSprite.color = tempColor;
         targetSprite.sprite = target.spriteRenderer.sprite;
         targetHealth.text = target.health.ToString();
+        if (name)
+        {
+            //targetHealth.text = target.typeName;
+            targetHealth.text = "";
+        }
     }
 
     public void AttackTarget()
@@ -59,5 +64,21 @@ public class AttackMenu : MonoBehaviour
     {
         terrainMap.SwitchTarget(right);
         UpdateTarget(terrainMap.ReturnCurrentTarget());
+    }
+
+    public void SwitchTargetForViewing(bool right = true)
+    {
+        terrainMap.SwitchViewedActor(right);
+        UpdateTarget(terrainMap.ReturnCurrentViewed(), true);
+    }
+
+    public void StartViewing()
+    {
+        if (!terrainMap.battleStarted)
+        {
+            return;
+        }
+        terrainMap.StartViewingActorInfo();
+        UpdateTarget(terrainMap.ReturnCurrentViewed(), true);
     }
 }

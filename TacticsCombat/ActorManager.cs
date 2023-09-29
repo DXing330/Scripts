@@ -53,10 +53,15 @@ public class ActorManager : MonoBehaviour
         LoadActor(GameManager.instance.familiar.playerActor, 0);
     }
 
+    public void LoadEnemyTeam()
+    {
+        
+    }
+
     public void LoadActor(TacticActor actorToCopy, int location, int team = 0)
     {
         TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
-        newActor = actorToCopy;
+        newActor.CopyStats(actorToCopy);
         newActor.InitialLocation(location);
         newActor.team = team;
         AddTeamCount(team);
@@ -77,11 +82,6 @@ public class ActorManager : MonoBehaviour
         newActor.SetMap(terrainMap);
         terrainMap.AddActor(newActor);
         newActor.QuickStart();
-    }
-
-    public TacticActor ReturnCurrentTarget()
-    {
-        return terrainMap.ReturnCurrentTarget();
     }
 
     private void UpdateActorSprite(TacticActor actor, string spriteName)
@@ -128,11 +128,16 @@ public class ActorManager : MonoBehaviour
 
     }
 
-    public void BattleBetweenActors(TacticActor attacker, TacticActor attackee, bool counter = true)
+    public bool BattleBetweenActors(TacticActor attacker, TacticActor attackee, bool counter = true, bool flanked = false)
     {
         int attackeeLocationType = terrainMap.terrainInfo[attackee.locationIndex];
         // Encourage attacking.
         int attackAdvantage = attacker.attackDamage*6/5;
+        // Check for flanking/ally support.
+        if (flanked)
+        {
+            attackAdvantage = attackAdvantage*6/5;
+        }
         // Calculate terrain bonuses at the end then damage each other.
         int attackerPower = attackAdvantage*6/terrainTile.TerrainDefenseBonus(attackeeLocationType);
         attackee.ReceiveDamage(attackerPower);
@@ -145,8 +150,15 @@ public class ActorManager : MonoBehaviour
             {
                 attackeePower/=2;
             }
+            int attackerHealth = attacker.health;
+            int attackerDefense = attacker.defense;
             attacker.ReceiveDamage(attackeePower);
+            if (attackeePower - attackerDefense >= attackerHealth || attackerHealth <= 1)
+            {
+                return true;
+            }
         }
+        return false;
     }
 
     private Sprite SpriteDictionary(string spriteName)

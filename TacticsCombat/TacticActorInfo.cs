@@ -18,8 +18,8 @@ public class TacticActorInfo : MonoBehaviour
         attack.text = "";
         defense.text = "";
         energy.text = "";
-        movement.text = "";
-        actions.text = "";
+        //movement.text = "";
+        //actions.text = "";
     }
 
     public void UpdateInfo(TacticActor actor)
@@ -31,10 +31,10 @@ public class TacticActorInfo : MonoBehaviour
             return;
         }
         health.text = actor.health.ToString();
-        attack.text = actor.attackDamage.ToString();
-        defense.text = actor.defense.ToString();
+        attack.text = actor.baseAttack.ToString();
+        defense.text = actor.baseDefense.ToString();
         energy.text = actor.energy.ToString();
-        movement.text = actor.movement.ToString();
-        actions.text = actor.actionsLeft.ToString();
+        //movement.text = actor.movement.ToString();
+        //actions.text = actor.actionsLeft.ToString();
     }
 }

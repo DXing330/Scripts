@@ -8,7 +8,14 @@ public class SkillMenu : MonoBehaviour
     public Text skillName;
     public Text skillDetails;
     public TacticActiveSkill activeSkill;
+    public AttackMenu lockOnMenu;
     public TerrainMap terrainMap;
+    private Animator animator;
+
+    void Start()
+    {
+        animator = GetComponent<Animator>();
+    }
 
     private void ResetSkillInfo()
     {
@@ -44,5 +51,22 @@ public class SkillMenu : MonoBehaviour
     {
         terrainMap.SwitchSkill(right);
         UpdateSkill(terrainMap.ReturnCurrentSkill());
+    }
+
+    public void UseSkill()
+    {
+        if (!terrainMap.CheckSkillActivatable())
+        {
+            return;
+        }
+        if (activeSkill.lockOn == 0)
+        {
+            animator.SetTrigger("Use");
+        }
+        else if (activeSkill.lockOn == 1)
+        {
+            animator.SetTrigger("Lock");
+            lockOnMenu.UpdateTarget(terrainMap.ReturnCurrentTarget());
+        }
     }
 }

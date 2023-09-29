@@ -14,7 +14,7 @@ public class TacticActiveSkill : MonoBehaviour
     // 1/5/13/etc. always diamond shaped
     public int span = 0;
     // Ally/enemy/all/etc.
-    public int target;
+    public int skillTarget;
     // Energy cost.
     public int cost;
     // Damage/heal/status/buff/etc.
@@ -40,8 +40,8 @@ public class TacticActiveSkill : MonoBehaviour
         }
     }
 
-    public void LoadSkill(string newName)
+    public void LoadData(string newName)
     {
-        skillData.LoadSkillData(this, newName);
+        skillData.LoadDataForSkill(this, newName);
     }
 }

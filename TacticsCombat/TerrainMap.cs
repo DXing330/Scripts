@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class TerrainMap : MonoBehaviour
 {
+    public bool battleStarted = false;
     private int turnIndex = 0;
     private int startIndex = 0;
     private int fixedCenter;
@@ -34,6 +35,11 @@ public class TerrainMap : MonoBehaviour
     public SkillEffectManager skillManager;
     public TacticActorInfo actorInfo;
 
+    public void StartBattle()
+    {
+        battleStarted = true;
+    }
+
     void Start()
     {
         Application.targetFrameRate = 30;
@@ -41,13 +47,10 @@ public class TerrainMap : MonoBehaviour
         GenerateMap(0, fullSize);
         UpdateCenterTile((fullSize * 2) + 2);
         UpdateMap();
-        //actorManager.GenerateActor(0, 0, 0);
-        //GenerateActor(0, "Player", 0);
-        //GenerateActor(1, "BatFamiliar", 0);
-        GenerateActor((fullSize * 2) + 2, "Wolf", 1);
-        GenerateActor((fullSize * fullSize) - 2, "Bear", 1);
+        int rngLocation = Random.Range(fullSize*fullSize/2, fullSize*fullSize-1);
+        GenerateActor(rngLocation/2, "Wolf", 1);
+        GenerateActor(rngLocation, "Wolf", 1);
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
-        //NextTurn();
     }
 
     /*private void InitializeTiles()
@@ -77,10 +80,10 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorsTurn()
     {
-        if (actors[turnIndex] == null)
+        if (actors[turnIndex].health <= 0)
         {
-            actors.RemoveAt(turnIndex);
             NextTurn();
+            return;
         }
         moveManager.UpdateMoveMenu();
         pathFinder.UpdateOccupiedTiles(occupiedTiles);
@@ -94,6 +97,21 @@ public class TerrainMap : MonoBehaviour
         actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
+    public void DelayTurn()
+    {
+        if (turnIndex == actors.Count - 1)
+        {
+            return;
+        }
+        TacticActor tempActor = actors[turnIndex];
+        tempActor.delayed = true;
+        actors.RemoveAt(turnIndex);
+        actors.Add(tempActor);
+        turnIndex--;
+        NextTurn();
+        ActorStopMoving();
+    }
+
     public void ActorStartMoving()
     {
         GetReachableTiles();
@@ -102,6 +120,7 @@ public class TerrainMap : MonoBehaviour
     public void ActorStopMoving()
     {
         freeView = false;
+        if (turnIndex < 0){turnIndex++;}
         UpdateCenterTile(actors[turnIndex].locationIndex);
         UpdateMap();
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -126,20 +145,56 @@ public class TerrainMap : MonoBehaviour
 
     public void SelectSkill()
     {
-        if (!actors[turnIndex].CheckSkillActivatable(currentTarget))
+        if (!CheckSkillActivatable())
         {
             return;
         }
-        skillCenter = actors[turnIndex].locationIndex;
-        skillSpan = actors[turnIndex].activeSkill.span;
-        SeeSkillRange();
-        SeeSkillSpan();
+        actors[turnIndex].LoadSkill(currentTarget);
+        if (actors[turnIndex].activeSkill.lockOn == 0)
+        {
+            skillCenter = actors[turnIndex].locationIndex;
+            skillSpan = actors[turnIndex].activeSkill.span;
+            SeeSkillRange();
+            SeeSkillSpan();
+        }
+        else
+        {
+            skillCenter = actors[turnIndex].locationIndex;
+            SeeSkillRange();
+            GetTargetableTiles(actors[turnIndex].activeSkill.range, actors[turnIndex].activeSkill.skillTarget);
+            SeeTarget();
+        }
+    }
+
+    public bool CheckSkillActivatable()
+    {
+        return actors[turnIndex].CheckSkillActivatable(currentTarget);
     }
 
     public void ActivateSkill()
     {
+        if (actors[turnIndex].activeSkill.lockOn == 0)
+        {
+            NonLockOnSkillActivate();
+        }
+        else
+        {
+            LockOnSkillActivate();
+        }
+    }
+
+    private void LockOnSkillActivate()
+    {
         ActorStopMoving();
-        actors[turnIndex].ActivateSkill(currentTarget);
+        actors[turnIndex].ActivateSkill();
+        skillManager.ApplySkillEffect(ReturnCurrentTarget(), actors[turnIndex].activeSkill, actors[turnIndex]);
+        actorInfo.UpdateInfo(actors[turnIndex]);
+    }
+
+    private void NonLockOnSkillActivate()
+    {
+        ActorStopMoving();
+        actors[turnIndex].ActivateSkill();
         int tileNumber = 0;
         TacticActor target = null;
         for (int i = 0; i < targetableTiles.Count; i++)
@@ -233,9 +288,14 @@ public class TerrainMap : MonoBehaviour
         return ReturnActorOnTile(targetLocation);
     }
 
+    public TacticActor ReturnCurrentViewed()
+    {
+        return actors[currentTarget];
+    }
+
     public TacticActor ReturnActorOnTile(int tileNumber)
     {
-        if (tileNumber < 0)
+        if (tileNumber < 0 || occupiedTiles[tileNumber] == 0)
         {
             return null;
         }
@@ -254,10 +314,82 @@ public class TerrainMap : MonoBehaviour
         {
             return;
         }
+        // If they die while attacking, automatically end their turn.
         actors[turnIndex].actionsLeft--;
         // Find if they can counter attack.
-        actorManager.BattleBetweenActors(actors[turnIndex], ReturnCurrentTarget(), Counterable(actors[turnIndex].locationIndex, ReturnCurrentTarget()));
+        bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], ReturnCurrentTarget(), Counterable(actors[turnIndex].locationIndex, ReturnCurrentTarget()), DetermineFlanking(ReturnCurrentTarget()));
+        if (attackerDied)
+        {
+            NextTurn();
+            ActorStopMoving();
+        }
         actorInfo.UpdateInfo(actors[turnIndex]);
+    }
+
+    private bool DetermineFlanking(TacticActor attackTarget)
+    {
+        int adjacentEnemies = 0;
+        int location = attackTarget.locationIndex;
+        pathFinder.AdjacentFromIndex(location);
+        for (int i = 0; i < pathFinder.adjacentTiles.Count; i++)
+        {
+            TacticActor tempActor = ReturnActorOnTile(pathFinder.adjacentTiles[i]);
+            if (tempActor != null && tempActor.team != attackTarget.team)
+            {
+                adjacentEnemies++;
+            }
+        }
+        if (adjacentEnemies >= 2)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public void NPCActorAttack(TacticActor attackTarget)
+    {
+        if (actors[turnIndex].actionsLeft <= 0)
+        {
+            return;
+        }
+        //actors[turnIndex].actionsLeft--; // handled in the NPC part
+        actorManager.BattleBetweenActors(actors[turnIndex], attackTarget, Counterable(actors[turnIndex].locationIndex, attackTarget), DetermineFlanking(attackTarget));
+    }
+
+    public TacticActor FindNearestEnemy()
+    {
+        return pathFinder.FindNearestEnemy(actors[turnIndex], actors);
+    }
+
+    public void ViewActorInfo()
+    {
+        actorInfo.UpdateInfo(actors[currentTarget]);
+        UpdateCenterTile(actors[currentTarget].locationIndex);
+        UpdateMap();
+        ViewReachableTiles();
+    }
+
+    public void StartViewingActorInfo()
+    {
+        currentTarget = turnIndex;
+        ViewActorInfo();
+    }
+
+    public void SwitchViewedActor(bool right)
+    {
+        if (right)
+        {
+            currentTarget = (currentTarget+1)%actors.Count;
+        }
+        else
+        {
+            currentTarget--;
+            if (currentTarget < 0)
+            {
+                currentTarget = actors.Count - 1;
+            }
+        }
+        ViewActorInfo();
     }
 
     private bool Counterable(int attackerLocation, TacticActor defender)
@@ -295,6 +427,10 @@ public class TerrainMap : MonoBehaviour
 
     public void NextTurn()
     {
+        if (!battleStarted)
+        {
+            return;
+        }
         turnIndex++;
         int winners = actorManager.WinningTeam();
         if (winners >= 0)
@@ -308,9 +444,11 @@ public class TerrainMap : MonoBehaviour
                 // Players lose.
             }
             actorManager.ReturnToHub();
+            return;
         }
         if (turnIndex >= actors.Count)
         {
+            RemoveActors();
             turnIndex = 0;
         }
         ActorsTurn();
@@ -372,15 +510,16 @@ public class TerrainMap : MonoBehaviour
         UpdateMap();
     }
 
-    public void RemoveActor(TacticActor deadActor)
+    public void RemoveActors()
     {
-        if (actors.Contains(deadActor))
+        for (int i = 0; i < actors.Count; i++)
         {
-            actorManager.SubtractTeamCount(deadActor.team);
-            actors.Remove(deadActor);
+            if (actors[i].health <= 0)
+            {
+                actorManager.SubtractTeamCount(actors[i].team);
+                actors.RemoveAt(i);
+            }
             UpdateMap();
-            turnIndex--;
-            GetTargetableTiles(actors[turnIndex].attackRange);
         }
     }
 
@@ -452,6 +591,11 @@ public class TerrainMap : MonoBehaviour
         occupiedTiles = new List<int>(allUnoccupied);
         for (int i = 0; i < actors.Count; i++)
         {
+            // Don't count the dead.
+            if (actors[i].health <= 0)
+            {
+                continue;
+            }
             occupiedTiles[actors[i].locationIndex] = i+1;
         }
     }
@@ -459,6 +603,7 @@ public class TerrainMap : MonoBehaviour
     private void UpdateMap()
     {
         UpdateOccupiedTiles();
+        pathFinder.UpdateOccupiedTiles(occupiedTiles);
         // O(n)
         for (int i = 0; i < terrainTiles.Count; i++)
         {
@@ -470,6 +615,10 @@ public class TerrainMap : MonoBehaviour
         // O(n^2)
         for (int i = 0; i < actors.Count; i++)
         {
+            if (actors[i].health <= 0)
+            {
+                continue;
+            }
             if (currentTiles.Contains(actors[i].locationIndex))
             {
                 UpdateActor(currentTiles.IndexOf(actors[i].locationIndex), i);
@@ -503,8 +652,14 @@ public class TerrainMap : MonoBehaviour
         HighlightTiles();
     }
 
-    // O(n^3)?
-    // Don't need to call it again if the center tile is moved around.
+    private void ViewReachableTiles()
+    {
+        int start = actors[currentTarget].locationIndex;
+        int movement = actors[currentTarget].baseMovement;
+        highlightedTiles = pathFinder.FindTilesInRange(start, movement, actors[currentTarget].movementType);
+        HighlightTiles();
+    }
+
     private void HighlightTiles(bool cyan = true)
     {
         int index = -1;
@@ -536,7 +691,8 @@ public class TerrainMap : MonoBehaviour
         terrainTiles[imageIndex].AoeHighlight(red);
     }
 
-    private void GetTargetableTiles(int targetRange)
+    // 0 for enemies, 1 for allies, 2 for everyone.
+    private void GetTargetableTiles(int targetRange, int targetsType = 0)
     {
         currentTarget = 0;
         UpdateOccupiedTiles();
@@ -544,12 +700,20 @@ public class TerrainMap : MonoBehaviour
         int start = actors[turnIndex].locationIndex;
         // Need a new list so that they don't both point to the same thing and automatically update with each other.
         highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, targetRange, -1));
+        if (targetsType != 0)
+        {
+            highlightedTiles.Add(start);
+        }
         // Check if the tiles in attack range have targets.
         for (int i = 0; i < highlightedTiles.Count; i++)
         {
             if (occupiedTiles[highlightedTiles[i]] > 0)
             {
-                if (SameTeam(actors[turnIndex], ReturnActorOnTile(highlightedTiles[i])))
+                if (targetsType == 0 && SameTeam(actors[turnIndex], ReturnActorOnTile(highlightedTiles[i])))
+                {
+                    continue;
+                }
+                if (targetsType == 1 && !SameTeam(actors[turnIndex], ReturnActorOnTile(highlightedTiles[i])))
                 {
                     continue;
                 }
@@ -567,11 +731,11 @@ public class TerrainMap : MonoBehaviour
         return false;
     }
 
-    private void SeeTarget()
+    private void SeeTarget(bool blue = false)
     {
         UpdateCenterTile(targetableTiles[currentTarget]);
         UpdateMap();
-        HighlightTiles(false);
+        HighlightTiles(blue);
         // Update some info about the target.
     }
 
@@ -635,6 +799,9 @@ public class TerrainMap : MonoBehaviour
         int previousFixedCenter = fixedCenter;
         switch (direction)
         {
+            case -1:
+                fixedCenter=fullSize*fullSize/2;
+                break;
             case 0:
                 if (previousFixedCenter < fullSize)
                 {
@@ -663,9 +830,31 @@ public class TerrainMap : MonoBehaviour
                 }
                 fixedCenter--;
                 break;
+            case 4:
+                MoveMap(0);
+                MoveMap(1);
+                break;
+            case 5:
+                MoveMap(2);
+                MoveMap(1);
+                break;
+            case 6:
+                MoveMap(2);
+                MoveMap(3);
+                break;
+            case 7:
+                MoveMap(0);
+                MoveMap(3);
+                break;
         }
         UpdateCenterTile(fixedCenter);
         UpdateMap();
         HighlightTiles();
+    }
+
+    public void ActorDied()
+    {
+        UpdateMap();
+        pathFinder.UpdateOccupiedTiles(occupiedTiles);
     }
 }

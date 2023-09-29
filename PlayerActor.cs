@@ -16,6 +16,7 @@ public class PlayerActor : MonoBehaviour
     public int moveType = 0;
     public List<string> learntPassives;
     public List<string> learntSkills;
+    public EquipmentContainer allEquipment;
 
     void Start()
     {
@@ -24,12 +25,13 @@ public class PlayerActor : MonoBehaviour
 
     public void UpdateStats()
     {
+        allEquipment.UpdateStats();
         currentLevel = GameManager.instance.playerLevel;
-        playerActor.baseHealth = baseHealth + ((currentLevel - 1) * healthPerLevel);
-        playerActor.baseAttack = baseAttack;
-        playerActor.baseDefense = baseDefense;
-        playerActor.baseEnergy = baseEnergy;
-        playerActor.baseMovement = baseMovement;
+        playerActor.baseHealth = baseHealth + ((currentLevel - 1) * healthPerLevel)+allEquipment.totalBonusHealth;
+        playerActor.baseAttack = baseAttack+allEquipment.totalBonusAttack;
+        playerActor.baseDefense = baseDefense+allEquipment.totalBonusDefense;
+        playerActor.baseEnergy = baseEnergy+allEquipment.totalBonusEnergy;
+        playerActor.baseMovement = baseMovement+allEquipment.totalBonusMovement;
         playerActor.attackRange = attackRange;
         playerActor.movementType = moveType;
         playerActor.passiveNames = new List<string>(learntPassives);

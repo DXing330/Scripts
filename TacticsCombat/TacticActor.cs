@@ -7,6 +7,7 @@ public class TacticActor : MonoBehaviour
 {
     // 0 is player's team, other teams are NPCs.
     public int team = 0;
+    public bool delayed = false;
     // Race/class/etc.
     public string typeName;
     public int locationIndex;
@@ -50,6 +51,9 @@ public class TacticActor : MonoBehaviour
     {
         health = baseHealth;
         movement = baseMovement;
+        energy = baseEnergy;
+        attackDamage = baseAttack;
+        defense = baseDefense;
     }
 
     public void SetBaseStats(string baseStats, int newLevel = 1)
@@ -62,6 +66,20 @@ public class TacticActor : MonoBehaviour
         baseDefense = int.Parse(newBase[3]);
         baseEnergy = int.Parse(newBase[4]);
         baseActions = int.Parse(newBase[5]);
+    }
+
+    public void CopyStats(TacticActor actorToCopy)
+    {
+        baseHealth = actorToCopy.baseHealth;
+        baseMovement = actorToCopy.baseMovement;
+        baseAttack = actorToCopy.baseAttack;
+        baseDefense = actorToCopy.baseDefense;
+        baseEnergy = actorToCopy.baseEnergy;
+        baseActions = actorToCopy.baseActions;
+        attackRange = actorToCopy.attackRange;
+        movementType = actorToCopy.movementType;
+        activeSkillNames = actorToCopy.activeSkillNames;
+        SetSprite(actorToCopy.spriteRenderer.sprite);
     }
 
     public void SetSprite(Sprite newSprite)
@@ -77,8 +95,11 @@ public class TacticActor : MonoBehaviour
 
     private void Death()
     {
-        terrainMap.RemoveActor(this);
-        Destroy(gameObject);
+        Color tempColor = Color.white;
+        tempColor.a = 0f;
+        spriteRenderer.color = tempColor;
+        terrainMap.ActorDied();
+        //Destroy(gameObject);
     }
 
     public void ReceiveDamage(int amount)
@@ -109,16 +130,15 @@ public class TacticActor : MonoBehaviour
         energy += amount;
     }
 
-    public void ActivateSkill(int skillIndex)
+    public void ActivateSkill()
     {
         actionsLeft--;
-        activeSkill.LoadSkill(activeSkillNames[skillIndex]);
         LoseEnergy(activeSkill.cost);
     }
 
     public void LoadSkill(int skillIndex)
     {
-        activeSkill.LoadSkill(activeSkillNames[skillIndex]);
+        activeSkill.LoadData(activeSkillNames[skillIndex]);
     }
 
     public bool CheckActions()
@@ -144,33 +164,14 @@ public class TacticActor : MonoBehaviour
         return true;
     }
 
-    // Player attack.
-    public void Attack(TacticActor target)
-    {
-        if (target ==  null || actionsLeft <= 0)
-        {
-            return;
-        }
-        // Check if target is in attack range?
-        target.ReceiveDamage(attackDamage);
-        actionsLeft--;
-    }
-
-    // NPC attack.
-    private void AttackTarget()
-    {
-        while (actionsLeft > 0)
-        {
-            Attack(attackTarget);
-            actionsLeft--;
-        }
-    }
-
     private void AttackAction()
     {
-        if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= attackRange)
+        if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= attackRange && actionsLeft > 0)
         {
-            AttackTarget();
+            Debug.Log(typeName+" attacks.");
+            terrainMap.NPCActorAttack(attackTarget);
+            actionsLeft--;
+            Debug.Log(actionsLeft);
         }
     }
 
@@ -191,40 +192,36 @@ public class TacticActor : MonoBehaviour
 
     public void NPCStartTurn()
     {
+        Debug.Log(typeName+" starts turn.");
         StartTurn();
         // Pick a target, based on goals.
         CheckGoal();
         GetPath();
         MoveAction();
-        //AttackAction();
+        AttackAction();
     }
 
     public void StartTurn()
     {
+        if (delayed)
+        {
+            delayed = false;
+            return;
+        }
         attackDamage =baseAttack;
         movement = baseMovement;
         actionsLeft = baseActions;
         defense = baseDefense;
         energy = Mathf.Min(energy+1, baseEnergy);
         // Deal with buffs/debuffs/passives.
-        for (int i = 0; i < buffDebuffNames.Count; i++)
-        {
-            /*buffDebuffs[i].AffectActor(this);
-            buffDebuffs[i].duration--;
-            if (buffDebuffs[i].duration <= 0)
-            {
-                buffDebuffs.RemoveAt(i);
-            }*/
-        }
     }
 
     private void CheckGoal()
     {
         // Randomly move around if you don't have a target.
-        if (terrainMap.CheckAdjacency(locationIndex, destinationIndex))
-        {
-            UpdateDest(terrainMap.RandomDestination(locationIndex));
-        }
+        // Look for the closest enemy.
+        UpdateTarget(terrainMap.FindNearestEnemy());
+        UpdateDest(attackTarget.locationIndex);
         // Attack your target if you have one.
         // If you're injured then start looking for targets? Depends on the type of AI.
     }
@@ -236,10 +233,6 @@ public class TacticActor : MonoBehaviour
 
     public void MoveAction()
     {
-        if (currentPath[0] == locationIndex)
-        {
-            return;
-        }
         if (Moveable())
         {
             MoveAction();
@@ -249,6 +242,10 @@ public class TacticActor : MonoBehaviour
 
     private bool Moveable()
     {
+        if (currentPath.Count <= 0 || currentPath[0] == locationIndex)
+        {
+            return false;
+        }
         if (currentPath.Contains(locationIndex))
         {
             // Move to the next step on the path.

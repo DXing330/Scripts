@@ -6,7 +6,6 @@ using UnityEngine;
 public class SkillDataManager : MonoBehaviour
 {
     public string configData;
-    public ListStringUtilities utilities;
     public List<string> skillClass;
     public List<string> skillNames;
     public List<string> skillLockOns;
@@ -33,7 +32,7 @@ public class SkillDataManager : MonoBehaviour
         skillBasePowers = configBlocks[9].Split("|").ToList();
     }
 
-    public void LoadSkillData(TacticActiveSkill activeSkill, string skillName)
+    public void LoadDataForSkill(TacticActiveSkill activeSkill, string skillName)
     {
         int skillIndex = skillNames.IndexOf(skillName);
         if (skillIndex < 0)
@@ -44,7 +43,7 @@ public class SkillDataManager : MonoBehaviour
         activeSkill.lockOn = int.Parse(skillLockOns[skillIndex]);
         activeSkill.range = int.Parse(skillRanges[skillIndex]);
         activeSkill.span = int.Parse(skillSpans[skillIndex]);
-        activeSkill.target = int.Parse(skillTargets[skillIndex]);
+        activeSkill.skillTarget = int.Parse(skillTargets[skillIndex]);
         activeSkill.cost = int.Parse(skillCosts[skillIndex]);
         activeSkill.effect = skillEffects[skillIndex];
         activeSkill.effectSpecifics = skillSpecifics[skillIndex];

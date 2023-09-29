@@ -271,4 +271,24 @@ public class TerrainPathfinder : MonoBehaviour
     {
         return location%fullSize;
     }
+
+    public TacticActor FindNearestEnemy(TacticActor currentActor, List<TacticActor> allActors)
+    {
+        int location = currentActor.locationIndex;
+        int distance = bigInt;
+        int targetIndex = 0;
+        for (int i = 0; i < allActors.Count; i++)
+        {
+            if (allActors[i].team != currentActor.team)
+            {
+                int distanceToEnemy = CalculateDistance(location, allActors[i].locationIndex);
+                if (distanceToEnemy < distance)
+                {
+                    distance = distanceToEnemy;
+                    targetIndex = i;
+                }
+            }
+        }
+        return allActors[targetIndex];
+    }
 }
