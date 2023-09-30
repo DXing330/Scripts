@@ -8,7 +8,6 @@ public class SaveButton : MonoBehaviour
     public void Save()
     {
         GameManager.instance.Save();
-        Debug.Log("Saved");
     }
 
     public void Work()
@@ -19,5 +18,10 @@ public class SaveButton : MonoBehaviour
     public void Battle()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("BattleMap");
+    }
+
+    public void ManageParty()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("PickArmy");
     }
 }

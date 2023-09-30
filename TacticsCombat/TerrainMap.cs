@@ -363,6 +363,11 @@ public class TerrainMap : MonoBehaviour
 
     public void ViewActorInfo()
     {
+        if (actors[currentTarget].health <= 0)
+        {
+            SwitchViewedActor(true);
+            return;
+        }
         actorInfo.UpdateInfo(actors[currentTarget]);
         UpdateCenterTile(actors[currentTarget].locationIndex);
         UpdateMap();
@@ -431,7 +436,6 @@ public class TerrainMap : MonoBehaviour
         {
             return;
         }
-        turnIndex++;
         int winners = actorManager.WinningTeam();
         if (winners >= 0)
         {
@@ -446,6 +450,7 @@ public class TerrainMap : MonoBehaviour
             actorManager.ReturnToHub();
             return;
         }
+        turnIndex++;
         if (turnIndex >= actors.Count)
         {
             RemoveActors();

@@ -168,10 +168,8 @@ public class TacticActor : MonoBehaviour
     {
         if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= attackRange && actionsLeft > 0)
         {
-            Debug.Log(typeName+" attacks.");
             terrainMap.NPCActorAttack(attackTarget);
             actionsLeft--;
-            Debug.Log(actionsLeft);
         }
     }
 
@@ -193,7 +191,6 @@ public class TacticActor : MonoBehaviour
     public void NPCStartTurn()
     {
         Debug.Log(typeName+" starts turn.");
-        StartTurn();
         // Pick a target, based on goals.
         CheckGoal();
         GetPath();
@@ -271,8 +268,6 @@ public class TacticActor : MonoBehaviour
     private bool CheckDistance(int index)
     {
         int distance = terrainMap.ReturnMoveCost(index, movementType);
-        //Debug.Log(index);
-        //Debug.Log(distance);
         if (distance <= movement)
         {
             movement -= distance;
