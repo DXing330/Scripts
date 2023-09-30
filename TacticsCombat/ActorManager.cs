@@ -49,8 +49,37 @@ public class ActorManager : MonoBehaviour
 
     public void LoadPlayerTeam()
     {
-        LoadActor(GameManager.instance.player.playerActor, 1);
-        LoadActor(GameManager.instance.familiar.playerActor, 0);
+        int column = 0;
+        int row = 0;
+        for (int i = 0; i < GameManager.instance.armyFormation.Count; i++)
+        {
+            string actorType = GameManager.instance.armyFormation[i];
+            Debug.Log(actorType);
+            LoadPlayerTeamMember(actorType, row, column);
+            column++;
+            if (column >= 3)
+            {
+                column = 0;
+                row++;
+            }
+        }
+    }
+
+    private void LoadPlayerTeamMember(string type, int row, int column)
+    {
+        int location = column + (row * terrainMap.fullSize);
+        if (type == "player")
+        {
+            LoadActor(GameManager.instance.player.playerActor, location);
+        }
+        else if (type == "familiar")
+        {
+            LoadActor(GameManager.instance.familiar.playerActor, location);
+        }
+        else if (type == "none")
+        {
+            return;
+        }
     }
 
     public void LoadEnemyTeam()
