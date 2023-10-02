@@ -13,14 +13,6 @@ public class ActorManager : MonoBehaviour
     public TerrainTile terrainTile;
     public ActorDataManager actorData;
 
-    void Start()
-    {
-        /*for (int i = 0; i < actorSprites.Count; i++)
-        {
-            Debug.Log(actorSprites[i].name);
-        }*/
-    }
-
     public void AddTeamCount(int team)
     {
         switch (team)
@@ -51,10 +43,9 @@ public class ActorManager : MonoBehaviour
     {
         int column = 0;
         int row = 0;
-        for (int i = 0; i < GameManager.instance.armyFormation.Count; i++)
+        for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
         {
-            string actorType = GameManager.instance.armyFormation[i];
-            Debug.Log(actorType);
+            string actorType = GameManager.instance.armyData.armyFormation[i];
             LoadPlayerTeamMember(actorType, row, column);
             column++;
             if (column >= 3)
@@ -68,11 +59,11 @@ public class ActorManager : MonoBehaviour
     private void LoadPlayerTeamMember(string type, int row, int column)
     {
         int location = column + (row * terrainMap.fullSize);
-        if (type == "player")
+        if (type == "Player")
         {
             LoadActor(GameManager.instance.player.playerActor, location);
         }
-        else if (type == "familiar")
+        else if (type == "Familiar")
         {
             LoadActor(GameManager.instance.familiar.playerActor, location);
         }
@@ -129,7 +120,7 @@ public class ActorManager : MonoBehaviour
 
     public void ReturnToHub()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Hub");
+        GameManager.instance.ReturnToHub();
     }
 
     public int WinningTeam()

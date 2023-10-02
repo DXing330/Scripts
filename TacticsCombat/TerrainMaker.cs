@@ -7,11 +7,6 @@ public class TerrainMaker : MonoBehaviour
     public List<int> terrain;
     private int rng;
 
-    void Start()
-    {
-        //terrain = GenerateTerrain(0, 6);
-    }
-
     public List<int> GenerateTerrain(int type = 0, int size = 6)
     {
         terrain.Clear();

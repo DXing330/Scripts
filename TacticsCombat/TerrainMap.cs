@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class TerrainMap : MonoBehaviour
 {
+    public List<Sprite> tileSprites;
     public bool battleStarted = false;
     private int turnIndex = 0;
     private int startIndex = 0;
@@ -14,6 +15,7 @@ public class TerrainMap : MonoBehaviour
     private int cornerColumn;
     private int gridSize = 7;
     public int fullSize = 7;
+    public int baseTerrain = 0;
     public List<int> terrainInfo;
     public List<int> terrainEffects;
     public List<int> terrainEffectDurations;
@@ -44,7 +46,7 @@ public class TerrainMap : MonoBehaviour
     {
         Application.targetFrameRate = 30;
         //InitializeTiles();
-        GenerateMap(0, fullSize);
+        GenerateMap(baseTerrain, fullSize);
         UpdateCenterTile((fullSize * 2) + 2);
         UpdateMap();
         int rngLocation = Random.Range(fullSize*fullSize/2, fullSize*fullSize-1);
@@ -99,6 +101,11 @@ public class TerrainMap : MonoBehaviour
 
     public void DelayTurn()
     {
+        if (!actors[turnIndex].Delayable())
+        {
+            NextTurn();
+            ActorStopMoving();
+        }
         if (turnIndex == actors.Count - 1)
         {
             return;
@@ -278,6 +285,11 @@ public class TerrainMap : MonoBehaviour
         SeeTarget();
     }
 
+    public TacticActor ReturnCurrentTurnActor()
+    {
+        return actors[turnIndex];
+    }
+
     public TacticActor ReturnCurrentTarget()
     {
         if (targetableTiles.Count <= 0)
@@ -361,11 +373,11 @@ public class TerrainMap : MonoBehaviour
         return pathFinder.FindNearestEnemy(actors[turnIndex], actors);
     }
 
-    public void ViewActorInfo()
+    public void ViewActorInfo(bool right = true)
     {
         if (actors[currentTarget].health <= 0)
         {
-            SwitchViewedActor(true);
+            SwitchViewedActor(right);
             return;
         }
         actorInfo.UpdateInfo(actors[currentTarget]);
@@ -388,13 +400,16 @@ public class TerrainMap : MonoBehaviour
         }
         else
         {
-            currentTarget--;
-            if (currentTarget < 0)
+            if (currentTarget > 0)
+            {
+                currentTarget--;
+            }
+            else
             {
                 currentTarget = actors.Count - 1;
             }
         }
-        ViewActorInfo();
+        ViewActorInfo(right);
     }
 
     private bool Counterable(int attackerLocation, TacticActor defender)
@@ -436,6 +451,12 @@ public class TerrainMap : MonoBehaviour
         {
             return;
         }
+        turnIndex++;
+        if (turnIndex >= actors.Count)
+        {
+            RemoveActors();
+            turnIndex = 0;
+        }
         int winners = actorManager.WinningTeam();
         if (winners >= 0)
         {
@@ -449,12 +470,6 @@ public class TerrainMap : MonoBehaviour
             }
             actorManager.ReturnToHub();
             return;
-        }
-        turnIndex++;
-        if (turnIndex >= actors.Count)
-        {
-            RemoveActors();
-            turnIndex = 0;
         }
         ActorsTurn();
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -645,7 +660,9 @@ public class TerrainMap : MonoBehaviour
         }
         else
         {
-            terrainTiles[imageIndex].UpdateColor(terrainInfo[tileIndex]);
+            int tileType = terrainInfo[tileIndex];
+            terrainTiles[imageIndex].UpdateColor(tileType);
+            terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
         }
     }
 

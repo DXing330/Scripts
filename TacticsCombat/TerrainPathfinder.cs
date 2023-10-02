@@ -104,8 +104,6 @@ public class TerrainPathfinder : MonoBehaviour
         while (pathIndex != startIndex)
         {
             actualPath.Add(pathIndex);
-            // Go backwards through the path until you reach the start.
-            //Debug.Log(pathIndex);
             pathIndex = savedPathList[pathIndex];
         }
         return actualPath;
@@ -155,8 +153,6 @@ public class TerrainPathfinder : MonoBehaviour
             {
                 // Then update the distance and the previous tile.
                 distances[adjacentTiles[i]] = distances[closestTile]+moveCost;
-                //Debug.Log(closestTile);
-                //Debug.Log(adjacentTiles[i]);
                 savedPathList[adjacentTiles[i]] = closestTile;
                 heap.AddNodeWeight(adjacentTiles[i], distances[adjacentTiles[i]]);
             }

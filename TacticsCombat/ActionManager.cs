@@ -18,12 +18,28 @@ public class ActionManager : MonoBehaviour
     public GameObject viewButton;
     public GameObject viewMenu;
     public int state = 0;
+    public TacticActor currentActor;
 
     public void ChangeState(int newState)
     {
         if (!terrainMap.battleStarted)
         {
             return;
+        }
+        currentActor = terrainMap.ReturnCurrentTurnActor();
+        switch (newState)
+        {
+            case 0:
+                break;
+            case 1:
+                if (currentActor.movement <= 0){return;}
+                break;
+            case 2:
+                if (currentActor.actionsLeft <= 0){return;}
+                break;
+            case 3:
+                if (currentActor.actionsLeft <= 0){return;}
+                break;
         }
         state = newState;
         UpdateState();

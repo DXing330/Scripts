@@ -8,6 +8,7 @@ public class TerrainTile : MonoBehaviour
     public int cType;
     //plains=0,forest=1,mountain=2,water=3,deepWater=4,desert=5
     public RectTransform rectTransform;
+    public Image backgroundColor;
     public Image tileImage;
     public Image actorImage;
     public Image highlight;
@@ -29,6 +30,16 @@ public class TerrainTile : MonoBehaviour
         rectTransform.pivot = new Vector2(xPivot, yPivot);
     }
 
+    public void ResetTileImage()
+    {
+        tileImage.sprite = null;
+    }
+
+    public void UpdateTileImage(Sprite newTile)
+    {
+        tileImage.sprite = newTile;
+    }
+
     public void ResetImage()
     {
         Color tempColor = Color.white;
@@ -40,7 +51,7 @@ public class TerrainTile : MonoBehaviour
     public void UpdateImage(Sprite newActor)
     {
         Color tempColor = Color.white;
-        tempColor.a = 0.6f;
+        tempColor.a = 0.7f;
         actorImage.sprite = newActor;
         actorImage.color = tempColor;
     }
@@ -85,12 +96,12 @@ public class TerrainTile : MonoBehaviour
     public void UpdateColor(int type)
     {
         Color tempColor = Color.white;
-        tempColor.a = 0.5f;
+        tempColor.a = 0.3f;
         if (type < 0)
         {
             tempColor = Color.black;
             tempColor.a = 1f;
-            tileImage.color = tempColor;
+            backgroundColor.color = tempColor;
             return;
         }
         switch (type)
@@ -101,23 +112,25 @@ public class TerrainTile : MonoBehaviour
                 break;
             case 1:
                 tempColor = Color.green;
-                tempColor.a = 0.8f;
+                tempColor.a = 0.3f;
                 break;
             case 2:
                 tempColor = Color.grey;
+                tempColor.a = 0.3f;
                 break;
             case 3:
                 tempColor = Color.blue;
+                tempColor.a = 0.3f;
                 break;
             case 4:
                 tempColor = Color.blue;
-                tempColor.a = 0.8f;
+                tempColor.a = 0.5f;
                 break;
             case 5:
                 tempColor = Color.yellow;
                 break;
         }
-        tileImage.color = tempColor;
+        backgroundColor.color = tempColor;
     }
 
     public int ReturnMoveCost(int type, int occupied = 0)

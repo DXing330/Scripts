@@ -97,6 +97,7 @@ public class TacticActor : MonoBehaviour
     {
         Color tempColor = Color.white;
         tempColor.a = 0f;
+        spriteRenderer.sprite = null;
         spriteRenderer.color = tempColor;
         terrainMap.ActorDied();
         //Destroy(gameObject);
@@ -139,6 +140,15 @@ public class TacticActor : MonoBehaviour
     public void LoadSkill(int skillIndex)
     {
         activeSkill.LoadData(activeSkillNames[skillIndex]);
+    }
+
+    public bool Delayable()
+    {
+        if (movement <= 0 && actionsLeft <= 0)
+        {
+            return false;
+        }
+        return true;
     }
 
     public bool CheckActions()
@@ -190,7 +200,6 @@ public class TacticActor : MonoBehaviour
 
     public void NPCStartTurn()
     {
-        Debug.Log(typeName+" starts turn.");
         // Pick a target, based on goals.
         CheckGoal();
         GetPath();

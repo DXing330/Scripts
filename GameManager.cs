@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     public PlayerActor player;
     public PlayerActor familiar;
+    public ArmyDataManager armyData;
     private string saveDataPath;
     private string loadedData;
 
@@ -28,12 +29,13 @@ public class GameManager : MonoBehaviour
     public void ReturnToHub()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("Hub");
+        SaveData();
     }
 
     void Start()
     {
         saveDataPath = Application.persistentDataPath;
-        Load();
+        LoadData();
     }
 
     public string ConvertListToString(List<string> string_list, string delimiter = "|")
@@ -46,27 +48,25 @@ public class GameManager : MonoBehaviour
     public int manaCrystals = 0;
     public int bloodCrystals = 0;
     public int time = 0;
-    public List<string> armyFormation;
     public List<string> playerPassives;
     public List<string> playerActives;
     public List<string> familiarPassives;
     public List<string> familiarActives;
 
-    public void Save()
+    public void SaveData()
     {
         string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time;
         File.WriteAllText(saveDataPath+"/saveData.txt", data);
-        string armyData = ConvertListToString(armyFormation);
-        File.WriteAllText(saveDataPath+"/armyData.txt", armyData);
         string activesPassives = "";
         activesPassives += ConvertListToString(playerPassives)+"#";
         activesPassives += ConvertListToString(playerActives)+"#";
         activesPassives += ConvertListToString(familiarPassives)+"#";
         activesPassives += ConvertListToString(familiarActives)+"#";
         File.WriteAllText(saveDataPath+"/skillData.txt", activesPassives);
+        armyData.Save();
     }
 
-    private void Load()
+    private void LoadData()
     {
         if (File.Exists(saveDataPath+"/saveData.txt"))
         {
@@ -77,19 +77,21 @@ public class GameManager : MonoBehaviour
             manaCrystals = int.Parse(dataBlocks[2]);
             goldCoins = int.Parse(dataBlocks[3]);
             time = int.Parse(dataBlocks[4]);
-            loadedData = File.ReadAllText(saveDataPath+"/armyData.txt");
-            armyFormation = loadedData.Split("|").ToList();
+            armyData.Load();
         }
     }
 
-    private void NewGame()
+    [ContextMenu("New Game")]
+    public void NewGame()
     {
+        saveDataPath = Application.persistentDataPath;
         playerLevel = 1;
         bloodCrystals = 0;
         manaCrystals = 0;
         goldCoins = 0;
         time = 0;
-        Save();
+        armyData.NewGame();
+        SaveData();
     }
 
     public void GainResource(int type, int amount)

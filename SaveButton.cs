@@ -7,7 +7,7 @@ public class SaveButton : MonoBehaviour
 {
     public void Save()
     {
-        GameManager.instance.Save();
+        GameManager.instance.SaveData();
     }
 
     public void Work()
