@@ -6,6 +6,21 @@ using UnityEngine.UI;
 public class FormationTile : MonoBehaviour
 {
     public Image image;
+    public Image highlight;
+
+    public void ResetHighlight()
+    {
+        Color tempColor = Color.white;
+        tempColor.a = 0f;
+        highlight.color = tempColor;
+    }
+
+    public void Highlight()
+    {
+        Color tempColor = Color.green;
+        tempColor.a = 0.3f;
+        highlight.color = tempColor;
+    }
 
     public void ResetActorSprite()
     {

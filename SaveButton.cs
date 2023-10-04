@@ -24,4 +24,14 @@ public class SaveButton : MonoBehaviour
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("PickArmy");
     }
+
+    public void RecruitFighters()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Recruit");
+    }
+
+    public void ReturnToHub()
+    {
+        GameManager.instance.ReturnToHub();
+    }
 }

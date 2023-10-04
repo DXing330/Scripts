@@ -13,6 +13,18 @@ public class ArmyDataManager : MonoBehaviour
     public List<string> armyFormation = new List<string>(9);
     public List<string> availableFighters = new List<string>(0);
 
+    private void AdjustLists()
+    {
+        GameManager.instance.RemoveEmptyListItems(availableFighters);
+        for (int i = 0; i < armyFormation.Count; i++)
+        {
+            if (armyFormation[i].Length < 3)
+            {
+                armyFormation[i] = "none";
+            }
+        }
+    }
+
     public void NewGame()
     {
         armyFormation.Clear();
@@ -46,5 +58,11 @@ public class ArmyDataManager : MonoBehaviour
         {
             NewGame();
         }
+        AdjustLists();
+    }
+
+    public void GainFighter(string fighterName)
+    {
+        availableFighters.Add(fighterName);
     }
 }

@@ -71,6 +71,10 @@ public class ActorManager : MonoBehaviour
         {
             return;
         }
+        else
+        {
+            GenerateActor(location, type, 0);
+        }
     }
 
     public void LoadEnemyTeam()

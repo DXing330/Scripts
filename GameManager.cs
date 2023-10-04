@@ -43,6 +43,17 @@ public class GameManager : MonoBehaviour
         return String.Join(delimiter, string_list);
     }
 
+    public void RemoveEmptyListItems(List<string> listToRemoveFrom, int minLength = 1)
+    {
+        for (int i = 0; i < listToRemoveFrom.Count; i++)
+        {
+            if (listToRemoveFrom[i].Length <= minLength)
+            {
+                listToRemoveFrom.RemoveAt(i);
+            }
+        }
+    }
+
     public int playerLevel = 1;
     public int goldCoins = 0;
     public int manaCrystals = 0;
