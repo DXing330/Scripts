@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public PlayerActor player;
     public PlayerActor familiar;
     public ArmyDataManager armyData;
+    public UnitUpgradeData upgradeData;
     private string saveDataPath;
     private string loadedData;
 
@@ -77,6 +78,7 @@ public class GameManager : MonoBehaviour
         activesPassives += ConvertListToString(familiarActives)+"#";
         File.WriteAllText(saveDataPath+"/skillData.txt", activesPassives);
         armyData.Save();
+        upgradeData.Save();
     }
 
     private void LoadData()
@@ -91,6 +93,7 @@ public class GameManager : MonoBehaviour
             goldCoins = int.Parse(dataBlocks[3]);
             time = int.Parse(dataBlocks[4]);
             armyData.Load();
+            upgradeData.Load();
         }
     }
 
@@ -131,6 +134,20 @@ public class GameManager : MonoBehaviour
     public void SetBattleDifficulty(int newBattleDifficulty)
     {
         battleDifficulty = newBattleDifficulty;
+    }
+
+    public bool CheckCost(int type, int amount)
+    {
+        switch (type)
+        {
+            case 0:
+                return (bloodCrystals >= amount);
+            case 1:
+                return (manaCrystals >= amount);
+            case 2:
+                return (goldCoins >= amount);
+        }
+        return false;
     }
 
 }

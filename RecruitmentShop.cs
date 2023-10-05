@@ -5,25 +5,18 @@ using UnityEngine;
 public class RecruitmentShop : MonoBehaviour
 {
     // lists of possible things to buy and their costs
-    public string selectedFighterName = "";
-    public int selectedFighterCost = 0;
+    public List<string> availableFighters;
+    public List<int> fighterCosts;
 
-    public void SelectFighter(string fighterName)
+    private bool AffordFighter(int cost, int type = 2)
     {
-        selectedFighterName = fighterName;
+        return GameManager.instance.CheckCost(type, cost);
     }
 
-    private bool AffordFighter(int cost)
+    public void BuyFighter(string fighterName)
     {
-        if (GameManager.instance.goldCoins >= cost)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public void BuyFighter(int cost, string fighterName)
-    {
+        int indexOf = availableFighters.IndexOf(fighterName);
+        int cost = fighterCosts[indexOf];
         if (AffordFighter(cost))
         {
             GameManager.instance.goldCoins -= cost;

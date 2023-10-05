@@ -105,6 +105,10 @@ public class ActorManager : MonoBehaviour
         newActor.InitialLocation(location);
         UpdateActorSprite(newActor, name);
         newActor.team = team;
+        if (team == 0)
+        {
+            GameManager.instance.upgradeData.AdjustUnitStats(newActor);
+        }
         newActor.SetMap(terrainMap);
         terrainMap.AddActor(newActor);
         newActor.QuickStart();
