@@ -17,6 +17,8 @@ public class ActorDataManager : MonoBehaviour
     public List<string> actorActions;
     public List<string> actorRanges;
     public List<string> actorSkills;
+    public List<string> actorDropTypes;
+    public List<string> actorDropAmounts;
 
     void Start()
     {
@@ -32,6 +34,8 @@ public class ActorDataManager : MonoBehaviour
         actorActions = configBlocks[8].Split("|").ToList();
         actorRanges = configBlocks[9].Split("|").ToList();
         actorSkills = configBlocks[10].Split("|").ToList();
+        actorDropTypes = configBlocks[11].Split("|").ToList();
+        actorDropAmounts = configBlocks[12].Split("|").ToList();
     }
 
     public void LoadActorData(TacticActor actor, string newName)
@@ -42,7 +46,7 @@ public class ActorDataManager : MonoBehaviour
             return;
         }
         actor.baseHealth = int.Parse(actorHealths[index]);
-        actor.attackDamage = int.Parse(actorAttacks[index]);
+        actor.baseAttack = int.Parse(actorAttacks[index]);
         actor.baseDefense = int.Parse(actorDefenses[index]);
         actor.baseEnergy = int.Parse(actorEnergies[index]);
         actor.baseMovement = int.Parse(actorMovements[index]);
@@ -50,6 +54,8 @@ public class ActorDataManager : MonoBehaviour
         actor.attackRange = int.Parse(actorRanges[index]);
         actor.movementType = int.Parse(actorMovetypes[index]);
         actor.activeSkillNames = actorSkills[index].Split(",").ToList();
+        actor.dropType = int.Parse(actorDropTypes[index]);
+        actor.dropAmount = int.Parse(actorDropAmounts[index]);
     }
     
 }

@@ -14,4 +14,14 @@ public class SceneManager : MonoBehaviour
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
     }
+
+    public void SetBattleDifficulty(int difficulty)
+    {
+        GameManager.instance.battleDifficulty = difficulty;
+    }
+
+    public void SetBattleTerrain(int terrainType)
+    {
+        GameManager.instance.battleLocationType = terrainType;
+    }
 }

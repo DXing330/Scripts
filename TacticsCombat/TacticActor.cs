@@ -7,6 +7,9 @@ public class TacticActor : MonoBehaviour
 {
     // 0 is player's team, other teams are NPCs.
     public int team = 0;
+    // Basic enemies drop 1 gold.
+    public int dropType = 2;
+    public int dropAmount = 1;
     public bool delayed = false;
     // Race/class/etc.
     public string typeName;
@@ -176,8 +179,19 @@ public class TacticActor : MonoBehaviour
 
     private void AttackAction()
     {
-        if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= attackRange && actionsLeft > 0)
+        if (actionsLeft <= 0)
         {
+            return;
+        }
+        if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= attackRange)
+        {
+            terrainMap.NPCActorAttack(attackTarget);
+            actionsLeft--;
+        }
+        else
+        {
+            attackTarget = terrainMap.ReturnEnemyInRange(locationIndex, team, attackRange);
+            if (attackTarget == null){return;}
             terrainMap.NPCActorAttack(attackTarget);
             actionsLeft--;
         }
@@ -214,7 +228,7 @@ public class TacticActor : MonoBehaviour
             delayed = false;
             return;
         }
-        attackDamage =baseAttack;
+        attackDamage = baseAttack;
         movement = baseMovement;
         actionsLeft = baseActions;
         defense = baseDefense;

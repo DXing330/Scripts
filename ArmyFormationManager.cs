@@ -141,6 +141,7 @@ public class ArmyFormationManager : MonoBehaviour
             armyData.availableFighters.Add(actorName);
             armyData.armyFormation[currentlySelected] = "none";
             UpdateFormationTiles();
+            UpdateReserveFighters();
         }
     }
 

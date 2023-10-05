@@ -63,6 +63,8 @@ public class GameManager : MonoBehaviour
     public List<string> playerActives;
     public List<string> familiarPassives;
     public List<string> familiarActives;
+    public int battleLocationType;
+    public int battleDifficulty;
 
     public void SaveData()
     {
@@ -119,6 +121,16 @@ public class GameManager : MonoBehaviour
                 goldCoins += amount;
                 break;
         }
+    }
+
+    public void SetBattleLocation(int locationType)
+    {
+        battleLocationType = locationType;
+    }
+
+    public void SetBattleDifficulty(int newBattleDifficulty)
+    {
+        battleDifficulty = newBattleDifficulty;
     }
 
 }

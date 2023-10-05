@@ -12,46 +12,23 @@ public class ActorManager : MonoBehaviour
     private int teamZeroCount = 0;
     public TerrainTile terrainTile;
     public ActorDataManager actorData;
-
-    public void AddTeamCount(int team)
-    {
-        switch (team)
-        {
-            case 0:
-                teamZeroCount++;
-                break;
-            case 1:
-                teamOneCount++;
-                break;
-        }
-    }
-
-    public void SubtractTeamCount(int team)
-    {
-        switch (team)
-        {
-            case 0:
-                teamZeroCount--;
-                break;
-            case 1:
-                teamOneCount--;
-                break;
-        }
-    }
+    public int collectedGold = 0;
+    public int collectedMana = 0;
+    public int collectedBlood = 0;
 
     public void LoadPlayerTeam()
     {
-        int column = 0;
-        int row = 0;
-        for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
+        int column = 2;
+        int row = 2;
+        for (int i = GameManager.instance.armyData.armyFormation.Count-1; i >= 0; i--)
         {
             string actorType = GameManager.instance.armyData.armyFormation[i];
             LoadPlayerTeamMember(actorType, row, column);
-            column++;
-            if (column >= 3)
+            column--;
+            if (column < 0)
             {
-                column = 0;
-                row++;
+                column = 2;
+                row--;
             }
         }
     }
@@ -79,7 +56,9 @@ public class ActorManager : MonoBehaviour
 
     public void LoadEnemyTeam()
     {
-        
+        int type = GameManager.instance.battleLocationType;
+        int maxAmount = GameManager.instance.battleDifficulty;
+
     }
 
     public void LoadActor(TacticActor actorToCopy, int location, int team = 0)
@@ -88,7 +67,6 @@ public class ActorManager : MonoBehaviour
         newActor.CopyStats(actorToCopy);
         newActor.InitialLocation(location);
         newActor.team = team;
-        AddTeamCount(team);
         newActor.SetMap(terrainMap);
         terrainMap.AddActor(newActor);
         newActor.QuickStart();
@@ -102,7 +80,6 @@ public class ActorManager : MonoBehaviour
         newActor.InitialLocation(location);
         UpdateActorSprite(newActor, name);
         newActor.team = team;
-        AddTeamCount(team);
         newActor.SetMap(terrainMap);
         terrainMap.AddActor(newActor);
         newActor.QuickStart();
@@ -122,22 +99,68 @@ public class ActorManager : MonoBehaviour
         }
     }
 
-    public void ReturnToHub()
+    public void ReturnToHub(bool win = true)
     {
+        if (win)
+        {
+            // Claims drops.
+        }
         GameManager.instance.ReturnToHub();
+    }
+
+    private void ClaimDrops()
+    {
+        GameManager.instance.GainResource(0, collectedBlood);
+        GameManager.instance.GainResource(1, collectedMana);
+        GameManager.instance.GainResource(2, collectedGold);
+    }
+
+    public void GetDrops(TacticActor actor)
+    {
+        switch (actor.dropType)
+        {
+            case 0:
+                collectedBlood += actor.dropAmount;
+                break;
+            case 1:
+                collectedMana += actor.dropAmount;
+                break;
+            case 2:
+                collectedGold += actor.dropAmount;
+                break;
+        }
     }
 
     public int WinningTeam()
     {
-        if (teamOneCount > 0 && teamZeroCount <= 0)
+        CountTeams();
+        if (teamZeroCount <= 0)
         {
             return 1;
         }
-        else if (teamOneCount <= 0 && teamZeroCount > 0)
+        else if (teamOneCount <= 0)
         {
             return 0;
         }
         return -1;
+    }
+
+    private void CountTeams()
+    {
+        teamOneCount = 0; teamZeroCount = 0;
+        for (int i = 0; i < terrainMap.actors.Count; i++)
+        {
+            if (terrainMap.actors[i].health <= 0){continue;}
+            switch (terrainMap.actors[i].team)
+            {
+                case 0:
+                    teamZeroCount++;
+                    break;
+                case 1:
+                    teamOneCount++;
+                    break;
+            }
+        }
     }
 
     public void SetActorStats(TacticActor tacticActor)
@@ -187,6 +210,27 @@ public class ActorManager : MonoBehaviour
 
     private Sprite SpriteDictionary(string spriteName)
     {
+        switch (spriteName)
+        {
+            case "Wolf":
+                return actorSprites[9];
+            case "Skeleton":
+                return actorSprites[12];
+            case "Bear":
+                return actorSprites[5];
+            /*case "Skeleton":
+                return actorSprites[12];
+            case "Skeleton":
+                return actorSprites[12];
+            case "Skeleton":
+                return actorSprites[12];
+            case "Skeleton":
+                return actorSprites[12];
+            case "Skeleton":
+                return actorSprites[12];
+            case "Skeleton":
+                return actorSprites[12];*/
+        }
         for (int i = 0; i < actorSprites.Count; i++)
         {
             if (actorSprites[i].name == spriteName)

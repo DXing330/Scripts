@@ -14,7 +14,7 @@ public class TerrainMap : MonoBehaviour
     private int cornerRow;
     private int cornerColumn;
     private int gridSize = 7;
-    public int fullSize = 7;
+    public int fullSize = 9;
     public int baseTerrain = 0;
     public List<int> terrainInfo;
     public List<int> terrainEffects;
@@ -45,13 +45,9 @@ public class TerrainMap : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 30;
-        //InitializeTiles();
         GenerateMap(baseTerrain, fullSize);
-        UpdateCenterTile((fullSize * 2) + 2);
+        UpdateCenterTile((fullSize * fullSize)/2);
         UpdateMap();
-        int rngLocation = Random.Range(fullSize*fullSize/2, fullSize*fullSize-1);
-        GenerateActor(rngLocation/2, "Wolf", 1);
-        GenerateActor(rngLocation, "Wolf", 1);
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
     }
 
@@ -74,6 +70,36 @@ public class TerrainMap : MonoBehaviour
             yPivot -= 1f/(gridSize - 1);
         }
     }*/
+
+    public void NextTurn()
+    {
+        if (!battleStarted)
+        {
+            return;
+        }
+        turnIndex++;
+        if (turnIndex >= actors.Count)
+        {
+            RemoveActors();
+            turnIndex = 0;
+        }
+        int winners = actorManager.WinningTeam();
+        if (winners >= 0)
+        {
+            if (winners == 0)
+            {
+                // Gain collected items.
+            }
+            else
+            {
+                // Lost collected items.
+            }
+            actorManager.ReturnToHub();
+            return;
+        }
+        ActorsTurn();
+        actorInfo.UpdateInfo(actors[turnIndex]);
+    }
 
     public int ActorCurrentMovement()
     {
@@ -314,6 +340,19 @@ public class TerrainMap : MonoBehaviour
         return actors[occupiedTiles[tileNumber]-1];
     }
 
+    public TacticActor ReturnEnemyInRange(int currentLocation, int team, int attackRange)
+    {
+        TacticActor tempActor = null;
+        targetableTiles = new List<int>(pathFinder.FindTilesInRange(currentLocation, attackRange, -1));
+        for (int i = 0; i < targetableTiles.Count; i++)
+        {
+            tempActor = ReturnActorOnTile(targetableTiles[i]);
+            if (tempActor == null){continue;}
+            if (tempActor.team != team){return tempActor;}
+        }
+        return null;
+    }
+
     public void ActorStopAttacking()
     {
         UpdateCenterTile(actors[turnIndex].locationIndex);
@@ -445,36 +484,6 @@ public class TerrainMap : MonoBehaviour
         UpdateMap();
     }
 
-    public void NextTurn()
-    {
-        if (!battleStarted)
-        {
-            return;
-        }
-        turnIndex++;
-        if (turnIndex >= actors.Count)
-        {
-            RemoveActors();
-            turnIndex = 0;
-        }
-        int winners = actorManager.WinningTeam();
-        if (winners >= 0)
-        {
-            if (winners == 0)
-            {
-                GameManager.instance.GainResource(2, 1);
-            }
-            else
-            {
-                // Players lose.
-            }
-            actorManager.ReturnToHub();
-            return;
-        }
-        ActorsTurn();
-        actorInfo.UpdateInfo(actors[turnIndex]);
-    }
-
     public int ReturnMoveCost(int index, int moveType = 0)
     {
         int distance = 1;
@@ -536,7 +545,10 @@ public class TerrainMap : MonoBehaviour
         {
             if (actors[i].health <= 0)
             {
-                actorManager.SubtractTeamCount(actors[i].team);
+                if (actors[i].team != 0)
+                {
+                    // Get drops.
+                }
                 actors.RemoveAt(i);
             }
             UpdateMap();
@@ -639,9 +651,10 @@ public class TerrainMap : MonoBehaviour
             {
                 continue;
             }
-            if (currentTiles.Contains(actors[i].locationIndex))
+            int indexOfActor = currentTiles.IndexOf(actors[i].locationIndex);
+            if (indexOfActor >= 0)
             {
-                UpdateActor(currentTiles.IndexOf(actors[i].locationIndex), i);
+                UpdateActor(indexOfActor, i);
             }
         }
     }
