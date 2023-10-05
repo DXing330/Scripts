@@ -37,7 +37,7 @@ public class TerrainMaker : MonoBehaviour
 
     protected int RandomPlainsTile()
     {
-        rng = Random.Range(0, 6);
+        rng = Random.Range(0, 10);
         switch (rng)
         {
             case 0:
@@ -51,6 +51,14 @@ public class TerrainMaker : MonoBehaviour
             case 4:
                 return 1;
             case 5:
+                return 0;
+            case 6:
+                return 0;
+            case 7:
+                return 0;
+            case 8:
+                return 1;
+            case 9:
                 return 3;
         }
         return 0;
@@ -58,7 +66,7 @@ public class TerrainMaker : MonoBehaviour
 
     protected int RandomForestTile()
     {
-        rng = Random.Range(0, 6);
+        rng = Random.Range(0, 10);
         switch (rng)
         {
             case 0:
@@ -70,16 +78,24 @@ public class TerrainMaker : MonoBehaviour
             case 3:
                 return 0;
             case 4:
-                return 3;
+                return 0;
             case 5:
-                return 4;
+                return 3;
+            case 6:
+                return 1;
+            case 7:
+                return 1;
+            case 8:
+                return 1;
+            case 9:
+                return 0;
         }
         return 1;
     }
 
     protected int RandomMountainTile()
     {
-        rng = Random.Range(0, 6);
+        rng = Random.Range(0, 10);
         switch (rng)
         {
             case 0:
@@ -94,6 +110,14 @@ public class TerrainMaker : MonoBehaviour
                 return 3;
             case 5:
                 return 4;
+            case 6:
+                return 2;
+            case 7:
+                return 2;
+            case 8:
+                return 2;
+            case 9:
+                return 1;
         }
         return 2;
     }
@@ -115,6 +139,14 @@ public class TerrainMaker : MonoBehaviour
                 return 0;
             case 5:
                 return 1;
+            case 6:
+                return 3;
+            case 7:
+                return 3;
+            case 8:
+                return 4;
+            case 9:
+                return 0;
         }
         return 3;
     }

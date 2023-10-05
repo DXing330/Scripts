@@ -103,7 +103,7 @@ public class ActorManager : MonoBehaviour
     {
         if (win)
         {
-            // Claims drops.
+            ClaimDrops();
         }
         GameManager.instance.ReturnToHub();
     }

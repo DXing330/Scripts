@@ -86,16 +86,14 @@ public class TerrainMap : MonoBehaviour
         int winners = actorManager.WinningTeam();
         if (winners >= 0)
         {
+            bool win = false;
             if (winners == 0)
             {
+                RemoveActors();
+                win = true;
                 // Gain collected items.
             }
-            else
-            {
-                // Lost collected items.
-            }
-            actorManager.ReturnToHub();
-            return;
+            actorManager.ReturnToHub(win);
         }
         ActorsTurn();
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -547,7 +545,7 @@ public class TerrainMap : MonoBehaviour
             {
                 if (actors[i].team != 0)
                 {
-                    // Get drops.
+                    actorManager.GetDrops(actors[i]);
                 }
                 actors.RemoveAt(i);
             }
@@ -829,7 +827,14 @@ public class TerrainMap : MonoBehaviour
         {
             freeView = true;
             // Need something better later.
-            fixedCenter = actors[turnIndex].locationIndex;
+            if (battleStarted)
+            {
+                fixedCenter = actors[turnIndex].locationIndex;
+            }
+            else
+            {
+                fixedCenter=fullSize*fullSize/2;
+            }
         }
         int previousFixedCenter = fixedCenter;
         switch (direction)
