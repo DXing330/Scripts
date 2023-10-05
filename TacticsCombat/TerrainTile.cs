@@ -51,7 +51,7 @@ public class TerrainTile : MonoBehaviour
     public void UpdateImage(Sprite newActor)
     {
         Color tempColor = Color.white;
-        tempColor.a = 0.7f;
+        tempColor.a = 0.8f;
         actorImage.sprite = newActor;
         actorImage.color = tempColor;
     }
@@ -115,16 +115,17 @@ public class TerrainTile : MonoBehaviour
                 tempColor.a = 0.3f;
                 break;
             case 2:
-                tempColor = Color.grey;
-                tempColor.a = 0.3f;
+                //tempColor = Color.grey;
+                tempColor = Color.green;
+                tempColor.a = 0.1f;
                 break;
             case 3:
                 tempColor = Color.blue;
-                tempColor.a = 0.3f;
+                tempColor.a = 0.2f;
                 break;
             case 4:
                 tempColor = Color.blue;
-                tempColor.a = 0.5f;
+                tempColor.a = 0.6f;
                 break;
             case 5:
                 tempColor = Color.yellow;

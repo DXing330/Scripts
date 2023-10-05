@@ -142,6 +142,8 @@ public class ArmyFormationManager : MonoBehaviour
             armyData.armyFormation[currentlySelected] = "none";
             UpdateFormationTiles();
             UpdateReserveFighters();
+            currentlySelected = -1;
+            selected = false;
         }
     }
 

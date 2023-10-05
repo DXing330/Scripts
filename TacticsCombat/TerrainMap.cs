@@ -47,6 +47,7 @@ public class TerrainMap : MonoBehaviour
         Application.targetFrameRate = 30;
         GenerateMap(baseTerrain, fullSize);
         UpdateCenterTile((fullSize * fullSize)/2);
+        actorManager.LoadEnemyTeam();
         UpdateMap();
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
     }
@@ -86,6 +87,7 @@ public class TerrainMap : MonoBehaviour
         int winners = actorManager.WinningTeam();
         if (winners >= 0)
         {
+            battleStarted = false;
             bool win = false;
             if (winners == 0)
             {
@@ -94,6 +96,7 @@ public class TerrainMap : MonoBehaviour
                 // Gain collected items.
             }
             actorManager.ReturnToHub(win);
+            return;
         }
         ActorsTurn();
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -106,7 +109,7 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorsTurn()
     {
-        if (actors[turnIndex].health <= 0)
+        if (actors[turnIndex].health <= 0 || !battleStarted)
         {
             NextTurn();
             return;

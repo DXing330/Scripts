@@ -12,6 +12,8 @@ public class ActorManager : MonoBehaviour
     private int teamZeroCount = 0;
     public TerrainTile terrainTile;
     public ActorDataManager actorData;
+    public EnemyGroupsData groupsData;
+    public List<int> usedTiles;
     public int collectedGold = 0;
     public int collectedMana = 0;
     public int collectedBlood = 0;
@@ -57,8 +59,31 @@ public class ActorManager : MonoBehaviour
     public void LoadEnemyTeam()
     {
         int type = GameManager.instance.battleLocationType;
-        int maxAmount = GameManager.instance.battleDifficulty;
+        int difficulty = GameManager.instance.battleDifficulty;
+        string enemyGroup = groupsData.ReturnEnemyGroup(type, difficulty);
+        string[] enemies = enemyGroup.Split(",");
+        usedTiles.Clear();
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            GenerateRandomLocation();
+        }
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            GenerateActor(usedTiles[i], enemies[i], 1);
+        }
+    }
 
+    private void GenerateRandomLocation()
+    {
+        int fullSize = terrainMap.fullSize;
+        int row = Random.Range(3, fullSize);
+        int column = Random.Range(3, fullSize);
+        int index = column + (row*fullSize);
+        if (!usedTiles.Contains(index))
+        {
+            usedTiles.Add(index);
+        }
+        else{GenerateRandomLocation();}
     }
 
     public void LoadActor(TacticActor actorToCopy, int location, int team = 0)

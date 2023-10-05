@@ -34,7 +34,14 @@ public class PlayerActor : MonoBehaviour
         playerActor.baseMovement = baseMovement+allEquipment.totalBonusMovement;
         playerActor.attackRange = attackRange;
         playerActor.movementType = moveType;
-        playerActor.passiveNames = new List<string>(learntPassives);
-        playerActor.activeSkillNames = new List<string>(learntSkills);
+        if (learntSkills.Count <= 0)
+        {
+            return;
+        }
+        playerActor.activeSkillNames.Clear();
+        for (int i = 0; i < Mathf.Min(currentLevel, learntSkills.Count); i++)
+        {
+            playerActor.activeSkillNames.Add(learntSkills[i]);
+        }
     }
 }
