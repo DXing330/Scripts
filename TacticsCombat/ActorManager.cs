@@ -13,6 +13,7 @@ public class ActorManager : MonoBehaviour
     public TerrainTile terrainTile;
     public ActorDataManager actorData;
     public EnemyGroupsData groupsData;
+    public SkillDataManager skillData;
     public List<int> usedTiles;
     public int collectedGold = 0;
     public int collectedMana = 0;
@@ -84,6 +85,11 @@ public class ActorManager : MonoBehaviour
             usedTiles.Add(index);
         }
         else{GenerateRandomLocation();}
+    }
+
+    public void LoadSkillData(TacticActiveSkill tacticActive, string skillName)
+    {
+        skillData.LoadDataForSkill(tacticActive, skillName);
     }
 
     public void LoadActor(TacticActor actorToCopy, int location, int team = 0)
@@ -204,15 +210,19 @@ public class ActorManager : MonoBehaviour
 
     }
 
-    public bool BattleBetweenActors(TacticActor attacker, TacticActor attackee, bool counter = true, bool flanked = false)
+    public bool BattleBetweenActors(TacticActor attacker, TacticActor attackee, bool counter = true, bool flanked = false, int skillPowerMultipler = 0)
     {
         int attackeeLocationType = terrainMap.terrainInfo[attackee.locationIndex];
         // Encourage attacking.
         int attackAdvantage = attacker.attackDamage*6/5;
+        if (skillPowerMultipler > 10)
+        {
+            attackAdvantage += attacker.attackDamage*skillPowerMultipler/10;
+        }
         // Check for flanking/ally support.
         if (flanked)
         {
-            attackAdvantage = attackAdvantage*6/5;
+            attackAdvantage += attacker.attackDamage*6/5;
         }
         // Calculate terrain bonuses at the end then damage each other.
         int attackerPower = attackAdvantage*6/terrainTile.TerrainDefenseBonus(attackeeLocationType);

@@ -140,9 +140,9 @@ public class TacticActor : MonoBehaviour
         LoseEnergy(activeSkill.cost);
     }
 
-    public void LoadSkill(int skillIndex)
+    public string LoadSkillName(int skillIndex)
     {
-        activeSkill.LoadData(activeSkillNames[skillIndex]);
+        return (activeSkillNames[skillIndex]);
     }
 
     public bool Delayable()
@@ -163,14 +163,9 @@ public class TacticActor : MonoBehaviour
         return true;
     }
 
-    public bool CheckSkillActivatable(int skillIndex)
+    public bool CheckSkillActivatable()
     {
-        if (actionsLeft < 1)
-        {
-            return false;
-        }
-        LoadSkill(skillIndex);
-        if (energy < activeSkill.cost)
+        if (actionsLeft < 1 || energy < activeSkill.cost)
         {
             return false;
         }
@@ -263,6 +258,10 @@ public class TacticActor : MonoBehaviour
     private bool Moveable()
     {
         if (currentPath.Count <= 0 || currentPath[0] == locationIndex)
+        {
+            return false;
+        }
+        if (terrainMap.CheckTargetInRange(locationIndex, attackTarget, attackRange))
         {
             return false;
         }

@@ -39,9 +39,4 @@ public class TacticActiveSkill : MonoBehaviour
                 break;
         }
     }
-
-    public void LoadData(string newName)
-    {
-        skillData.LoadDataForSkill(this, newName);
-    }
 }

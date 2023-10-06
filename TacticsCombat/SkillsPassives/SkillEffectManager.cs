@@ -5,7 +5,7 @@ using UnityEngine;
 public class SkillEffectManager : MonoBehaviour
 {
     private int powerDenominator;
-    public void ApplySkillEffect(TacticActor target, TacticActiveSkill skill, TacticActor user)
+    public bool ApplySkillEffect(TacticActor target, TacticActiveSkill skill, TacticActor user)
     {
         // Determine skill power.
         int power = skill.basePower;
@@ -17,8 +17,11 @@ public class SkillEffectManager : MonoBehaviour
             case "Heal":
                 power *= user.level;
                 break;
+            case "Battle":
+                return true;
         }
         power /= powerDenominator;
         skill.AffectActor(target, power);
+        return false;
     }
 }

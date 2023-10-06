@@ -11,6 +11,7 @@ public class PlayerActor : MonoBehaviour
     public int baseAttack = 10;
     public int baseDefense = 3;
     public int baseEnergy = 3;
+    public int energyPerLevel = 1;
     public int baseMovement = 3;
     public int attackRange = 1;
     public int moveType = 0;

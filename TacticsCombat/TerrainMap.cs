@@ -179,11 +179,12 @@ public class TerrainMap : MonoBehaviour
 
     public void SelectSkill()
     {
+        string skillName = actors[turnIndex].LoadSkillName(currentTarget);
+        actorManager.LoadSkillData(actors[turnIndex].activeSkill, skillName);
         if (!CheckSkillActivatable())
         {
             return;
         }
-        actors[turnIndex].LoadSkill(currentTarget);
         if (actors[turnIndex].activeSkill.lockOn == 0)
         {
             skillCenter = actors[turnIndex].locationIndex;
@@ -202,7 +203,7 @@ public class TerrainMap : MonoBehaviour
 
     public bool CheckSkillActivatable()
     {
-        return actors[turnIndex].CheckSkillActivatable(currentTarget);
+        return actors[turnIndex].CheckSkillActivatable();
     }
 
     public void ActivateSkill()
@@ -217,11 +218,28 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
+    private void SpecialSkillActivation()
+    {
+        switch (actors[turnIndex].activeSkill.effect)
+        {
+            case "Battle":
+                Debug.Log("Battling");
+                CurrentActorAttack(actors[turnIndex].activeSkill.basePower);
+                break;
+        }
+    }
+
     private void LockOnSkillActivate()
     {
+        bool specialEffect = false;
         ActorStopMoving();
         actors[turnIndex].ActivateSkill();
-        skillManager.ApplySkillEffect(ReturnCurrentTarget(), actors[turnIndex].activeSkill, actors[turnIndex]);
+        specialEffect = skillManager.ApplySkillEffect(ReturnCurrentTarget(), actors[turnIndex].activeSkill, actors[turnIndex]);
+        if (specialEffect)
+        {
+            Debug.Log("Special effect");
+            SpecialSkillActivation();
+        }
         actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
@@ -231,14 +249,19 @@ public class TerrainMap : MonoBehaviour
         actors[turnIndex].ActivateSkill();
         int tileNumber = 0;
         TacticActor target = null;
+        bool specialEffect = false;
         for (int i = 0; i < targetableTiles.Count; i++)
         {
             tileNumber = targetableTiles[i];
             if (occupiedTiles[tileNumber] > 0)
             {
                 target = ReturnActorOnTile(tileNumber);
-                skillManager.ApplySkillEffect(target, actors[turnIndex].activeSkill, actors[turnIndex]);
-                // Add hitbacks to some skills
+                specialEffect = skillManager.ApplySkillEffect(target, actors[turnIndex].activeSkill, actors[turnIndex]);
+                if (specialEffect)
+                {
+                    Debug.Log("Special effect");
+                    SpecialSkillActivation();
+                }
             }
         }
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -277,7 +300,8 @@ public class TerrainMap : MonoBehaviour
         {
             return null;
         }
-        actors[turnIndex].LoadSkill(currentTarget);
+        string skillName = actors[turnIndex].LoadSkillName(currentTarget);
+        actorManager.LoadSkillData(actors[turnIndex].activeSkill, skillName);
         return actors[turnIndex].activeSkill;
     }
 
@@ -354,13 +378,24 @@ public class TerrainMap : MonoBehaviour
         return null;
     }
 
+    public bool CheckTargetInRange(int location, TacticActor target, int range)
+    {
+        targetableTiles = new List<int>(pathFinder.FindTilesInRange(location, range, -1));
+        for (int i = 0; i < targetableTiles.Count; i++)
+        {
+            if (ReturnActorOnTile(targetableTiles[i]) == null){continue;}
+            if (ReturnActorOnTile(targetableTiles[i]) == target){return true;}
+        }
+        return false;
+    }
+
     public void ActorStopAttacking()
     {
         UpdateCenterTile(actors[turnIndex].locationIndex);
         UpdateMap();
     }
 
-    public void CurrentActorAttack()
+    public void CurrentActorAttack(int skillPowerMultipler = 0)
     {
         if (targetableTiles.Count <= 0 || !actors[turnIndex].CheckActions())
         {
@@ -369,11 +404,11 @@ public class TerrainMap : MonoBehaviour
         // If they die while attacking, automatically end their turn.
         actors[turnIndex].actionsLeft--;
         // Find if they can counter attack.
-        bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], ReturnCurrentTarget(), Counterable(actors[turnIndex].locationIndex, ReturnCurrentTarget()), DetermineFlanking(ReturnCurrentTarget()));
+        bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], ReturnCurrentTarget(), Counterable(actors[turnIndex].locationIndex, ReturnCurrentTarget()), DetermineFlanking(ReturnCurrentTarget()), skillPowerMultipler);
         if (attackerDied)
         {
-            NextTurn();
             ActorStopMoving();
+            NextTurn();
         }
         actorInfo.UpdateInfo(actors[turnIndex]);
     }
