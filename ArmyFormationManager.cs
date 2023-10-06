@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ArmyFormationManager : MonoBehaviour
 {
-    public List<Sprite> actorSprites;
+    public ActorSprites actorSprites;
     public List<FormationTile> formationTiles;
     public List<FormationTile> reserveFighters;
     private bool selected = false;
@@ -154,21 +154,6 @@ public class ArmyFormationManager : MonoBehaviour
 
     private Sprite SpriteDictionary(string actorName)
     {
-        if (actorName == "Player")
-        {
-            return actorSprites[0];
-        }
-        if (actorName == "Familiar")
-        {
-            return actorSprites[1];
-        }
-        for (int i = 0; i < actorSprites.Count; i++)
-        {
-            if (actorSprites[i].name == actorName)
-            {
-                return actorSprites[i];
-            }
-        }
-        return null;
+        return actorSprites.SpriteDictionary(actorName);
     }
 }

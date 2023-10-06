@@ -395,10 +395,15 @@ public class TerrainMap : MonoBehaviour
 
     private void BattleBetweenActors(TacticActor attacker, TacticActor defender, int skillMultiplier = 0)
     {
-        actorManager.BattleBetweenActors(attacker, defender, Counterable(attacker.locationIndex, defender), DetermineFlanking(defender), skillMultiplier);
+        bool attackerDied = actorManager.BattleBetweenActors(attacker, defender, Counterable(attacker.locationIndex, defender), DetermineFlanking(defender), skillMultiplier);
+        if (attackerDied)
+        {
+            ActorStopMoving();
+            NextTurn();
+        }
     }
 
-    public void CurrentActorAttack(int skillPowerMultipler = 0)
+    public void CurrentActorAttack()
     {
         if (targetableTiles.Count <= 0 || !actors[turnIndex].CheckActions())
         {
@@ -409,7 +414,7 @@ public class TerrainMap : MonoBehaviour
         actors[turnIndex].actionsLeft--;
         // Find if they can counter attack.
         TacticActor target = ReturnCurrentTarget();
-        bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex].locationIndex, target), DetermineFlanking(target), skillPowerMultipler);
+        bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex].locationIndex, target), DetermineFlanking(target));
         if (attackerDied)
         {
             ActorStopMoving();

@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class ActorManager : MonoBehaviour
 {
-    public List<Sprite> actorSprites;
+    public ActorSprites actorSprites;
     public TacticActor actorPrefab;
     public TerrainMap terrainMap;
     private int teamOneCount = 0;
@@ -130,7 +130,7 @@ public class ActorManager : MonoBehaviour
         }
         else
         {
-            actor.SetSprite(actorSprites[0]);
+            actor.SetSprite(actorSprites.allSprites[0]);
         }
     }
 
@@ -217,16 +217,16 @@ public class ActorManager : MonoBehaviour
         int attackAdvantage = attacker.attackDamage*6/5;
         if (skillPowerMultipler > 10)
         {
-            attackAdvantage += attacker.attackDamage*skillPowerMultipler/10;
+            attackAdvantage += attacker.attackDamage*skillPowerMultipler/10 - attacker.attackDamage;
         }
         // Check for flanking/ally support.
         if (flanked)
         {
-            attackAdvantage += attacker.attackDamage*6/5;
+            attackAdvantage += attacker.attackDamage*6/5 - attacker.attackDamage;
         }
         // Calculate terrain bonuses at the end then damage each other.
-        int attackerPower = attackAdvantage*6/terrainTile.TerrainDefenseBonus(attackeeLocationType);
-        attackee.ReceiveDamage(attackerPower);
+        attackAdvantage = attackAdvantage*6/terrainTile.TerrainDefenseBonus(attackeeLocationType);
+        attackee.ReceiveDamage(attackAdvantage);
         if (counter)
         {
             int attackerLocationType = terrainMap.terrainInfo[attacker.locationIndex];
@@ -249,34 +249,6 @@ public class ActorManager : MonoBehaviour
 
     private Sprite SpriteDictionary(string spriteName)
     {
-        switch (spriteName)
-        {
-            case "Wolf":
-                return actorSprites[9];
-            case "Skeleton":
-                return actorSprites[12];
-            case "Bear":
-                return actorSprites[5];
-            /*case "Skeleton":
-                return actorSprites[12];
-            case "Skeleton":
-                return actorSprites[12];
-            case "Skeleton":
-                return actorSprites[12];
-            case "Skeleton":
-                return actorSprites[12];
-            case "Skeleton":
-                return actorSprites[12];
-            case "Skeleton":
-                return actorSprites[12];*/
-        }
-        for (int i = 0; i < actorSprites.Count; i++)
-        {
-            if (actorSprites[i].name == spriteName)
-            {
-                return actorSprites[i];
-            }
-        }
-        return null;
+        return actorSprites.SpriteDictionary(spriteName);
     }
 }
