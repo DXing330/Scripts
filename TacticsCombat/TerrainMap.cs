@@ -218,13 +218,12 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
-    private void SpecialSkillActivation()
+    private void SpecialSkillActivation(TacticActor target)
     {
         switch (actors[turnIndex].activeSkill.effect)
         {
             case "Battle":
-                Debug.Log("Battling");
-                CurrentActorAttack(actors[turnIndex].activeSkill.basePower);
+                BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower);
                 break;
         }
     }
@@ -233,20 +232,18 @@ public class TerrainMap : MonoBehaviour
     {
         bool specialEffect = false;
         ActorStopMoving();
-        actors[turnIndex].ActivateSkill();
         specialEffect = skillManager.ApplySkillEffect(ReturnCurrentTarget(), actors[turnIndex].activeSkill, actors[turnIndex]);
         if (specialEffect)
         {
-            Debug.Log("Special effect");
-            SpecialSkillActivation();
+            SpecialSkillActivation(ReturnCurrentTarget());
         }
+        actors[turnIndex].ActivateSkill();
         actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
     private void NonLockOnSkillActivate()
     {
         ActorStopMoving();
-        actors[turnIndex].ActivateSkill();
         int tileNumber = 0;
         TacticActor target = null;
         bool specialEffect = false;
@@ -260,10 +257,11 @@ public class TerrainMap : MonoBehaviour
                 if (specialEffect)
                 {
                     Debug.Log("Special effect");
-                    SpecialSkillActivation();
+                    SpecialSkillActivation(ReturnCurrentTarget());
                 }
             }
         }
+        actors[turnIndex].ActivateSkill();
         actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
@@ -395,16 +393,23 @@ public class TerrainMap : MonoBehaviour
         UpdateMap();
     }
 
+    private void BattleBetweenActors(TacticActor attacker, TacticActor defender, int skillMultiplier = 0)
+    {
+        actorManager.BattleBetweenActors(attacker, defender, Counterable(attacker.locationIndex, defender), DetermineFlanking(defender), skillMultiplier);
+    }
+
     public void CurrentActorAttack(int skillPowerMultipler = 0)
     {
         if (targetableTiles.Count <= 0 || !actors[turnIndex].CheckActions())
         {
+            Debug.Log(actors[turnIndex].CheckActions());
             return;
         }
         // If they die while attacking, automatically end their turn.
         actors[turnIndex].actionsLeft--;
         // Find if they can counter attack.
-        bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], ReturnCurrentTarget(), Counterable(actors[turnIndex].locationIndex, ReturnCurrentTarget()), DetermineFlanking(ReturnCurrentTarget()), skillPowerMultipler);
+        TacticActor target = ReturnCurrentTarget();
+        bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex].locationIndex, target), DetermineFlanking(target), skillPowerMultipler);
         if (attackerDied)
         {
             ActorStopMoving();
