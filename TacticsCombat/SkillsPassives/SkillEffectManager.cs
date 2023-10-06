@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SkillEffectManager : MonoBehaviour
 {
+    private int powerDenominator;
     public void ApplySkillEffect(TacticActor target, TacticActiveSkill skill, TacticActor user)
     {
         // Determine skill power.
@@ -11,12 +12,13 @@ public class SkillEffectManager : MonoBehaviour
         switch (skill.effect)
         {
             case "Damage":
-                power += user.attackDamage;
+                power *= user.attackDamage;
                 break;
             case "Heal":
                 power *= user.level;
                 break;
         }
+        power /= powerDenominator;
         skill.AffectActor(target, power);
     }
 }
