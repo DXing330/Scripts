@@ -25,10 +25,6 @@ public class TacticActiveSkill : MonoBehaviour
 
     public void AffectActor(TacticActor actor, int power = 0)
     {
-        if (power < basePower)
-        {
-            power = basePower;
-        }
         switch (effect)
         {
             case "Damage":

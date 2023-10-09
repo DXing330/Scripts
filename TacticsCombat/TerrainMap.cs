@@ -407,7 +407,6 @@ public class TerrainMap : MonoBehaviour
     {
         if (targetableTiles.Count <= 0 || !actors[turnIndex].CheckActions())
         {
-            Debug.Log(actors[turnIndex].CheckActions());
             return;
         }
         // If they die while attacking, automatically end their turn.

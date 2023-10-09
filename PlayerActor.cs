@@ -28,6 +28,7 @@ public class PlayerActor : MonoBehaviour
     {
         allEquipment.UpdateStats();
         currentLevel = GameManager.instance.playerLevel;
+        playerActor.level = currentLevel;
         playerActor.baseHealth = baseHealth + ((currentLevel - 1) * healthPerLevel)+allEquipment.totalBonusHealth;
         playerActor.baseAttack = baseAttack+allEquipment.totalBonusAttack;
         playerActor.baseDefense = baseDefense+allEquipment.totalBonusDefense;

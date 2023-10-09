@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SkillEffectManager : MonoBehaviour
 {
-    private int powerDenominator;
+    private int powerDenominator = 10;
     public bool ApplySkillEffect(TacticActor target, TacticActiveSkill skill, TacticActor user)
     {
         // Determine skill power.

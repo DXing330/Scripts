@@ -73,6 +73,7 @@ public class TacticActor : MonoBehaviour
 
     public void CopyStats(TacticActor actorToCopy)
     {
+        level = actorToCopy.level;
         baseHealth = actorToCopy.baseHealth;
         baseMovement = actorToCopy.baseMovement;
         baseAttack = actorToCopy.baseAttack;
