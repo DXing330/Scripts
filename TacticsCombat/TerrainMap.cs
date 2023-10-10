@@ -40,6 +40,7 @@ public class TerrainMap : MonoBehaviour
     public void StartBattle()
     {
         battleStarted = true;
+        ActorsTurn();
     }
 
     void Start()
@@ -109,7 +110,7 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorsTurn()
     {
-        if (actors[turnIndex].health <= 0 || !battleStarted)
+        if (actors[turnIndex].health <= 0)
         {
             NextTurn();
             return;
@@ -158,6 +159,7 @@ public class TerrainMap : MonoBehaviour
         UpdateCenterTile(actors[turnIndex].locationIndex);
         UpdateMap();
         actorInfo.UpdateInfo(actors[turnIndex]);
+
     }
 
     public void ActorStartAttacking()
@@ -579,7 +581,7 @@ public class TerrainMap : MonoBehaviour
 
     public void AddActor(TacticActor newActor)
     {
-        actors.Add(newActor);
+        actors.Insert(0, newActor);
         UpdateOccupiedTiles();
         UpdateMap();
     }

@@ -21,17 +21,17 @@ public class ActorManager : MonoBehaviour
 
     public void LoadPlayerTeam()
     {
-        int column = 2;
-        int row = 2;
-        for (int i = GameManager.instance.armyData.armyFormation.Count-1; i >= 0; i--)
+        int column = 0;
+        int row = 0;
+        for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
         {
             string actorType = GameManager.instance.armyData.armyFormation[i];
             LoadPlayerTeamMember(actorType, row, column);
-            column--;
-            if (column < 0)
+            column++;
+            if (column >= 3)
             {
-                column = 2;
-                row--;
+                column = 0;
+                row++;
             }
         }
     }
