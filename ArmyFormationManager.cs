@@ -14,10 +14,13 @@ public class ArmyFormationManager : MonoBehaviour
     public int currentReserveSelected = -1;
     private int currentReservePage = 0;
     public ArmyDataManager armyData;
+    public int armyMaxCapacity = 0;
+    public int currentCapacity;
 
     void Start()
     {
         armyData = GameManager.instance.armyData;
+        armyMaxCapacity = 2+GameManager.instance.playerLevel;
         UpdateFormationTiles();
         UpdateReserveFighters();
     }
@@ -46,6 +49,7 @@ public class ArmyFormationManager : MonoBehaviour
                 currentReservePage = armyData.availableFighters.Count/reserveFighters.Count;
             }
         }
+        currentReserveSelected = -1;
         UpdateReserveFighters();
     }
 
@@ -55,9 +59,14 @@ public class ArmyFormationManager : MonoBehaviour
         for (int i = 0; i < reserveFighters.Count; i++)
         {
             reserveFighters[i].ResetActorSprite();
+            reserveFighters[i].ResetHighlight();
             if (index >= armyData.availableFighters.Count)
             {
                 break;
+            }
+            if (i == currentReserveSelected)
+            {
+                reserveFighters[i].Highlight();
             }
             reserveFighters[i].UpdateActorSprite(SpriteDictionary(armyData.availableFighters[index]));
             index++;
@@ -68,21 +77,57 @@ public class ArmyFormationManager : MonoBehaviour
     {
         for (int i = 0; i < formationTiles.Count; i++)
         {
+            formationTiles[i].ResetHighlight();
             formationTiles[i].UpdateActorSprite(SpriteDictionary(armyData.armyFormation[i]));
+            if (i == currentlySelected)
+            {
+                formationTiles[i].Highlight();
+            }
         }
     }
 
     public void SelectReserveSpot(int index)
     {
-        if (!reserveSelected)
-        {
-            reserveSelected = true;
-        }
         currentReserveSelected = index+(currentReservePage * reserveFighters.Count);
         if (currentReserveSelected >= armyData.availableFighters.Count)
         {
             currentReserveSelected = -1;
         }
+        if (selected)
+        {
+            selected = false;
+            // Try to switch the army and the reserve members.
+            // Never remove the player or familiar.
+            string tempString = armyData.armyFormation[currentlySelected];
+            if (tempString == "Player" || tempString == "Familiar")
+            {
+                currentlySelected = -1;
+                UpdateFormationTiles();
+                return;
+            }
+            CountCapacity();
+            // Don't add anymore units if you're at max capacity.
+            if (currentReserveSelected < 0 || (currentCapacity >= armyMaxCapacity && tempString == "none"))
+            {
+                currentlySelected = -1;
+                UpdateFormationTiles();
+                return;
+            }
+            // Otherwise do the switcheroo.
+            armyData.armyFormation[currentlySelected] = armyData.availableFighters[currentReserveSelected];
+            armyData.availableFighters[currentReserveSelected] = tempString;
+            currentlySelected = -1;
+            currentReserveSelected = -1;
+            UpdateFormationTiles();
+            UpdateReserveFighters();
+            return;
+        }
+        if (!reserveSelected)
+        {
+            reserveSelected = true;
+        }
+        UpdateFormationTiles();
+        UpdateReserveFighters();
     }
 
     public void SelectSpot(int index)
@@ -97,6 +142,16 @@ public class ArmyFormationManager : MonoBehaviour
             string tempString = armyData.armyFormation[index];
             if (tempString == "Player" || tempString == "Familiar")
             {
+                currentReserveSelected = -1;
+                UpdateReserveFighters();
+                return;
+            }
+            CountCapacity();
+            // Don't add anymore units if you're at max capacity.
+            if (currentCapacity >= armyMaxCapacity && tempString == "none")
+            {
+                currentReserveSelected = -1;
+                UpdateReserveFighters();
                 return;
             }
             armyData.armyFormation[index] = armyData.availableFighters[currentReserveSelected];
@@ -105,6 +160,8 @@ public class ArmyFormationManager : MonoBehaviour
             {
                 armyData.availableFighters.Add(tempString);
             }
+            currentReserveSelected = -1;
+            currentlySelected = -1;
             UpdateFormationTiles();
             UpdateReserveFighters();
             return;
@@ -123,6 +180,21 @@ public class ArmyFormationManager : MonoBehaviour
             UpdateFormationTiles();
             currentlySelected = -1;
         }
+        UpdateFormationTiles();
+        UpdateReserveFighters();
+    }
+
+    private void CountCapacity()
+    {
+        currentCapacity = 0;
+        for (int i = 0; i < armyData.armyFormation.Count; i++)
+        {
+            if (armyData.armyFormation[i] == "none")
+            {
+                continue;
+            }
+            currentCapacity++;
+        }
     }
 
     public void RemoveFromSpot()
@@ -140,9 +212,9 @@ public class ArmyFormationManager : MonoBehaviour
         {
             armyData.availableFighters.Add(actorName);
             armyData.armyFormation[currentlySelected] = "none";
+            currentlySelected = -1;
             UpdateFormationTiles();
             UpdateReserveFighters();
-            currentlySelected = -1;
             selected = false;
         }
     }
