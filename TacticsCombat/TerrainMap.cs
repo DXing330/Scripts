@@ -235,6 +235,7 @@ public class TerrainMap : MonoBehaviour
 
     public void NPCActivateSkill(int skillTargetLocation)
     {
+        UpdateOccupiedTiles();
         // Lock == single target.
         if (actors[turnIndex].activeSkill.lockOn == 1)
         {

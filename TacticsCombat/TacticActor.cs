@@ -77,6 +77,7 @@ public class TacticActor : MonoBehaviour
     public void CopyStats(TacticActor actorToCopy)
     {
         level = actorToCopy.level;
+        typeName = actorToCopy.typeName;
         baseHealth = actorToCopy.baseHealth;
         baseMovement = actorToCopy.baseMovement;
         baseAttack = actorToCopy.baseAttack;
@@ -308,6 +309,20 @@ public class TacticActor : MonoBehaviour
         {
             MoveAction();
             terrainMap.UpdateOnActorTurn();
+        }
+        else
+        {
+            // If you can't move anymore but the target is still not in range then try to use a movement skill.
+            if (!terrainMap.CheckTargetInRange(locationIndex, attackTarget, attackRange))
+            {
+                NPCLoadSkill(0);
+                if (CheckSkillActivatable())
+                {
+                    terrainMap.NPCActivateSkill(locationIndex);
+                    ActivateSkill();
+                    MoveAction();
+                }
+            }
         }
     }
 

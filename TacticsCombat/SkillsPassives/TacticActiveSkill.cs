@@ -35,6 +35,9 @@ public class TacticActiveSkill : MonoBehaviour
             case "Heal":
                 actor.RegainHealth(power);
                 break;
+            case "Move":
+                actor.movement += power;
+                break;
         }
     }
 }
