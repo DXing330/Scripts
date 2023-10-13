@@ -202,8 +202,15 @@ public class TacticActor : MonoBehaviour
         {
             return;
         }
+        NPCLoadSkill(1);
         if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= attackRange)
         {
+            if (CheckSkillActivatable())
+            {
+                terrainMap.NPCActivateSkill(attackTarget.locationIndex);
+                ActivateSkill();
+                return;
+            }
             terrainMap.NPCActorAttack(attackTarget);
             actionsLeft--;
         }
@@ -211,6 +218,12 @@ public class TacticActor : MonoBehaviour
         {
             attackTarget = terrainMap.ReturnEnemyInRange(locationIndex, team, attackRange);
             if (attackTarget == null){return;}
+            if (CheckSkillActivatable())
+            {
+                terrainMap.NPCActivateSkill(attackTarget.locationIndex);
+                ActivateSkill();
+                return;
+            }
             terrainMap.NPCActorAttack(attackTarget);
             actionsLeft--;
         }
