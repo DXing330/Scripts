@@ -233,6 +233,22 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
+    public void NPCActivateSkill(int skillTargetLocation)
+    {
+        // Lock == single target.
+        if (actors[turnIndex].activeSkill.lockOn == 0)
+        {
+            TacticActor skillTarget = ReturnActorOnTile(skillTargetLocation);
+            bool specialEffect = false;
+            specialEffect = skillManager.ApplySkillEffect(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);
+            if (specialEffect)
+            {
+                SpecialSkillActivation(ReturnCurrentTarget());
+            }
+        }
+        // !Lock == aoe.
+    }
+
     private void SpecialSkillActivation(TacticActor target)
     {
         switch (actors[turnIndex].activeSkill.effect)

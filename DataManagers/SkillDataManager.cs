@@ -41,6 +41,10 @@ public class SkillDataManager : MonoBehaviour
         int skillIndex = skillNames.IndexOf(skillName);
         if (skillIndex < 0)
         {
+            activeSkill.skillName = "";
+            activeSkill.cost = 0;
+            activeSkill.effect = "";
+            activeSkill.actionCost = 0;
             return;
         }
         activeSkill.skillName = skillNames[skillIndex];

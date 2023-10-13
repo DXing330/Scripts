@@ -39,6 +39,7 @@ public class ActionManager : MonoBehaviour
                 break;
             case 3:
                 if (currentActor.actionsLeft <= 0){return;}
+                if (currentActor.activeSkillNames.Count <= 0){return;}
                 break;
         }
         state = newState;

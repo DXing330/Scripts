@@ -13,6 +13,8 @@ public class UnitUpgradeData : MonoBehaviour
     public List<string> bonusHealth;
     public List<string> bonusAttack;
     public List<string> bonusDefense;
+    public List<string> bonusPassiveSkills;
+    public List<string> bonusActiveSkills;
 
     public void NewGame()
     {

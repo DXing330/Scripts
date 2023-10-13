@@ -40,6 +40,9 @@ public class TacticActor : MonoBehaviour
     public List<int> buffDebuffsDurations;
     public List<string> passiveNames;
     public List<string> activeSkillNames;
+    public string npcMoveSkill;
+    public string npcAttackSkill;
+    public string npcSupportSkill;
     public TacticActiveSkill activeSkill;
     //public List<TacticActiveSkill> activeSkills;
 
@@ -146,6 +149,25 @@ public class TacticActor : MonoBehaviour
         return (activeSkillNames[skillIndex]);
     }
 
+    private void NPCLoadSkill(int type)
+    {
+        // 0 = move, 1 = attack, 2 = support
+        string skillName = "";
+        switch (type)
+        {
+            case 0:
+                skillName = npcMoveSkill;
+                break;
+            case 1:
+                skillName = npcAttackSkill;
+                break;
+            case 2:
+                skillName = npcSupportSkill;
+                break;
+        }
+        terrainMap.actorManager.LoadSkillData(activeSkill, skillName);
+    }
+
     public bool Delayable()
     {
         if (movement <= 0 && actionsLeft <= 0)
@@ -166,7 +188,8 @@ public class TacticActor : MonoBehaviour
 
     public bool CheckSkillActivatable()
     {
-        if (actionsLeft < 1 || energy < activeSkill.cost)
+        // No such thing as a skill that costs zero energy.
+        if (actionsLeft < 1 || energy < activeSkill.cost || activeSkill.cost <= 0)
         {
             return false;
         }
@@ -193,6 +216,22 @@ public class TacticActor : MonoBehaviour
         }
     }
 
+    private void SupportAction()
+    {
+        if (actionsLeft <= 0)
+        {
+            return;
+        }
+        NPCLoadSkill(2);
+        if (CheckSkillActivatable())
+        {
+            // Support skills are always cast on oneself?
+            // We can make different AI's later.
+            terrainMap.NPCActivateSkill(locationIndex);
+            ActivateSkill();
+        }
+    }
+
     private void UpdateTarget(TacticActor newTarget)
     {
         attackTarget = newTarget;
@@ -214,7 +253,10 @@ public class TacticActor : MonoBehaviour
         CheckGoal();
         GetPath();
         MoveAction();
+        // Check movement skill.
+        // Check dps skill.
         AttackAction();
+        SupportAction();
     }
 
     public void StartTurn()

@@ -15,7 +15,9 @@ public class SkillEffectManager : MonoBehaviour
                 power *= user.attackDamage;
                 break;
             case "Heal":
-                power *= user.level;
+                power *= user.baseHealth/10;
+                // Limit healing.
+                power = Mathf.Min(power, skill.basePower*powerDenominator);
                 break;
             case "Battle":
                 return true;
