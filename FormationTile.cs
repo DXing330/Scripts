@@ -30,5 +30,8 @@ public class FormationTile : MonoBehaviour
     public void UpdateActorSprite(Sprite newSprite)
     {
         image.sprite = newSprite;
+        Color tempColor = Color.white;
+        tempColor.a = 1f;
+        image.color = tempColor;
     }
 }

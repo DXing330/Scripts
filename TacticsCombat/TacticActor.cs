@@ -137,7 +137,7 @@ public class TacticActor : MonoBehaviour
 
     public void ActivateSkill()
     {
-        actionsLeft--;
+        actionsLeft -= activeSkill.actionCost;
         LoseEnergy(activeSkill.cost);
     }
 

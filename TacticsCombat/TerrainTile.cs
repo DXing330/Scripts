@@ -51,7 +51,7 @@ public class TerrainTile : MonoBehaviour
     public void UpdateImage(Sprite newActor)
     {
         Color tempColor = Color.white;
-        tempColor.a = 0.8f;
+        tempColor.a = 1f;
         actorImage.sprite = newActor;
         actorImage.color = tempColor;
     }

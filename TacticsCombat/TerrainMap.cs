@@ -24,6 +24,7 @@ public class TerrainMap : MonoBehaviour
     public List<int> highlightedTiles;
     public List<int> targetableTiles;
     private int currentTarget = 0;
+    private int currentViewed = 0;
     private int skillCenter;
     private int skillSpan;
     public List<int> currentTiles;
@@ -36,6 +37,9 @@ public class TerrainMap : MonoBehaviour
     public MoveManager moveManager;
     public SkillEffectManager skillManager;
     public TacticActorInfo actorInfo;
+    public TurnOrderPanel turnOrder;
+
+    public int GetTurnIndex(){return turnIndex;}
 
     public void StartBattle()
     {
@@ -129,6 +133,7 @@ public class TerrainMap : MonoBehaviour
             NPCActorsTurn();
         }
         actorInfo.UpdateInfo(actors[turnIndex]);
+        turnOrder.UpdateTurnOrder(turnIndex);
     }
 
     public void DelayTurn()
@@ -359,7 +364,7 @@ public class TerrainMap : MonoBehaviour
         return ReturnActorOnTile(targetLocation);
     }
 
-    public TacticActor ReturnCurrentViewed()
+    public TacticActor ReturnCurrentAttackTarget()
     {
         return actors[currentTarget];
     }
@@ -429,6 +434,7 @@ public class TerrainMap : MonoBehaviour
             ActorStopMoving();
             NextTurn();
         }
+        CheckWinners();
         actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
@@ -469,20 +475,26 @@ public class TerrainMap : MonoBehaviour
 
     public void ViewActorInfo(bool right = true)
     {
-        if (actors[currentTarget].health <= 0)
+        if (actors[currentViewed].health <= 0)
         {
             SwitchViewedActor(right);
             return;
         }
-        actorInfo.UpdateInfo(actors[currentTarget]);
-        UpdateCenterTile(actors[currentTarget].locationIndex);
+        actorInfo.UpdateInfo(actors[currentViewed]);
+        UpdateCenterTile(actors[currentViewed].locationIndex);
         UpdateMap();
         ViewReachableTiles();
     }
 
+    public void ViewActorByIndex(int index)
+    {
+        currentViewed = (turnIndex+index)%actors.Count;
+        ViewActorInfo();
+    }
+
     public void StartViewingActorInfo()
     {
-        currentTarget = turnIndex;
+        currentViewed = turnIndex;
         ViewActorInfo();
     }
 
@@ -490,17 +502,17 @@ public class TerrainMap : MonoBehaviour
     {
         if (right)
         {
-            currentTarget = (currentTarget+1)%actors.Count;
+            currentViewed = (currentViewed+1)%actors.Count;
         }
         else
         {
-            if (currentTarget > 0)
+            if (currentViewed > 0)
             {
-                currentTarget--;
+                currentViewed--;
             }
             else
             {
-                currentTarget = actors.Count - 1;
+                currentViewed = actors.Count - 1;
             }
         }
         ViewActorInfo(right);
@@ -738,21 +750,25 @@ public class TerrainMap : MonoBehaviour
     {
         int start = actors[turnIndex].locationIndex;
         int movement = actors[turnIndex].movement;
-        highlightedTiles = pathFinder.FindTilesInRange(start, movement, actors[turnIndex].movementType);
+        highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, movement, actors[turnIndex].movementType));
         HighlightTiles();
     }
 
     private void ViewReachableTiles()
     {
-        int start = actors[currentTarget].locationIndex;
-        int movement = actors[currentTarget].baseMovement;
-        highlightedTiles = pathFinder.FindTilesInRange(start, movement, actors[currentTarget].movementType);
+        int start = actors[currentViewed].locationIndex;
+        int movement = actors[currentViewed].baseMovement;
+        highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, movement, actors[currentViewed].movementType));
         HighlightTiles();
     }
 
     private void HighlightTiles(bool cyan = true)
     {
         int index = -1;
+        for (int i = 0; i < terrainTiles.Count; i++)
+        {
+            terrainTiles[i].ResetHighlight();
+        }
         for (int i = 0; i < highlightedTiles.Count; i++)
         {
             index = currentTiles.IndexOf(highlightedTiles[i]);
