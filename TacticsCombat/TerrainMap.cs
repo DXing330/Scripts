@@ -159,7 +159,11 @@ public class TerrainMap : MonoBehaviour
         UpdateCenterTile(actors[turnIndex].locationIndex);
         UpdateMap();
         actorInfo.UpdateInfo(actors[turnIndex]);
-
+        // Auto end turn when out of moves and actions.
+        if (!actors[turnIndex].Delayable())
+        {
+            NextTurn();
+        }
     }
 
     public void ActorStartAttacking()
