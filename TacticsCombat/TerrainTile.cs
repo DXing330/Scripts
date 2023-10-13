@@ -216,17 +216,17 @@ public class TerrainTile : MonoBehaviour
         switch (type)
         {
             case 0:
-                return 1;
+                return 3;
             case 1:
-                return 2;
-            case 2:
                 return 4;
+            case 2:
+                return 5;
             case 3:
                 return 1;
             case 4:
                 return 1;
             case 5:
-                return 4;
+                return 6;
         }
         return 1;
     }
@@ -255,9 +255,47 @@ public class TerrainTile : MonoBehaviour
         return 1;
     }
 
-    public int TerrainDefenseBonus(int type)
+    public int ReturnDefenseBonus(int tileType, int moveType)
+    {
+        switch (moveType)
+        {
+            case 0:
+                return TerrainDefenseBonus(tileType);
+            case 1:
+                return FlyingDefenseBonus(tileType);
+            case 2:
+                return RidingDefenseBonus(tileType);
+            case 3:
+                return SwimmingDefenseBonus(tileType);
+            case 4:
+                return ScoutingDefenseBonus(tileType);
+        }
+        return 6;
+    }
+
+    private int TerrainDefenseBonus(int type)
     {
         // Divide the bonus by six and multiply it by defense to get the final defender defense.
+        switch (type)
+        {
+            case 0:
+                return 6;
+            case 1:
+                return 7;
+            case 2:
+                return 8;
+            case 3:
+                return 5;
+            case 4:
+                return 4;
+            case 5:
+                return 6;
+        }
+        return 6;
+    }
+
+    private int FlyingDefenseBonus(int type)
+    {
         switch (type)
         {
             case 0:
@@ -270,6 +308,66 @@ public class TerrainTile : MonoBehaviour
                 return 6;
             case 4:
                 return 6;
+            case 5:
+                return 5;
+        }
+        return 6;
+    }
+
+    private int RidingDefenseBonus(int type)
+    {
+        switch (type)
+        {
+            case 0:
+                return 6;
+            case 1:
+                return 7;
+            case 2:
+                return 8;
+            case 3:
+                return 4;
+            case 4:
+                return 3;
+            case 5:
+                return 6;
+        }
+        return 6;
+    }
+
+    private int SwimmingDefenseBonus(int type)
+    {
+        switch (type)
+        {
+            case 0:
+                return 6;
+            case 1:
+                return 7;
+            case 2:
+                return 7;
+            case 3:
+                return 8;
+            case 4:
+                return 9;
+            case 5:
+                return 4;
+        }
+        return 6;
+    }
+
+    private int ScoutingDefenseBonus(int type)
+    {
+        switch (type)
+        {
+            case 0:
+                return 6;
+            case 1:
+                return 8;
+            case 2:
+                return 9;
+            case 3:
+                return 6;
+            case 4:
+                return 5;
             case 5:
                 return 6;
         }

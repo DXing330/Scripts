@@ -140,7 +140,11 @@ public class ActorManager : MonoBehaviour
         {
             ClaimDrops();
         }
-        GameManager.instance.ReturnToHub();
+        else
+        {
+            ResetDrops();
+        }
+        GameManager.instance.MoveScenes("BattleOver");
     }
 
     private void ClaimDrops()
@@ -148,6 +152,18 @@ public class ActorManager : MonoBehaviour
         GameManager.instance.GainResource(0, collectedBlood);
         GameManager.instance.GainResource(1, collectedMana);
         GameManager.instance.GainResource(2, collectedGold);
+        GameManager.instance.recentlyGainedBlood = collectedBlood;
+        GameManager.instance.recentlyGainedMana = collectedMana;
+        GameManager.instance.recentlyGainedGold = collectedGold;
+        GameManager.instance.recentlyWon = 1;
+    }
+
+    private void ResetDrops()
+    {
+        GameManager.instance.recentlyGainedBlood = 0;
+        GameManager.instance.recentlyGainedMana = 0;
+        GameManager.instance.recentlyGainedGold = 0;
+        GameManager.instance.recentlyWon = 0;
     }
 
     public void GetDrops(TacticActor actor)
@@ -210,9 +226,9 @@ public class ActorManager : MonoBehaviour
 
     }
 
-    public bool BattleBetweenActors(TacticActor attacker, TacticActor attackee, bool counter = true, bool flanked = false, int skillPowerMultipler = 0)
+    public bool BattleBetweenActors(TacticActor attacker, TacticActor defender, bool counter = true, bool flanked = false, int skillPowerMultipler = 0)
     {
-        int attackeeLocationType = terrainMap.terrainInfo[attackee.locationIndex];
+        int defenderLocationType = terrainMap.terrainInfo[defender.locationIndex];
         // Encourage attacking.
         int attackAdvantage = attacker.attackDamage*6/5;
         if (skillPowerMultipler > 10)
@@ -225,21 +241,23 @@ public class ActorManager : MonoBehaviour
             attackAdvantage += attacker.attackDamage*6/5 - attacker.attackDamage;
         }
         // Calculate terrain bonuses at the end then damage each other.
-        attackAdvantage = attackAdvantage*6/terrainTile.TerrainDefenseBonus(attackeeLocationType);
-        attackee.ReceiveDamage(attackAdvantage);
+        int defenderBonus = terrainTile.ReturnDefenseBonus(defenderLocationType, defender.movementType);
+        attackAdvantage = attackAdvantage*6/defenderBonus;
+        defender.ReceiveDamage(attackAdvantage);
         if (counter)
         {
             int attackerLocationType = terrainMap.terrainInfo[attacker.locationIndex];
-            int attackeePower = attackee.attackDamage*6/terrainTile.TerrainDefenseBonus(attackerLocationType);
+            int defenseBonus = terrainTile.ReturnDefenseBonus(attackerLocationType, attacker.movementType);
+            int defenderPower = defender.attackDamage*6/defenseBonus;
             // Penalty for ranged defenders.
-            if (attacker.attackRange < attackee.attackRange)
+            if (attacker.attackRange < defender.attackRange)
             {
-                attackeePower/=2;
+                defenderPower/=2;
             }
             int attackerHealth = attacker.health;
             int attackerDefense = attacker.defense;
-            attacker.ReceiveDamage(attackeePower);
-            if (attackeePower - attackerDefense >= attackerHealth || attackerHealth <= 1)
+            attacker.ReceiveDamage(defenderPower);
+            if (defenderPower - attackerDefense >= attackerHealth || attackerHealth <= 1)
             {
                 return true;
             }

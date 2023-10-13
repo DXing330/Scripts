@@ -73,6 +73,23 @@ public class TerrainMap : MonoBehaviour
         }
     }*/
 
+    private void CheckWinners()
+    {
+        int winners = actorManager.WinningTeam();
+        if (winners >= 0)
+        {
+            battleStarted = false;
+            bool win = false;
+            if (winners == 0)
+            {
+                RemoveActors();
+                win = true;
+            }
+            actorManager.ReturnToHub(win);
+            return;
+        }
+    }
+
     public void NextTurn()
     {
         if (!battleStarted)
@@ -85,20 +102,7 @@ public class TerrainMap : MonoBehaviour
             RemoveActors();
             turnIndex = 0;
         }
-        int winners = actorManager.WinningTeam();
-        if (winners >= 0)
-        {
-            battleStarted = false;
-            bool win = false;
-            if (winners == 0)
-            {
-                RemoveActors();
-                win = true;
-                // Gain collected items.
-            }
-            actorManager.ReturnToHub(win);
-            return;
-        }
+        CheckWinners();
         ActorsTurn();
         actorInfo.UpdateInfo(actors[turnIndex]);
     }

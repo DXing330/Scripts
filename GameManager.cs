@@ -33,6 +33,11 @@ public class GameManager : MonoBehaviour
         SaveData();
     }
 
+    public void MoveScenes(string sceneName)
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+    }
+
     void Start()
     {
         saveDataPath = Application.persistentDataPath;
@@ -59,6 +64,10 @@ public class GameManager : MonoBehaviour
     public int goldCoins = 0;
     public int manaCrystals = 0;
     public int bloodCrystals = 0;
+    public int recentlyWon = 0;
+    public int recentlyGainedGold = 0;
+    public int recentlyGainedMana = 0;
+    public int recentlyGainedBlood = 0;
     public int time = 0;
     public List<string> playerPassives;
     public List<string> playerActives;

@@ -22,6 +22,8 @@ public class TacticActiveSkill : MonoBehaviour
     public string effectSpecifics;
     // Based on caster?
     public int basePower;
+    public int actionCost;
+    public string flavorText;
 
     public void AffectActor(TacticActor actor, int power = 0)
     {
