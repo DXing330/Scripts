@@ -10,7 +10,7 @@ public class TerrainMap : MonoBehaviour
     private int turnIndex = 0;
     private int startIndex = 0;
     private int fixedCenter;
-    private bool freeView = false;
+    private bool lockedView = false;
     private int cornerRow;
     private int cornerColumn;
     private int gridSize = 7;
@@ -55,6 +55,7 @@ public class TerrainMap : MonoBehaviour
         actorManager.LoadEnemyTeam();
         UpdateMap();
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
+        fixedCenter=fullSize*fullSize/2;
     }
 
     /*private void InitializeTiles()
@@ -117,8 +118,8 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorsTurn()
     {
-        Debug.Log(turnIndex);
-        Debug.Log(actors.Count);
+        //Debug.Log(turnIndex);
+        //Debug.Log(actors.Count);
         if (actors[turnIndex].health <= 0)
         {
             NextTurn();
@@ -139,7 +140,6 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorEndTurn()
     {
-        freeView = false;
         NextTurn();
     }
 
@@ -180,7 +180,6 @@ public class TerrainMap : MonoBehaviour
 
     public void ViewCurrentActor()
     {
-        freeView = false;
         UpdateCenterTile(actors[turnIndex].locationIndex);
         UpdateMap();
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -521,6 +520,7 @@ public class TerrainMap : MonoBehaviour
 
     public void ViewActorByIndex(int index)
     {
+        lockedView = false;
         currentViewed = (turnIndex+index)%actors.Count;
         ViewActorInfo();
     }
@@ -673,9 +673,17 @@ public class TerrainMap : MonoBehaviour
 
     private void UpdateCenterTile(int index)
     {
-        startIndex = index;
+        if (lockedView)
+        {
+            startIndex = fixedCenter;
+        }
+        else
+        {
+            startIndex = index;
+        }
         DetermineCornerRowColumn();
         DetermineCurrentTiles();
+        // If locked do something different.
     }
 
     private void DetermineCornerRowColumn()
@@ -929,19 +937,7 @@ public class TerrainMap : MonoBehaviour
 
     public void MoveMap(int direction)
     {
-        if (!freeView)
-        {
-            freeView = true;
-            // Need something better later.
-            if (battleStarted)
-            {
-                fixedCenter = actors[turnIndex].locationIndex;
-            }
-            else
-            {
-                fixedCenter=fullSize*fullSize/2;
-            }
-        }
+        lockedView = true;
         int previousFixedCenter = fixedCenter;
         switch (direction)
         {
@@ -996,6 +992,11 @@ public class TerrainMap : MonoBehaviour
         UpdateCenterTile(fixedCenter);
         UpdateMap();
         HighlightTiles();
+    }
+
+    public void ChangeLockMapView()
+    {
+        lockedView = !lockedView;
     }
 
     public void ActorDied()

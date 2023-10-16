@@ -136,16 +136,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SetBattleLocation(int locationType)
-    {
-        battleLocationType = locationType;
-    }
-
-    public void SetBattleDifficulty(int newBattleDifficulty)
-    {
-        battleDifficulty = newBattleDifficulty;
-    }
-
     public bool CheckCost(int type, int amount)
     {
         switch (type)
@@ -158,6 +148,30 @@ public class GameManager : MonoBehaviour
                 return (goldCoins >= amount);
         }
         return false;
+    }
+
+    public int ReturnCurrency(int type)
+    {
+        switch (type)
+        {
+            case 0:
+                return bloodCrystals;
+            case 1:
+                return manaCrystals;
+            case 2:
+                return goldCoins;
+        }
+        return 0;
+    }
+
+    public void LevelUp()
+    {
+        if (bloodCrystals >= playerLevel * playerLevel)
+        {
+            bloodCrystals -= playerLevel * playerLevel;
+            playerLevel++;
+            SaveData();
+        }
     }
 
 }

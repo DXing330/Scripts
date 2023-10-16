@@ -20,6 +20,7 @@ public class RecruitmentShop : MonoBehaviour
     public TMP_Text investmentCost;
     public TMP_Text fighterFlavor;
     public TMP_Text investmentFlavor;
+    public TMP_Text currentCurrency;
     public UpgradeUnitPanel upgradePanel;
 
     void Start()
@@ -46,7 +47,7 @@ public class RecruitmentShop : MonoBehaviour
         UpdateTexts();
     }
 
-    private void UpdatePanel()
+    public void UpdatePanel()
     {
         upgradePanel.unitName = availableFighters[currentlyViewedFighter];
         upgradePanel.upgradeCostType = acceptedCurrency;
@@ -54,7 +55,7 @@ public class RecruitmentShop : MonoBehaviour
         upgradePanel.UpdateUpgradeInfo();
     }
 
-    private void UpdateTexts()
+    public void UpdateTexts()
     {
         int cost = fighterCosts[currentlyViewedFighter];
         fighterCost.text = "Buy"+"\n"+"("+cost+" Gold)";
@@ -62,6 +63,7 @@ public class RecruitmentShop : MonoBehaviour
         fighterFlavor.text = fighterFlavorTexts[currentlyViewedFighter];
         investmentFlavor.text = investmentFlavorTexts[currentlyViewedFighter];
         fighterImage.sprite = fighterSprites[currentlyViewedFighter];
+        currentCurrency.text = GameManager.instance.ReturnCurrency(acceptedCurrency).ToString();
     }
 
     private bool AffordFighter(int cost, int type = 2)
@@ -77,6 +79,7 @@ public class RecruitmentShop : MonoBehaviour
             GameManager.instance.goldCoins -= cost;
             GainFighter(availableFighters[currentlyViewedFighter]);
         }
+        UpdateTexts();
     }
 
     private void GainFighter(string fighterName)
