@@ -87,6 +87,8 @@ public class TerrainMap : MonoBehaviour
             bool win = false;
             if (winners == 0)
             {
+                // Need to remove these actors since they have the drops we need.
+                RemoveActors();
                 win = true;
             }
             actorManager.ReturnToHub(win);
@@ -443,11 +445,12 @@ public class TerrainMap : MonoBehaviour
     private void BattleBetweenActors(TacticActor attacker, TacticActor defender, int skillMultiplier = 0)
     {
         bool attackerDied = actorManager.BattleBetweenActors(attacker, defender, Counterable(attacker.locationIndex, defender), DetermineFlanking(defender), skillMultiplier);
-        if (attackerDied)
+        if (attackerDied && attacker.team == 0)
         {
             ActorStopMoving();
             NextTurn();
         }
+        CheckWinners();
     }
 
     public void CurrentActorAttack()
@@ -497,7 +500,8 @@ public class TerrainMap : MonoBehaviour
             return;
         }
         //actors[turnIndex].actionsLeft--; // handled in the NPC part
-        actorManager.BattleBetweenActors(actors[turnIndex], attackTarget, Counterable(actors[turnIndex].locationIndex, attackTarget), DetermineFlanking(attackTarget));
+        BattleBetweenActors(actors[turnIndex], attackTarget, actors[turnIndex].activeSkill.basePower);
+        CheckWinners();
     }
 
     public TacticActor FindNearestEnemy()

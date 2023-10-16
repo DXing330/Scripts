@@ -190,7 +190,7 @@ public class TacticActor : MonoBehaviour
     public bool CheckSkillActivatable()
     {
         // No such thing as a skill that costs zero energy.
-        if (actionsLeft < 1 || energy < activeSkill.cost || activeSkill.cost <= 0)
+        if (actionsLeft < 1 || energy < activeSkill.cost || activeSkill.cost <= 0 || health <= 0)
         {
             return false;
         }
@@ -199,7 +199,7 @@ public class TacticActor : MonoBehaviour
 
     private void AttackAction()
     {
-        if (actionsLeft <= 0)
+        if (actionsLeft <= 0 || health <= 0)
         {
             return;
         }
@@ -232,7 +232,7 @@ public class TacticActor : MonoBehaviour
 
     private void SupportAction()
     {
-        if (actionsLeft <= 0)
+        if (actionsLeft <= 0 || health <= 0)
         {
             return;
         }
@@ -328,7 +328,7 @@ public class TacticActor : MonoBehaviour
 
     private bool Moveable()
     {
-        if (currentPath.Count <= 0 || currentPath[0] == locationIndex)
+        if (currentPath.Count <= 0 || currentPath[0] == locationIndex || health <= 0)
         {
             return false;
         }
