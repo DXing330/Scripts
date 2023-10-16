@@ -86,7 +86,6 @@ public class TerrainMap : MonoBehaviour
             bool win = false;
             if (winners == 0)
             {
-                RemoveActors();
                 win = true;
             }
             actorManager.ReturnToHub(win);
@@ -118,6 +117,8 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorsTurn()
     {
+        Debug.Log(turnIndex);
+        Debug.Log(actors.Count);
         if (actors[turnIndex].health <= 0)
         {
             NextTurn();
@@ -134,6 +135,12 @@ public class TerrainMap : MonoBehaviour
         }
         actorInfo.UpdateInfo(actors[turnIndex]);
         turnOrder.UpdateTurnOrder(turnIndex);
+    }
+
+    public void ActorEndTurn()
+    {
+        freeView = false;
+        NextTurn();
     }
 
     public void DelayTurn()
@@ -163,16 +170,20 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorStopMoving()
     {
-        freeView = false;
-        if (turnIndex < 0){turnIndex++;}
-        UpdateCenterTile(actors[turnIndex].locationIndex);
-        UpdateMap();
-        actorInfo.UpdateInfo(actors[turnIndex]);
+        ViewCurrentActor();
         // Auto end turn when out of moves and actions.
         if (!actors[turnIndex].Delayable())
         {
-            NextTurn();
+            ActorEndTurn();
         }
+    }
+
+    public void ViewCurrentActor()
+    {
+        freeView = false;
+        UpdateCenterTile(actors[turnIndex].locationIndex);
+        UpdateMap();
+        actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
     public void ActorStartAttacking()
@@ -384,6 +395,11 @@ public class TerrainMap : MonoBehaviour
     public TacticActor ReturnCurrentAttackTarget()
     {
         return actors[currentTarget];
+    }
+
+    public TacticActor ReturnCurrentViewedTarget()
+    {
+        return actors[currentViewed];
     }
 
     public TacticActor ReturnActorOnTile(int tileNumber)

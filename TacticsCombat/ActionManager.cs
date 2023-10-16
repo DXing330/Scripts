@@ -72,7 +72,7 @@ public class ActionManager : MonoBehaviour
         switch (state)
         {
             case 0:
-                terrainMap.ActorStopMoving();
+                terrainMap.ViewCurrentActor();
                 DisableMovement();
                 DisableAttack();
                 DisableSkills();

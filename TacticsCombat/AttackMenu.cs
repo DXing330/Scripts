@@ -69,7 +69,7 @@ public class AttackMenu : MonoBehaviour
     public void SwitchTargetForViewing(bool right = true)
     {
         terrainMap.SwitchViewedActor(right);
-        UpdateTarget(terrainMap.ReturnCurrentAttackTarget(), true);
+        UpdateTarget(terrainMap.ReturnCurrentViewedTarget(), true);
     }
 
     public void StartViewing()
