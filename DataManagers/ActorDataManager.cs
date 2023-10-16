@@ -64,5 +64,19 @@ public class ActorDataManager : MonoBehaviour
         actor.dropType = int.Parse(actorDropTypes[index]);
         actor.dropAmount = int.Parse(actorDropAmounts[index]);
     }
+
+    public string ReturnActorBaseStats(string actorName)
+    {
+        int index = actorNames.IndexOf(actorName);
+        if (index < 0)
+        {
+            return "";
+        }
+        string baseStats = "";
+        baseStats += (actorHealths[index])+"|";
+        baseStats += (actorAttacks[index])+"|";
+        baseStats += (actorDefenses[index])+"|";
+        return baseStats;
+    }
     
 }

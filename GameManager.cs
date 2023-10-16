@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public PlayerActor player;
     public PlayerActor familiar;
     public ArmyDataManager armyData;
+    public ActorDataManager actorData;
     public UnitUpgradeData upgradeData;
     private string saveDataPath;
     private string loadedData;

@@ -29,15 +29,19 @@ public class UpgradeUnitPanel : MonoBehaviour
     public void UpdateUpgradeInfo()
     {
         string upgradeInfo = GameManager.instance.upgradeData.ReturnUpgradeAmounts(unitName);
+        string unitInfo = GameManager.instance.actorData.ReturnActorBaseStats(unitName);
+        string[] unitStats = unitInfo.Split("|");
         if (upgradeInfo.Length < 5)
         {
-            ResetUpgradeInfo();
+            healthUpgrade.text = unitStats[0];
+            attackUpgrade.text = unitStats[1];
+            defenseUpgrade.text = unitStats[2];
             return;
         }
         string[] upgradeAmounts = upgradeInfo.Split("|");
-        healthUpgrade.text = upgradeAmounts[0]+" %";
-        attackUpgrade.text = upgradeAmounts[1]+" %";
-        defenseUpgrade.text = upgradeAmounts[2]+" %";
+        healthUpgrade.text = (int.Parse(unitStats[0])+(int.Parse(unitStats[0])*int.Parse(upgradeAmounts[0])/100)).ToString();
+        attackUpgrade.text = (int.Parse(unitStats[1])+(int.Parse(unitStats[1])*int.Parse(upgradeAmounts[1])/100)).ToString();
+        defenseUpgrade.text = (int.Parse(unitStats[2])+(int.Parse(unitStats[2])*int.Parse(upgradeAmounts[2])/100)).ToString();
     }
 
     public void UpgradeUnit()

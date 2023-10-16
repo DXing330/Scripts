@@ -24,6 +24,7 @@ public class RecruitmentShop : MonoBehaviour
 
     void Start()
     {
+        UpdatePanel();
         UpdateTexts();
     }
 
