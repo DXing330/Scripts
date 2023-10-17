@@ -23,7 +23,7 @@ public class TacticActor : MonoBehaviour
     public int baseEnergy = 5;
     public int energy;
     public int baseMovement = 3;
-    public int baseActions = 1;
+    public int baseActions = 4;
     public int actionsLeft;
     public int attackRange = 1;
     public int baseAttack = 10;
@@ -31,6 +31,7 @@ public class TacticActor : MonoBehaviour
     public int baseDefense = 5;
     public int defense;
     public int movement;
+    private int tilesMoved;
     private int destinationIndex;
     private TacticActor attackTarget;
     public SpriteRenderer spriteRenderer;
@@ -49,7 +50,6 @@ public class TacticActor : MonoBehaviour
     void Start()
     {
         health = baseHealth;
-        movement = baseMovement;
     }
 
     // Since the text is loading before start is called.
@@ -141,7 +141,7 @@ public class TacticActor : MonoBehaviour
 
     public void ActivateSkill()
     {
-        actionsLeft -= activeSkill.actionCost;
+        UseActionsBesidesMovement(activeSkill.actionCost);
         LoseEnergy(activeSkill.cost);
     }
 
@@ -190,7 +190,7 @@ public class TacticActor : MonoBehaviour
     public bool CheckSkillActivatable()
     {
         // No such thing as a skill that costs zero energy.
-        if (actionsLeft < 1 || energy < activeSkill.cost || activeSkill.cost <= 0 || health <= 0)
+        if (actionsLeft < activeSkill.actionCost || energy < activeSkill.cost || activeSkill.cost <= 0)
         {
             return false;
         }
@@ -199,7 +199,7 @@ public class TacticActor : MonoBehaviour
 
     private void AttackAction()
     {
-        if (actionsLeft <= 0 || health <= 0)
+        if (actionsLeft <= 1 || health <= 0)
         {
             return;
         }
@@ -213,7 +213,7 @@ public class TacticActor : MonoBehaviour
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
-            actionsLeft--;
+            UseActionsBesidesMovement(2);
         }
         else
         {
@@ -226,7 +226,7 @@ public class TacticActor : MonoBehaviour
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
-            actionsLeft--;
+            UseActionsBesidesMovement(2);
         }
     }
 
@@ -267,7 +267,6 @@ public class TacticActor : MonoBehaviour
         CheckGoal();
         GetPath();
         MoveAction();
-        // Check movement skill.
         // Check dps skill.
         AttackAction();
         SupportAction();
@@ -281,11 +280,12 @@ public class TacticActor : MonoBehaviour
             return;
         }
         attackDamage = baseAttack;
-        movement = baseMovement;
         actionsLeft = baseActions;
         defense = baseDefense;
         energy = Mathf.Min(energy+1, baseEnergy);
         // Deal with buffs/debuffs/passives.
+        tilesMoved = 0;
+        movement = baseMovement * actionsLeft;
     }
 
     private void CheckGoal()
@@ -310,7 +310,7 @@ public class TacticActor : MonoBehaviour
             MoveAction();
             terrainMap.UpdateOnActorTurn();
         }
-        else
+        /*else
         {
             // If you can't move anymore but the target is still not in range then try to use a movement skill.
             if (!terrainMap.CheckTargetInRange(locationIndex, attackTarget, attackRange))
@@ -323,12 +323,12 @@ public class TacticActor : MonoBehaviour
                     MoveAction();
                 }
             }
-        }
+        }*/
     }
 
     private bool Moveable()
     {
-        if (currentPath.Count <= 0 || currentPath[0] == locationIndex || health <= 0)
+        if (currentPath.Count <= 0 || currentPath[0] == locationIndex || health <= 0 || actionsLeft <= 0)
         {
             return false;
         }
@@ -364,9 +364,31 @@ public class TacticActor : MonoBehaviour
         if (distance <= movement)
         {
             movement -= distance;
+            tilesMoved += distance;
+            UseActionsOnMovement();
             return true;
         }
         return false;
+    }
+
+    public void UseActionsOnMovement()
+    {
+        if (tilesMoved >= 1)
+        {
+            actionsLeft--;
+            tilesMoved -= baseMovement;
+            UseActionsOnMovement();
+        }
+    }
+
+    public void UseActionsBesidesMovement(int actionCost)
+    {
+        actionsLeft -= actionCost;
+        movement -= actionCost * baseMovement;
+        if (movement < 0)
+        {
+            movement = 0;
+        }
     }
 
 }

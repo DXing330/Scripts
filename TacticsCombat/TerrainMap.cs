@@ -460,7 +460,7 @@ public class TerrainMap : MonoBehaviour
             return;
         }
         // If they die while attacking, automatically end their turn.
-        actors[turnIndex].actionsLeft--;
+        actors[turnIndex].UseActionsBesidesMovement(2);
         // Find if they can counter attack.
         TacticActor target = ReturnCurrentTarget();
         bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex].locationIndex, target), DetermineFlanking(target));
@@ -495,11 +495,10 @@ public class TerrainMap : MonoBehaviour
 
     public void NPCActorAttack(TacticActor attackTarget)
     {
-        if (actors[turnIndex].actionsLeft <= 0)
+        if (actors[turnIndex].actionsLeft <= 1)
         {
             return;
         }
-        //actors[turnIndex].actionsLeft--; // handled in the NPC part
         BattleBetweenActors(actors[turnIndex], attackTarget, actors[turnIndex].activeSkill.basePower);
         CheckWinners();
     }
@@ -802,7 +801,7 @@ public class TerrainMap : MonoBehaviour
     private void ViewReachableTiles()
     {
         int start = actors[currentViewed].locationIndex;
-        int movement = actors[currentViewed].baseMovement;
+        int movement = actors[currentViewed].baseMovement * actors[currentViewed].baseActions;
         highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, movement, actors[currentViewed].movementType));
         HighlightTiles();
     }

@@ -14,6 +14,7 @@ public class PlayerActor : MonoBehaviour
     public int energyPerLevel = 1;
     public int baseMovement = 3;
     public int attackRange = 1;
+    public int baseActions = 4;
     public int moveType = 0;
     public List<string> learntPassives;
     public List<string> learntSkills;
@@ -35,6 +36,7 @@ public class PlayerActor : MonoBehaviour
         playerActor.baseEnergy = baseEnergy+allEquipment.totalBonusEnergy;
         playerActor.baseMovement = baseMovement+allEquipment.totalBonusMovement;
         playerActor.attackRange = attackRange;
+        playerActor.baseActions = baseActions;
         playerActor.movementType = moveType;
         if (learntSkills.Count <= 0)
         {
