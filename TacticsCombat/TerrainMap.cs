@@ -99,10 +99,7 @@ public class TerrainMap : MonoBehaviour
 
     public void NextTurn()
     {
-        if (!battleStarted)
-        {
-            return;
-        }
+        if (!battleStarted){return;}
         turnIndex++;
         if (turnIndex >= actors.Count)
         {
@@ -110,6 +107,7 @@ public class TerrainMap : MonoBehaviour
             turnIndex = 0;
         }
         CheckWinners();
+        if (!battleStarted){return;}
         ActorsTurn();
         actorInfo.UpdateInfo(actors[turnIndex]);
     }
@@ -194,7 +192,7 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorStartAttacking()
     {
-        GetTargetableTiles(actors[turnIndex].attackRange);
+        GetTargetableTiles(actors[turnIndex].currentAttackRange);
         HighlightTiles(false);
         if (targetableTiles.Count > 0)
         {
@@ -562,7 +560,7 @@ public class TerrainMap : MonoBehaviour
     private bool Counterable(int attackerLocation, TacticActor defender)
     {
         int defenderLocation = defender.locationIndex;
-        int range = defender.attackRange;
+        int range = defender.currentAttackRange;
         int distance = pathFinder.CalculateDistance(defenderLocation, attackerLocation);
         return (distance <= range);
     }

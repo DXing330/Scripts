@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class TacticActiveSkill : MonoBehaviour
 {
-    public SkillDataManager skillData;
     public string skillName;
     // 0 = free range move as you wish, 1 = can only move between possible targets if there are none then the skill fails/can't be used
     public int lockOn = 0;
@@ -25,6 +24,7 @@ public class TacticActiveSkill : MonoBehaviour
     public int actionCost;
     public string flavorText;
 
+    // Definitely don't need two of these.
     public void AffectActor(TacticActor actor, int power = 0)
     {
         switch (effect)
@@ -38,6 +38,24 @@ public class TacticActiveSkill : MonoBehaviour
             case "Move":
                 actor.movement += power;
                 break;
+            case "Support":
+                AddTemporaryCondition(actor, effectSpecifics, power);
+                break;
+        }
+    }
+
+    public void AddTemporaryCondition(TacticActor actor, string type, int duration)
+    {
+        // No duplicate buffs/debuffs
+        int indexOf = actor.buffDebuffNames.IndexOf(type);
+        if (indexOf < 0)
+        {
+            actor.buffDebuffNames.Add(type);
+            actor.buffDebuffsDurations.Add(duration);
+        }
+        else
+        {
+            actor.buffDebuffsDurations[indexOf] = Mathf.Max(duration, actor.buffDebuffsDurations[indexOf]);
         }
     }
 }

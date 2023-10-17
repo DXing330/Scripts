@@ -22,6 +22,9 @@ public class SkillEffectManager : MonoBehaviour
             case "Move":
                 power *= user.baseMovement;
                 break;
+            case "Support":
+                power *= powerDenominator;
+                break;
             case "Battle":
                 return true;
         }

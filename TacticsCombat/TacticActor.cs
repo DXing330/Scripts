@@ -27,6 +27,7 @@ public class TacticActor : MonoBehaviour
     public int baseActions = 4;
     public int actionsLeft;
     public int attackRange = 1;
+    public int currentAttackRange;
     public int baseAttack = 10;
     public int attackDamage;
     public int baseDefense = 5;
@@ -46,6 +47,7 @@ public class TacticActor : MonoBehaviour
     public string npcAttackSkill;
     public string npcSupportSkill;
     public TacticActiveSkill activeSkill;
+    public TacticBuffsStatuses buffDebuff;
 
     void Start()
     {
@@ -101,6 +103,23 @@ public class TacticActor : MonoBehaviour
         destinationIndex = location;
     }
 
+    public void StartTurn()
+    {
+        if (delayed)
+        {
+            delayed = false;
+            return;
+        }
+        attackDamage = baseAttack;
+        actionsLeft = baseActions;
+        defense = baseDefense;
+        currentMovespeed = baseMovement;
+        currentAttackRange = attackRange;
+        energy = Mathf.Min(energy+1, baseEnergy);
+        ApplyBuffDebuffEffects();
+        movement = 0;
+    }
+
     private void Death()
     {
         Color tempColor = Color.white;
@@ -143,6 +162,34 @@ public class TacticActor : MonoBehaviour
     {
         UseActionsBesidesMovement(activeSkill.actionCost);
         LoseEnergy(activeSkill.cost);
+    }
+
+    private void ApplyBuffDebuffEffects()
+    {
+        if (buffDebuffNames.Count <= 0)
+        {
+            return;
+        }
+        for (int i = 0; i < buffDebuffNames.Count; i++)
+        {
+            buffDebuff.LoadEffectName(buffDebuffNames[i]);
+            buffDebuff.AffectActor(this);
+            buffDebuffsDurations[i]--;
+            if (buffDebuffsDurations[i] <= 0)
+            {
+                buffDebuffsDurations.RemoveAt(i);
+                buffDebuffNames.RemoveAt(i);
+            }
+        }
+        /*for (int j = 0; j < buffDebuffsDurations.Count; j++)
+        {
+            buffDebuffsDurations[i]--;
+            if (buffDebuffsDurations[i] <= 0)
+            {
+                buffDebuffsDurations.RemoveAt(i);
+                buffDebuffNames.RemoveAt(i);
+            }
+        }*/
     }
 
     public string LoadSkillName(int skillIndex)
@@ -222,29 +269,43 @@ public class TacticActor : MonoBehaviour
             return;
         }
         NPCLoadSkill(1);
-        if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= attackRange)
+        // Try to hit the first target.
+        if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= currentAttackRange)
         {
             if (CheckSkillActivatable())
             {
                 terrainMap.NPCActivateSkill(attackTarget.locationIndex);
                 ActivateSkill();
+                CheckIfAttackAgain();
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
-            UseActionsBesidesMovement(2);
+            actionsLeft -= 2;
         }
+        // Otherwise look for another target.
         else
         {
-            attackTarget = terrainMap.ReturnEnemyInRange(locationIndex, team, attackRange);
+            attackTarget = terrainMap.ReturnEnemyInRange(locationIndex, team, currentAttackRange);
             if (attackTarget == null){return;}
             if (CheckSkillActivatable())
             {
                 terrainMap.NPCActivateSkill(attackTarget.locationIndex);
                 ActivateSkill();
+                CheckIfAttackAgain();
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
-            UseActionsBesidesMovement(2);
+            actionsLeft -= 2;
+        }
+        // Keep attacking until you're out of actions.
+        CheckIfAttackAgain();
+    }
+
+    private void CheckIfAttackAgain()
+    {
+        if (actionsLeft >= 2)
+        {
+            AttackAction();
         }
     }
 
@@ -288,22 +349,6 @@ public class TacticActor : MonoBehaviour
         // Check dps skill.
         AttackAction();
         SupportAction();
-    }
-
-    public void StartTurn()
-    {
-        if (delayed)
-        {
-            delayed = false;
-            return;
-        }
-        attackDamage = baseAttack;
-        actionsLeft = baseActions;
-        defense = baseDefense;
-        currentMovespeed = baseMovement;
-        energy = Mathf.Min(energy+1, baseEnergy);
-        // Deal with buffs/debuffs/passives.
-        movement = 0;
     }
 
     private void CheckGoal()
@@ -350,7 +395,7 @@ public class TacticActor : MonoBehaviour
         {
             return false;
         }
-        if (terrainMap.CheckTargetInRange(locationIndex, attackTarget, attackRange))
+        if (terrainMap.CheckTargetInRange(locationIndex, attackTarget, currentAttackRange))
         {
             return false;
         }

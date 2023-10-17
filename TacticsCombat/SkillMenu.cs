@@ -39,11 +39,9 @@ public class SkillMenu : MonoBehaviour
     private void UpdateSkillInfo()
     {
         string skillDetailsText = "";
-        skillName.text = activeSkill.skillName;
-        skillDetailsText += "Effect: "+activeSkill.effect;
-        skillDetailsText += ", Range: "+activeSkill.range;
-        skillDetailsText += ", Span: "+activeSkill.span;
-        skillDetailsText += ", Cost: "+activeSkill.cost;
+        // Need to show the energy and action cost.
+        skillName.text = activeSkill.skillName+", Cost: "+activeSkill.cost;;
+        skillDetailsText += activeSkill.flavorText;
         skillDetails.text = skillDetailsText;
     }
 

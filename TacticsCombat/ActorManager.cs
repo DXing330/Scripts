@@ -250,7 +250,7 @@ public class ActorManager : MonoBehaviour
             int defenseBonus = terrainTile.ReturnDefenseBonus(attackerLocationType, attacker.movementType);
             int defenderPower = defender.attackDamage*6/defenseBonus;
             // Penalty for ranged defenders.
-            if (attacker.attackRange < defender.attackRange)
+            if (attacker.currentAttackRange < defender.currentAttackRange)
             {
                 defenderPower/=2;
             }
