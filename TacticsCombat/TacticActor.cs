@@ -23,6 +23,7 @@ public class TacticActor : MonoBehaviour
     public int baseEnergy = 5;
     public int energy;
     public int baseMovement = 3;
+    public int currentMovespeed;
     public int baseActions = 4;
     public int actionsLeft;
     public int attackRange = 1;
@@ -45,7 +46,6 @@ public class TacticActor : MonoBehaviour
     public string npcAttackSkill;
     public string npcSupportSkill;
     public TacticActiveSkill activeSkill;
-    //public List<TacticActiveSkill> activeSkills;
 
     void Start()
     {
@@ -197,6 +197,24 @@ public class TacticActor : MonoBehaviour
         return true;
     }
 
+    public bool CheckIfAnySkillActivateable()
+    {
+        int cost = energy + 1;
+        for (int i = 0; i < activeSkillNames.Count; i++)
+        {
+            terrainMap.actorManager.LoadSkillData(activeSkill, activeSkillNames[i]);
+            if (activeSkill.cost < cost)
+            {
+                cost = activeSkill.cost;
+            }
+        }
+        if (cost <= energy)
+        {
+            return true;
+        }
+        return false;
+    }
+
     private void AttackAction()
     {
         if (actionsLeft <= 1 || health <= 0)
@@ -282,10 +300,10 @@ public class TacticActor : MonoBehaviour
         attackDamage = baseAttack;
         actionsLeft = baseActions;
         defense = baseDefense;
+        currentMovespeed = baseMovement;
         energy = Mathf.Min(energy+1, baseEnergy);
         // Deal with buffs/debuffs/passives.
-        tilesMoved = 0;
-        movement = baseMovement * actionsLeft;
+        movement = 0;
     }
 
     private void CheckGoal()
@@ -361,34 +379,46 @@ public class TacticActor : MonoBehaviour
     private bool CheckDistance(int index)
     {
         int distance = terrainMap.ReturnMoveCost(index, movementType);
+        if (distance > movement)
+        {
+            CheckIfDistanceIsCoverable(distance);
+        }
         if (distance <= movement)
         {
             movement -= distance;
-            tilesMoved += distance;
-            UseActionsOnMovement();
             return true;
         }
         return false;
     }
 
+    public bool CheckIfDistanceIsCoverable(int distance)
+    {
+        int max_movement = movement + (currentMovespeed * actionsLeft);
+        if (max_movement >= distance)
+        {
+            while (movement < distance && actionsLeft > 0)
+            {
+                UseActionsOnMovement();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public int ReturnMaxPossibleDistance()
+    {
+        return movement + (currentMovespeed * actionsLeft);
+    }
+
     public void UseActionsOnMovement()
     {
-        if (tilesMoved >= 1)
-        {
-            actionsLeft--;
-            tilesMoved -= baseMovement;
-            UseActionsOnMovement();
-        }
+        actionsLeft--;
+        movement += currentMovespeed;
     }
 
     public void UseActionsBesidesMovement(int actionCost)
     {
         actionsLeft -= actionCost;
-        movement -= actionCost * baseMovement;
-        if (movement < 0)
-        {
-            movement = 0;
-        }
     }
 
 }

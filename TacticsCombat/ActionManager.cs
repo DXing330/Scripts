@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ActionManager : MonoBehaviour
 {
+    public TMP_Text actionsLeft;
     public TerrainMap terrainMap;
     public GameObject moveArrows;
     public MoveMenu moveMenu;
@@ -20,6 +22,12 @@ public class ActionManager : MonoBehaviour
     public int state = 0;
     public TacticActor currentActor;
 
+    public void UpdateActionsLeft()
+    {
+        currentActor = terrainMap.ReturnCurrentTurnActor();
+        actionsLeft.text = currentActor.actionsLeft.ToString();
+    }
+
     public void ChangeState(int newState)
     {
         if (!terrainMap.battleStarted)
@@ -30,9 +38,10 @@ public class ActionManager : MonoBehaviour
         switch (newState)
         {
             case 0:
+                UpdateActionsLeft();
                 break;
             case 1:
-                if (currentActor.movement <= 0){return;}
+                if (currentActor.movement <= 0 && currentActor.actionsLeft <= 0){return;}
                 break;
             case 2:
                 if (currentActor.actionsLeft <= 1){return;}
@@ -114,7 +123,7 @@ public class ActionManager : MonoBehaviour
     private void EnableMovement()
     {
         moveArrows.SetActive(true);
-        moveMenu.UpdateText();
+        moveMenu.UpdateMovementText();
     }
 
     private void DisableMovement()
@@ -150,5 +159,18 @@ public class ActionManager : MonoBehaviour
     private void DisableViewing()
     {
         viewMenu.SetActive(false);
+    }
+
+    public void CheckIfAttackAgain()
+    {
+        UpdateActionsLeft();
+        if (currentActor.actionsLeft >= 2)
+        {
+            return;
+        }
+        else
+        {
+            ChangeState(0);
+        }
     }
 }

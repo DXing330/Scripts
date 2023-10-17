@@ -12,8 +12,8 @@ public class MoveMenu : MonoBehaviour
     public Text moveDownCost;
     public Text moveLeftCost;
 
-    public void UpdateText()
+    public void UpdateMovementText()
     {
-        movement.text = "Movement: "+terrainMap.ActorCurrentMovement();
+        movement.text = "Move Speed: "+terrainMap.ActorCurrentMovement();
     }
 }

@@ -13,10 +13,10 @@ public class InfoMenu : MonoBehaviour
 
     void Start()
     {
-        UpdateTexts();
+        UpdateInfoTexts();
     }
 
-    public void UpdateTexts()
+    public void UpdateInfoTexts()
     {
         playerLevelText.text = GameManager.instance.playerLevel.ToString();
         goldCoinText.text = GameManager.instance.goldCoins.ToString();

@@ -94,6 +94,7 @@ public class TerrainMap : MonoBehaviour
             actorManager.ReturnToHub(win);
             return;
         }
+        turnOrder.UpdateTurnOrder(turnIndex);
     }
 
     public void NextTurn()
@@ -115,7 +116,7 @@ public class TerrainMap : MonoBehaviour
 
     public int ActorCurrentMovement()
     {
-        return actors[turnIndex].movement;
+        return actors[turnIndex].currentMovespeed;
     }
 
     public void ActorsTurn()
@@ -136,8 +137,12 @@ public class TerrainMap : MonoBehaviour
         {
             NPCActorsTurn();
         }
-        actorInfo.UpdateInfo(actors[turnIndex]);
-        turnOrder.UpdateTurnOrder(turnIndex);
+        // If the NPC die on their turn you don't need to do anything else.
+        if (battleStarted)
+        {
+            actorInfo.UpdateInfo(actors[turnIndex]);
+            turnOrder.UpdateTurnOrder(turnIndex);
+        }
     }
 
     public void ActorEndTurn()
@@ -793,7 +798,7 @@ public class TerrainMap : MonoBehaviour
     private void GetReachableTiles()
     {
         int start = actors[turnIndex].locationIndex;
-        int movement = actors[turnIndex].movement;
+        int movement = actors[turnIndex].ReturnMaxPossibleDistance();
         highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, movement, actors[turnIndex].movementType));
         HighlightTiles();
     }

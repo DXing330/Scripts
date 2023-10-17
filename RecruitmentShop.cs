@@ -26,7 +26,7 @@ public class RecruitmentShop : MonoBehaviour
     void Start()
     {
         UpdatePanel();
-        UpdateTexts();
+        UpdateStoreTexts();
     }
 
     public void ChangeViewed(bool right)
@@ -44,7 +44,7 @@ public class RecruitmentShop : MonoBehaviour
             }
         }
         UpdatePanel();
-        UpdateTexts();
+        UpdateStoreTexts();
     }
 
     public void UpdatePanel()
@@ -55,7 +55,7 @@ public class RecruitmentShop : MonoBehaviour
         upgradePanel.UpdateUpgradeInfo();
     }
 
-    public void UpdateTexts()
+    public void UpdateStoreTexts()
     {
         int cost = fighterCosts[currentlyViewedFighter];
         fighterCost.text = "Buy"+"\n"+"("+cost+" Gold)";
@@ -79,7 +79,7 @@ public class RecruitmentShop : MonoBehaviour
             GameManager.instance.goldCoins -= cost;
             GainFighter(availableFighters[currentlyViewedFighter]);
         }
-        UpdateTexts();
+        UpdateStoreTexts();
     }
 
     private void GainFighter(string fighterName)

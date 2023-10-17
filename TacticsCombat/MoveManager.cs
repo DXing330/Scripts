@@ -9,7 +9,7 @@ public class MoveManager : MonoBehaviour
 
     public void UpdateMoveMenu()
     {
-        moveMenu.UpdateText();
+        moveMenu.UpdateMovementText();
     }
 
     private int DetermineMoveCost(int moveType, int destination)
@@ -36,16 +36,17 @@ public class MoveManager : MonoBehaviour
         return cost;
     }
 
-    private bool Moveable(int location, int dest, int movement, int moveType = 0)
+    private bool Moveable(TacticActor actor, int dest)
     {
-        pathfinder.AdjacentFromIndex(location);
+        pathfinder.AdjacentFromIndex(actor.locationIndex);
         if (!pathfinder.adjacentTiles.Contains(dest))
         {
             return false;
         }
-        if (DetermineMoveCost(moveType, dest) > movement)
+        int distance = DetermineMoveCost(actor.movementType, dest);
+        if (distance > actor.movement)
         {
-            return false;
+            return actor.CheckIfDistanceIsCoverable(distance);
         }
         return true;
     }
@@ -68,7 +69,7 @@ public class MoveManager : MonoBehaviour
     public void MoveInDirection(TacticActor actor, int direction)
     {
         int destination = GetDestination(actor.locationIndex, direction);
-        if (Moveable(actor.locationIndex, destination, actor.movement, actor.movementType))
+        if (Moveable(actor, destination))
         {
             actor.locationIndex = destination;
             actor.movement -= DetermineMoveCost(actor.movementType, destination);
