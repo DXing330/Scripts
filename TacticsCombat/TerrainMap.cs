@@ -88,8 +88,8 @@ public class TerrainMap : MonoBehaviour
             if (winners == 0)
             {
                 // Need to remove these actors since they have the drops we need.
-                RemoveActors();
                 win = true;
+                RemoveActors(win);
             }
             actorManager.ReturnToHub(win);
             return;
@@ -463,7 +463,7 @@ public class TerrainMap : MonoBehaviour
             return;
         }
         // If they die while attacking, automatically end their turn.
-        actors[turnIndex].UseActionsBesidesMovement(2);
+        actors[turnIndex].actionsLeft--;
         // Find if they can counter attack.
         TacticActor target = ReturnCurrentTarget();
         bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex].locationIndex, target), DetermineFlanking(target));
@@ -645,7 +645,7 @@ public class TerrainMap : MonoBehaviour
         UpdateMap();
     }
 
-    public void RemoveActors()
+    public void RemoveActors(bool win = false)
     {
         for (int i = 0; i < actors.Count; i++)
         {
@@ -658,6 +658,17 @@ public class TerrainMap : MonoBehaviour
                 actors.RemoveAt(i);
             }
             UpdateMap();
+        }
+        // If you win make sure you collect the drops from all the enemies.
+        if (win)
+        {
+            for (int i = 0; i < actors.Count; i++)
+            {
+                if (actors[i].team != 0)
+                {
+                    actorManager.GetDrops(actors[i]);
+                }
+            }
         }
     }
 

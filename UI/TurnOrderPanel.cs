@@ -32,6 +32,8 @@ public class TurnOrderPanel : MonoBehaviour
             // Don't draw dead actors.
             if (terrainMap.actors[actorIndex].health <= 0)
             {
+                currentTurnIndex++;
+                i--;
                 continue;
             }
             UpdateTurnSprite(updateIndex, terrainMap.actors[actorIndex].spriteRenderer.sprite);

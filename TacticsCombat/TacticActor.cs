@@ -58,10 +58,11 @@ public class TacticActor : MonoBehaviour
     public void QuickStart()
     {
         health = baseHealth;
-        movement = baseMovement;
+        currentMovespeed = baseMovement;
         energy = baseEnergy;
         attackDamage = baseAttack;
         defense = baseDefense;
+        currentAttackRange = attackRange;
     }
 
     public void SetBaseStats(string baseStats, int newLevel = 1)
@@ -192,6 +193,12 @@ public class TacticActor : MonoBehaviour
         }*/
     }
 
+    public void ApplyNewlyAddedBuffDebuffEffect()
+    {
+        buffDebuff.LoadEffectName(buffDebuffNames[^1]);
+        buffDebuff.AffectActor(this);
+    }
+
     public string LoadSkillName(int skillIndex)
     {
         return (activeSkillNames[skillIndex]);
@@ -264,7 +271,7 @@ public class TacticActor : MonoBehaviour
 
     private void AttackAction()
     {
-        if (actionsLeft <= 1 || health <= 0)
+        if (actionsLeft < 1 || health <= 0)
         {
             return;
         }
@@ -280,7 +287,7 @@ public class TacticActor : MonoBehaviour
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
-            actionsLeft -= 2;
+            actionsLeft -= 1;
         }
         // Otherwise look for another target.
         else
@@ -295,7 +302,7 @@ public class TacticActor : MonoBehaviour
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
-            actionsLeft -= 2;
+            actionsLeft -= 1;
         }
         // Keep attacking until you're out of actions.
         CheckIfAttackAgain();
@@ -303,7 +310,7 @@ public class TacticActor : MonoBehaviour
 
     private void CheckIfAttackAgain()
     {
-        if (actionsLeft >= 2)
+        if (actionsLeft >= 1)
         {
             AttackAction();
         }

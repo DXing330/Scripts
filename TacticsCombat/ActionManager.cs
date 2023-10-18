@@ -44,7 +44,7 @@ public class ActionManager : MonoBehaviour
                 if (currentActor.movement <= 0 && currentActor.actionsLeft <= 0){return;}
                 break;
             case 2:
-                if (currentActor.actionsLeft <= 1){return;}
+                if (currentActor.actionsLeft <= 0){return;}
                 break;
             case 3:
                 if (currentActor.actionsLeft <= 0){return;}

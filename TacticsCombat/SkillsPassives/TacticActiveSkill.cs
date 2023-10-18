@@ -39,12 +39,12 @@ public class TacticActiveSkill : MonoBehaviour
                 actor.movement += power;
                 break;
             case "Support":
-                AddTemporaryCondition(actor, effectSpecifics, power);
+                AddBuffDebuff(actor, effectSpecifics, power);
                 break;
         }
     }
 
-    public void AddTemporaryCondition(TacticActor actor, string type, int duration)
+    public void AddBuffDebuff(TacticActor actor, string type, int duration)
     {
         // No duplicate buffs/debuffs
         int indexOf = actor.buffDebuffNames.IndexOf(type);
@@ -52,6 +52,7 @@ public class TacticActiveSkill : MonoBehaviour
         {
             actor.buffDebuffNames.Add(type);
             actor.buffDebuffsDurations.Add(duration);
+            actor.ApplyNewlyAddedBuffDebuffEffect();
         }
         else
         {
