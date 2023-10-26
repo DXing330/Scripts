@@ -9,7 +9,11 @@ public class TerrainTile : MonoBehaviour
     //plains=0,forest=1,mountain=2,water=3,deepWater=4,desert=5
     public RectTransform rectTransform;
     public Image backgroundColor;
+    // The terrain.
     public Image tileImage;
+    // Any special features.
+    public Image locationImage;
+    // Any actors.
     public Image actorImage;
     public Image highlight;
     // Show the border when you're trying to select a tile.
@@ -38,6 +42,19 @@ public class TerrainTile : MonoBehaviour
     public void UpdateTileImage(Sprite newTile)
     {
         tileImage.sprite = newTile;
+    }
+
+    public void ResetLocationImage()
+    {
+        locationImage.sprite = null;
+    }
+
+    public void UpdateLocationImage(Sprite newTile)
+    {
+        Color tempColor = Color.white;
+        tempColor.a = 0.8f;
+        locationImage.sprite = newTile;
+        locationImage.color = tempColor;
     }
 
     public void ResetImage()

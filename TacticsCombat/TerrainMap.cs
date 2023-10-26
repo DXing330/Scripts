@@ -3,18 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TerrainMap : MonoBehaviour
+public class TerrainMap : Map
 {
-    public List<Sprite> tileSprites;
     public bool battleStarted = false;
     private int turnIndex = 0;
-    private int startIndex = 0;
     private int fixedCenter;
     private bool lockedView = false;
-    private int cornerRow;
-    private int cornerColumn;
-    private int gridSize = 7;
-    public int fullSize = 9;
+    public new int fullSize = 9;
     public int baseTerrain = 0;
     public List<int> terrainInfo;
     public List<int> terrainEffects;
@@ -27,9 +22,6 @@ public class TerrainMap : MonoBehaviour
     private int currentViewed = 0;
     private int skillCenter;
     private int skillSpan;
-    public List<int> currentTiles;
-    public List<TerrainTile> terrainTiles;
-    public TacticTileList allTiles;
     public TerrainMaker terrainMaker;
     public TerrainPathfinder pathFinder;
     public List<TacticActor> actors;
@@ -38,6 +30,7 @@ public class TerrainMap : MonoBehaviour
     public SkillEffectManager skillManager;
     public TacticActorInfo actorInfo;
     public TurnOrderPanel turnOrder;
+    public ActionManager actionManager;
 
     public int GetTurnIndex(){return turnIndex;}
 
@@ -57,26 +50,6 @@ public class TerrainMap : MonoBehaviour
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
         fixedCenter=fullSize*fullSize/2;
     }
-
-    /*private void InitializeTiles()
-    {
-        int tileIndex = 0;
-        float scale = 1f/gridSize;
-        float xPivot = 0f;
-        float yPivot = 1f;
-        for (int i = 0; i < gridSize; i++)
-        {
-            xPivot = 0f;
-            for (int j = 0; j < gridSize; j++)
-            {
-                terrainTiles[tileIndex].UpdatePivot(xPivot, yPivot);
-                terrainTiles[tileIndex].UpdateSize(scale);
-                tileIndex++;
-                xPivot += 1f/(gridSize - 1);
-            }
-            yPivot -= 1f/(gridSize - 1);
-        }
-    }*/
 
     private void CheckWinners()
     {
@@ -452,6 +425,7 @@ public class TerrainMap : MonoBehaviour
         {
             ActorStopMoving();
             NextTurn();
+            actionManager.ChangeState(0);
         }
         CheckWinners();
     }
@@ -471,6 +445,7 @@ public class TerrainMap : MonoBehaviour
         {
             ActorStopMoving();
             NextTurn();
+            actionManager.ChangeState(0);
         }
         CheckWinners();
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -688,35 +663,7 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
-    private void UpdateCenterTile(int index)
-    {
-        if (lockedView)
-        {
-            startIndex = fixedCenter;
-        }
-        else
-        {
-            startIndex = index;
-        }
-        DetermineCornerRowColumn();
-        DetermineCurrentTiles();
-        // If locked do something different.
-    }
-
-    private void DetermineCornerRowColumn()
-    {
-        int start = startIndex;
-        cornerRow = -(gridSize/2);
-        cornerColumn = -(gridSize/2);
-        while (start >= fullSize)
-        {
-            start -= fullSize;
-            cornerRow++;
-        }
-        cornerColumn += start;
-    }
-
-    private void DetermineCurrentTiles()
+    protected override void DetermineCurrentTiles()
     {
         currentTiles.Clear();
         int cColumn = 0;
@@ -733,7 +680,7 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
-    private void AddCurrentTile(int row, int column)
+    protected override void AddCurrentTile(int row, int column)
     {
         if (row < 0 || column < 0 || column >= fullSize || row >= fullSize)
         {
@@ -741,6 +688,48 @@ public class TerrainMap : MonoBehaviour
             return;
         }
         currentTiles.Add((row*fullSize)+column);
+    }
+
+    protected override void DetermineCornerRowColumn()
+    {
+        int start = startIndex;
+        cornerRow = -(gridSize/2);
+        cornerColumn = -(gridSize/2);
+        while (start >= fullSize)
+        {
+            start -= fullSize;
+            cornerRow++;
+        }
+        cornerColumn += start;
+    }
+
+    protected override void UpdateTile(int imageIndex, int tileIndex)
+    {
+        // Undefined tiles are black.
+        if (tileIndex < 0 || tileIndex >= (fullSize * fullSize))
+        {
+            terrainTiles[imageIndex].UpdateColor(-1);
+        }
+        else
+        {
+            int tileType = terrainInfo[tileIndex];
+            terrainTiles[imageIndex].UpdateColor(tileType);
+            terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
+        }
+    }
+
+    private void UpdateCenterTile(int index)
+    {
+        if (lockedView)
+        {
+            startIndex = fixedCenter;
+        }
+        else
+        {
+            startIndex = index;
+        }
+        DetermineCornerRowColumn();
+        DetermineCurrentTiles();
     }
 
     private void UpdateOccupiedTiles()
@@ -765,6 +754,7 @@ public class TerrainMap : MonoBehaviour
         for (int i = 0; i < terrainTiles.Count; i++)
         {
             terrainTiles[i].ResetImage();
+            terrainTiles[i].ResetLocationImage();
             terrainTiles[i].ResetHighlight();
             terrainTiles[i].ResetAOEHighlight();
             UpdateTile(i, currentTiles[i]);
@@ -787,21 +777,6 @@ public class TerrainMap : MonoBehaviour
     private void UpdateActor(int imageIndex, int actorIndex)
     {
         terrainTiles[imageIndex].UpdateImage(actors[actorIndex].spriteRenderer.sprite);
-    }
-
-    private void UpdateTile(int imageIndex, int tileIndex)
-    {
-        // Undefined tiles are black.
-        if (tileIndex < 0 || tileIndex >= (fullSize * fullSize))
-        {
-            terrainTiles[imageIndex].UpdateColor(-1);
-        }
-        else
-        {
-            int tileType = terrainInfo[tileIndex];
-            terrainTiles[imageIndex].UpdateColor(tileType);
-            terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
-        }
     }
 
     private void GetReachableTiles()

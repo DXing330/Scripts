@@ -44,7 +44,7 @@ public class SkillDataManager : MonoBehaviour
             activeSkill.skillName = "";
             activeSkill.cost = 0;
             activeSkill.effect = "";
-            activeSkill.actionCost = 0;
+            activeSkill.actionCost = "0";
             return;
         }
         activeSkill.skillName = skillNames[skillIndex];
@@ -56,7 +56,7 @@ public class SkillDataManager : MonoBehaviour
         activeSkill.effect = skillEffects[skillIndex];
         activeSkill.effectSpecifics = skillSpecifics[skillIndex];
         activeSkill.basePower = int.Parse(skillBasePowers[skillIndex]);
-        activeSkill.actionCost = int.Parse(skillactionCosts[skillIndex]);
+        activeSkill.actionCost = skillactionCosts[skillIndex];
         activeSkill.flavorText = (skillFlavorTexts[skillIndex]);
     }
 }

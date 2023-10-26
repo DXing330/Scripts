@@ -47,7 +47,7 @@ public class ActionManager : MonoBehaviour
                 if (currentActor.actionsLeft <= 0){return;}
                 break;
             case 3:
-                if (currentActor.actionsLeft <= 0){return;}
+                if (currentActor.actionsLeft <= 0 || currentActor.energy <= 0){return;}
                 if (currentActor.activeSkillNames.Count <= 0){return;}
                 break;
         }
@@ -164,7 +164,7 @@ public class ActionManager : MonoBehaviour
     public void CheckIfAttackAgain()
     {
         UpdateActionsLeft();
-        if (currentActor.actionsLeft >= 2)
+        if (currentActor.CheckActionsToAttack())
         {
             return;
         }

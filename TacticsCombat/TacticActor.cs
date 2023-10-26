@@ -27,6 +27,7 @@ public class TacticActor : MonoBehaviour
     public int baseActions = 4;
     public int actionsLeft;
     public int attackRange = 1;
+    public int actionsToAttack = 1;
     public int currentAttackRange;
     public int baseAttack = 10;
     public int attackDamage;
@@ -127,6 +128,7 @@ public class TacticActor : MonoBehaviour
         tempColor.a = 0f;
         spriteRenderer.sprite = null;
         spriteRenderer.color = tempColor;
+        actionsLeft = 0;
         terrainMap.ActorDied();
         //Destroy(gameObject);
     }
@@ -161,7 +163,7 @@ public class TacticActor : MonoBehaviour
 
     public void ActivateSkill()
     {
-        UseActionsBesidesMovement(activeSkill.actionCost);
+        UseActionsBesidesMovement(activeSkill.ReturnActionCost(this));
         LoseEnergy(activeSkill.cost);
     }
 
@@ -232,9 +234,9 @@ public class TacticActor : MonoBehaviour
         return true;
     }
 
-    public bool CheckActions()
+    public bool CheckActions(int actionCost = 1)
     {
-        if (actionsLeft < 1)
+        if (actionsLeft < actionCost)
         {
             return false;
         }
@@ -244,7 +246,7 @@ public class TacticActor : MonoBehaviour
     public bool CheckSkillActivatable()
     {
         // No such thing as a skill that costs zero energy.
-        if (actionsLeft < activeSkill.actionCost || energy < activeSkill.cost || activeSkill.cost <= 0)
+        if (actionsLeft < activeSkill.ReturnActionCost(this) || energy < activeSkill.cost || activeSkill.cost <= 0)
         {
             return false;
         }
@@ -310,10 +312,19 @@ public class TacticActor : MonoBehaviour
 
     private void CheckIfAttackAgain()
     {
-        if (actionsLeft >= 1)
+        if (actionsLeft >= actionsToAttack)
         {
             AttackAction();
         }
+    }
+
+    public bool CheckActionsToAttack()
+    {
+        if (actionsLeft >= actionsToAttack)
+        {
+            return true;
+        }
+        return false;
     }
 
     private void SupportAction()

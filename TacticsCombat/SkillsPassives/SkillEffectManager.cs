@@ -8,7 +8,7 @@ public class SkillEffectManager : MonoBehaviour
     public bool ApplySkillEffect(TacticActor target, TacticActiveSkill skill, TacticActor user)
     {
         // Determine skill power.
-        int power = skill.basePower;
+        int power = Mathf.Max(skill.basePower, skill.currentPower);
         switch (skill.effect)
         {
             case "Damage":
@@ -17,7 +17,7 @@ public class SkillEffectManager : MonoBehaviour
             case "Heal":
                 power *= user.baseHealth/10;
                 // Limit healing.
-                power = Mathf.Min(power, skill.basePower*powerDenominator);
+                power = Mathf.Min(power, Mathf.Max(skill.basePower, skill.currentPower)*powerDenominator);
                 break;
             case "Move":
                 power *= user.baseMovement;

@@ -21,7 +21,8 @@ public class TacticActiveSkill : MonoBehaviour
     public string effectSpecifics;
     // Based on caster?
     public int basePower;
-    public int actionCost;
+    public int currentPower;
+    public string actionCost;
     public string flavorText;
 
     // Definitely don't need two of these.
@@ -58,5 +59,15 @@ public class TacticActiveSkill : MonoBehaviour
         {
             actor.buffDebuffsDurations[indexOf] = Mathf.Max(duration, actor.buffDebuffsDurations[indexOf]);
         }
+    }
+
+    public int ReturnActionCost(TacticActor user)
+    {
+        if (actionCost == "Attack")
+        {
+            return user.actionsToAttack;
+        }
+        // Can make it consume all actions and increase power based on actions consumed.
+        return int.Parse(actionCost);
     }
 }
