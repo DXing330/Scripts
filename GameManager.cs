@@ -69,6 +69,7 @@ public class GameManager : MonoBehaviour
     public int recentlyGainedGold = 0;
     public int recentlyGainedMana = 0;
     public int recentlyGainedBlood = 0;
+    public int location = 2203;
     public int time = 0;
     public List<string> playerPassives;
     public List<string> playerActives;
@@ -79,7 +80,7 @@ public class GameManager : MonoBehaviour
 
     public void SaveData()
     {
-        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time;
+        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+location;
         File.WriteAllText(saveDataPath+"/saveData.txt", data);
         string activesPassives = "";
         activesPassives += ConvertListToString(playerPassives)+"#";
@@ -89,6 +90,12 @@ public class GameManager : MonoBehaviour
         File.WriteAllText(saveDataPath+"/skillData.txt", activesPassives);
         armyData.Save();
         upgradeData.Save();
+    }
+
+    private void QuickSave()
+    {
+        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+location;
+        File.WriteAllText(saveDataPath+"/saveData.txt", data);
     }
 
     private void LoadData()
@@ -102,6 +109,7 @@ public class GameManager : MonoBehaviour
             manaCrystals = int.Parse(dataBlocks[2]);
             goldCoins = int.Parse(dataBlocks[3]);
             time = int.Parse(dataBlocks[4]);
+            location = int.Parse(dataBlocks[5]);
             armyData.Load();
             upgradeData.Load();
         }
@@ -116,6 +124,7 @@ public class GameManager : MonoBehaviour
         manaCrystals = 0;
         goldCoins = 0;
         time = 0;
+        location = 2203;
         armyData.NewGame();
         SaveData();
     }
@@ -174,4 +183,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void UpdateLocation(int newLocation)
+    {
+        location = newLocation;
+        QuickSave();
+    }
 }

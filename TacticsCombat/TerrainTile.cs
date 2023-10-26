@@ -146,6 +146,7 @@ public class TerrainTile : MonoBehaviour
                 break;
             case 5:
                 tempColor = Color.yellow;
+                tempColor.a = 0.3f;
                 break;
         }
         backgroundColor.color = tempColor;
