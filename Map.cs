@@ -5,7 +5,7 @@ using UnityEngine;
 public class Map : MonoBehaviour
 {
     protected int startIndex;
-    protected int gridSize = 7;
+    public int gridSize = 7;
     protected int fullSize;
     protected int cornerColumn;
     protected int cornerRow;
@@ -14,7 +14,12 @@ public class Map : MonoBehaviour
     public List<int> currentTiles;
     public List<TerrainTile> terrainTiles;
 
-    /*protected virtual void InitializeTiles()
+    protected virtual void Start()
+    {
+        InitializeTiles();
+    }
+
+    protected virtual void InitializeTiles()
     {
         int tileIndex = 0;
         float scale = 1f/gridSize;
@@ -33,7 +38,7 @@ public class Map : MonoBehaviour
             yPivot -= 1f/(gridSize - 1);
         }
         //need to put the rest of the tiles somewhere invisible
-    }*/
+    }
 
     protected virtual void DetermineCurrentTiles()
     {

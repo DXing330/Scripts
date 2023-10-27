@@ -22,7 +22,7 @@ public class OverworldMap : Map
     public List<string> locationSpecifics;
     public List<string> exploredTiles;
     
-    void Start()
+    protected override void Start()
     {
         allTiles = allTilesString.Split("|").ToList();
         // Might need to be able to save and change these as the story progresses.

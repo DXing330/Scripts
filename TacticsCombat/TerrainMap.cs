@@ -9,7 +9,7 @@ public class TerrainMap : Map
     private int turnIndex = 0;
     private int fixedCenter;
     private bool lockedView = false;
-    public new int fullSize = 9;
+    public new int fullSize = 13;
     public int baseTerrain = 0;
     public List<int> terrainInfo;
     public List<int> terrainEffects;
@@ -40,7 +40,7 @@ public class TerrainMap : Map
         ActorsTurn();
     }
 
-    void Start()
+    protected override void Start()
     {
         Application.targetFrameRate = 30;
         GenerateMap(baseTerrain, fullSize);

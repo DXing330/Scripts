@@ -27,12 +27,12 @@ public class InfoMenu : MonoBehaviour
 
     public void UpdateLevelButton()
     {
+        levelUpButton.SetActive(false);
         int currentLevel = GameManager.instance.playerLevel;
         if (GameManager.instance.CheckCost(0, currentLevel * currentLevel))
         {
             levelUpButton.SetActive(true);
         }
-        else{levelUpButton.SetActive(false);}
     }
 
     public void TryToLevel()
