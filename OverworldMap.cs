@@ -113,10 +113,12 @@ public class OverworldMap : Map
         if (int.Parse(allTiles[playerLocation]) == 2)
         {
             playerLocation = previousLocation;
+            return;
         }
         GameManager.instance.UpdateLocation(playerLocation);
         UpdateCenterTile();
         UpdateMap();
+        MoveIntoTile();
     }
 
     protected bool CheckIfMoveable(int direction)
@@ -194,6 +196,8 @@ public class OverworldMap : Map
             case "Shop":
                 interactText.text = "Talk";
                 break;
+            case "Battle":
+                break;
         }
         if (interactText.text.Length < 3)
         {
@@ -219,5 +223,19 @@ public class OverworldMap : Map
         sceneManager.MoveScenes(shopName);
     }
 
-    
+    private void MoveIntoTile()
+    {
+        switch (allLocations[playerLocation])
+        {
+            case "RandomBattle":
+                EnterBattle(locationSpecifics[playerLocation]);
+                break;
+        }
+    }
+
+    private void EnterBattle(string locationDifficulty)
+    {
+        string[] locDiff = locationDifficulty.Split("=");
+        GameManager.instance.SetRandomBattleLocationDifficulty(int.Parse(locDiff[0]), int.Parse(locDiff[1]));
+    }
 }

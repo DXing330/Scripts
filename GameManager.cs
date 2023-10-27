@@ -188,4 +188,11 @@ public class GameManager : MonoBehaviour
         location = newLocation;
         QuickSave();
     }
+
+    public void SetRandomBattleLocationDifficulty(int location, int difficulty)
+    {
+        battleLocationType = location;
+        battleDifficulty = difficulty;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("BattleMap");
+    }
 }
