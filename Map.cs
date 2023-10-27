@@ -32,6 +32,7 @@ public class Map : MonoBehaviour
             }
             yPivot -= 1f/(gridSize - 1);
         }
+        //need to put the rest of the tiles somewhere invisible
     }*/
 
     protected virtual void DetermineCurrentTiles()

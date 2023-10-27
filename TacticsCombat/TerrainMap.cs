@@ -630,6 +630,10 @@ public class TerrainMap : Map
                 {
                     actorManager.GetDrops(actors[i]);
                 }
+                else
+                {
+                    actorManager.RemoveFromPlayerTeam(actors[i]);
+                }
                 actors.RemoveAt(i);
             }
             UpdateMap();

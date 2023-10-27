@@ -47,6 +47,9 @@ public class TerrainTile : MonoBehaviour
     public void ResetLocationImage()
     {
         locationImage.sprite = null;
+        Color tempColor = Color.white;
+        tempColor.a = 0f;
+        locationImage.color = tempColor;
     }
 
     public void UpdateLocationImage(Sprite newTile)

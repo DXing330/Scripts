@@ -10,6 +10,13 @@ public class SceneManager : MonoBehaviour
         GameManager.instance.ReturnToHub();
     }
 
+    public void LoadCurrentLocationScene()
+    {
+        // Based on location in GameManager.
+        // For now just return to hub.
+        ReturnToHub();
+    }
+
     public void MoveScenes(string sceneName)
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);

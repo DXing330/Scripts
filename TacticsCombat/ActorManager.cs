@@ -19,6 +19,20 @@ public class ActorManager : MonoBehaviour
     public int collectedMana = 0;
     public int collectedBlood = 0;
 
+    public void RemoveFromPlayerTeam(TacticActor actor)
+    {
+        if (actor.typeName == "Player" || actor.typeName == "Familiar" || actor.typeName == "")
+        {
+            return;
+        }
+        int indexOf = GameManager.instance.armyData.armyFormation.IndexOf(actor.typeName);
+        if (indexOf < 0)
+        {
+            return;
+        }
+        GameManager.instance.armyData.armyFormation[indexOf] = "none";
+    }
+
     public void LoadPlayerTeam()
     {
         int column = 0;

@@ -3,16 +3,23 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class OverworldMap : Map
 {
+    public SceneManager sceneManager;
     public int playerLocation;
     public Sprite playerSprite;
+    public List<Sprite> locationSprites;
+    public GameObject interactButton;
+    public TMP_Text interactText;
     private int currentColumn;
     private int currentRow;
     public string allTilesString;
     public string allLocationsString;
+    public string allLocationSpecifics;
     public List<string> allLocations;
+    public List<string> locationSpecifics;
     public List<string> exploredTiles;
     
     void Start()
@@ -21,6 +28,7 @@ public class OverworldMap : Map
         // Might need to be able to save and change these as the story progresses.
         // People move, cities fall, etc.
         allLocations = allLocationsString.Split("|").ToList();
+        locationSpecifics = allLocationSpecifics.Split("|").ToList();
         fullSize = (int) Mathf.Sqrt(allTiles.Count);
         playerLocation = GameManager.instance.location;
         UpdateCenterTile();
@@ -69,8 +77,14 @@ public class OverworldMap : Map
             terrainTiles[i].ResetLocationImage();
             terrainTiles[i].ResetHighlight();
             UpdateTile(i, currentTiles[i]);
+            UpdateLocationImage(i, locationSpecifics[currentTiles[i]]);
         }
         terrainTiles[terrainTiles.Count/2].UpdateImage(playerSprite);
+        if (UpdateLocationImage(terrainTiles.Count/2, locationSpecifics[currentTiles[terrainTiles.Count/2]]))
+        {
+            terrainTiles[terrainTiles.Count/2].ResetImage();
+        }
+        UpdateInteractButton();
     }
 
     public void MovePlayer(int direction)
@@ -105,7 +119,7 @@ public class OverworldMap : Map
         UpdateMap();
     }
 
-    private bool CheckIfMoveable(int direction)
+    protected bool CheckIfMoveable(int direction)
     {
         DetermineRowColumn();
         switch (direction)
@@ -138,7 +152,7 @@ public class OverworldMap : Map
         return false;
     }
 
-    private void DetermineRowColumn()
+    protected void DetermineRowColumn()
     {
         currentRow = 0;
         currentColumn = 0;
@@ -150,4 +164,60 @@ public class OverworldMap : Map
         }
         currentColumn += locationIndex;
     }
+
+    protected bool UpdateLocationImage(int tileIndex, string tileSpecifics)
+    {
+        // Could just make a hashmap.
+        int spriteIndex = -1;
+        for (int i = 0; i < locationSprites.Count; i++)
+        {
+            if (locationSprites[i].name == tileSpecifics)
+            {
+                spriteIndex = i;
+                break;
+            }
+        }
+        if (spriteIndex < 0)
+        {
+            return false;
+        }
+        terrainTiles[tileIndex].UpdateLocationImage(locationSprites[spriteIndex]);
+        return true;
+    }
+
+    protected void UpdateInteractButton()
+    {
+        interactButton.SetActive(true);
+        interactText.text = "";
+        switch (allLocations[playerLocation])
+        {
+            case "Shop":
+                interactText.text = "Talk";
+                break;
+        }
+        if (interactText.text.Length < 3)
+        {
+            interactButton.SetActive(false);
+        }
+    }
+
+    public void InteractWithLocation()
+    {
+        switch (allLocations[playerLocation])
+        {
+            case "Shop":
+                TalkToMerchant(locationSpecifics[playerLocation]);
+                break;
+            case "Battle":
+                break;
+        }
+    }
+
+    private void TalkToMerchant(string merchantType)
+    {
+        string shopName = merchantType+"Shop";
+        sceneManager.MoveScenes(shopName);
+    }
+
+    
 }
