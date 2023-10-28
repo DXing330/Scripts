@@ -19,6 +19,16 @@ public class ActorManager : MonoBehaviour
     public int collectedMana = 0;
     public int collectedBlood = 0;
 
+    void Start()
+    {
+        GetActorData();
+    }
+
+    public void GetActorData()
+    {
+        actorData = GameManager.instance.actorData;
+    }
+
     public void RemoveFromPlayerTeam(TacticActor actor)
     {
         if (actor.typeName == "Player" || actor.typeName == "Familiar" || actor.typeName == "")

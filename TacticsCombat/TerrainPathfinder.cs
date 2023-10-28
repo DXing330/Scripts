@@ -28,6 +28,7 @@ public class TerrainPathfinder : MonoBehaviour
     public List<int> checkedTiles;
     // Reachable tiles.
     public List<int> reachableTiles;
+    public List<int> attackableTiles;
 
     public void SetTerrainInfo(List<int> newTerrain, int size, List<int> newOccupied)
     {
@@ -122,7 +123,7 @@ public class TerrainPathfinder : MonoBehaviour
         {
             reachableTiles.Add(closestTile);
         }
-        AdjacentFromIndex(closestTile);
+        RecurviseAdjacency(closestTile);
         for (int i = 0; i < adjacentTiles.Count; i++)
         {
             // If the cost to move to the path from this tile is less than what we've already recorded;
@@ -159,9 +160,9 @@ public class TerrainPathfinder : MonoBehaviour
         }
     }
 
-    public void AdjacentFromIndex(int location)
+    // O(1);
+    private void AdjacentFromIndex(int location)
     {
-        adjacentTiles.Clear();
         if (location%fullSize > 0)
         {
             adjacentTiles.Add(location-1);
@@ -177,6 +178,27 @@ public class TerrainPathfinder : MonoBehaviour
         if (location > fullSize - 1)
         {
             adjacentTiles.Add(location-fullSize);
+        }
+    }
+
+    public void RecurviseAdjacency(int location, int range = 1)
+    {
+        adjacentTiles.Clear();
+        if (range <= 0)
+        {
+            return;
+        }
+        AdjacentFromIndex(location);
+        if (range == 1)
+        {
+            return;
+        }
+        for (int i = 0; i < range - 1; i++)
+        {
+            for (int j = 0; j < adjacentTiles.Count; j++)
+            {
+                AdjacentFromIndex(adjacentTiles[j]);
+            }
         }
     }
 
@@ -243,6 +265,36 @@ public class TerrainPathfinder : MonoBehaviour
         return reachableTiles;
     }
 
+    public List<int> FindTilesInAttackRange(int startIndex, int moveRange, int moveType = 0, int attackRange = 1)
+    {
+        attackableTiles.Clear();
+        reachableTiles.Clear();
+        if (attackRange <= 0)
+        {
+            return reachableTiles;
+        }
+        ResetDistances(startIndex);
+        // Check what tiles you can move to.
+        int distance = 0;
+        while (distance <= moveRange && reachableTiles.Count < fullSize * fullSize)
+        {
+            distance = heap.PeekWeight();
+            if (distance > moveRange)
+            {
+                break;
+            }
+            CheckClosestTile(false, moveType);
+        }
+        // Check what tiles you can attack based on the tiles you can move to.
+        // O(n).
+        for (int i = 0; i < reachableTiles.Count; i++)
+        {
+            RecurviseAdjacency(reachableTiles[i], attackRange);
+            attackableTiles.AddRange(adjacentTiles);
+        }
+        return attackableTiles;
+    }
+
     public int CalculateDistance(int pointOne, int pointTwo)
     {
         int rowOne = GetRow(pointOne);
@@ -286,5 +338,35 @@ public class TerrainPathfinder : MonoBehaviour
             }
         }
         return allActors[targetIndex];
+    }
+
+    public TacticActor FindClosestEnemyInAttackRange(TacticActor currentActor, List<TacticActor> allActors)
+    {
+        int targetIndex = -1;
+        int targetDistance = bigInt;
+        int currentDistance = bigInt;
+        int location = currentActor.locationIndex;
+        FindTilesInAttackRange(location, currentActor.ReturnMaxPossibleDistance(), currentActor.movementType, currentActor.attackRange);
+        for (int i = 0; i < allActors.Count; i++)
+        {
+            if (allActors[i].team == currentActor.team)
+            {
+                continue;
+            }
+            if (attackableTiles.Contains(allActors[i].locationIndex))
+            {
+                currentDistance = CalculateDistance(location, allActors[i].locationIndex);
+                if (currentDistance < targetDistance)
+                {
+                    targetIndex = i;
+                    targetDistance = currentDistance;
+                }
+            }
+        }
+        if (targetIndex >= 0)
+        {
+            return allActors[targetIndex];
+        }
+        return null;
     }
 }

@@ -77,10 +77,10 @@ public class OverworldMap : Map
             terrainTiles[i].ResetLocationImage();
             terrainTiles[i].ResetHighlight();
             UpdateTile(i, currentTiles[i]);
-            UpdateLocationImage(i, locationSpecifics[currentTiles[i]]);
+            UpdateLocationImage(i, currentTiles[i]);
         }
         terrainTiles[terrainTiles.Count/2].UpdateImage(playerSprite);
-        if (UpdateLocationImage(terrainTiles.Count/2, locationSpecifics[currentTiles[terrainTiles.Count/2]]))
+        if (UpdateLocationImage(terrainTiles.Count/2, currentTiles[terrainTiles.Count/2]))
         {
             terrainTiles[terrainTiles.Count/2].ResetImage();
         }
@@ -167,8 +167,13 @@ public class OverworldMap : Map
         currentColumn += locationIndex;
     }
 
-    protected bool UpdateLocationImage(int tileIndex, string tileSpecifics)
+    protected bool UpdateLocationImage(int imageIndex, int tileIndex)
     {
+        if (tileIndex < 0)
+        {
+            return false;
+        }
+        string tileSpecifics = locationSpecifics[tileIndex];
         // Could just make a hashmap.
         int spriteIndex = -1;
         for (int i = 0; i < locationSprites.Count; i++)
@@ -183,7 +188,7 @@ public class OverworldMap : Map
         {
             return false;
         }
-        terrainTiles[tileIndex].UpdateLocationImage(locationSprites[spriteIndex]);
+        terrainTiles[imageIndex].UpdateLocationImage(locationSprites[spriteIndex]);
         return true;
     }
 
@@ -197,6 +202,7 @@ public class OverworldMap : Map
                 interactText.text = "Talk";
                 break;
             case "Battle":
+                interactText.text = "Attack";
                 break;
         }
         if (interactText.text.Length < 3)

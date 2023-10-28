@@ -45,6 +45,7 @@ public class TerrainMap : Map
         Application.targetFrameRate = 30;
         GenerateMap(baseTerrain, fullSize);
         UpdateCenterTile((fullSize * fullSize)/2);
+        actorManager.GetActorData();
         actorManager.LoadEnemyTeam();
         UpdateMap();
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
@@ -455,7 +456,7 @@ public class TerrainMap : Map
     {
         int adjacentEnemies = 0;
         int location = attackTarget.locationIndex;
-        pathFinder.AdjacentFromIndex(location);
+        pathFinder.RecurviseAdjacency(location);
         for (int i = 0; i < pathFinder.adjacentTiles.Count; i++)
         {
             TacticActor tempActor = ReturnActorOnTile(pathFinder.adjacentTiles[i]);
@@ -484,6 +485,11 @@ public class TerrainMap : Map
     public TacticActor FindNearestEnemy()
     {
         return pathFinder.FindNearestEnemy(actors[turnIndex], actors);
+    }
+
+    public TacticActor FindClosestEnemyInAttackRange()
+    {
+        return pathFinder.FindClosestEnemyInAttackRange(actors[turnIndex], actors);
     }
 
     public void ViewActorInfo(bool right = true)
@@ -605,7 +611,7 @@ public class TerrainMap : Map
         {
             return true;
         }
-        pathFinder.AdjacentFromIndex(location);
+        pathFinder.RecurviseAdjacency(location);
         if (pathFinder.adjacentTiles.Contains(target))
         {
             return true;

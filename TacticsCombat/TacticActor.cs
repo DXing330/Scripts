@@ -34,7 +34,8 @@ public class TacticActor : MonoBehaviour
     public int baseDefense = 5;
     public int defense;
     public int movement;
-    private int tilesMoved;
+    // 0 is offensive, 1 is defensive
+    public int AIType;
     private int destinationIndex;
     private TacticActor attackTarget;
     public SpriteRenderer spriteRenderer;
@@ -133,8 +134,17 @@ public class TacticActor : MonoBehaviour
         //Destroy(gameObject);
     }
 
+    public void TriggerAggro()
+    {
+        if (AIType == 1)
+        {
+            AIType = 0;
+        }
+    }
+
     public void ReceiveDamage(int amount)
     {
+        TriggerAggro();
         health -= Mathf.Max(amount - defense, 1);
         if (health <= 0)
         {
@@ -360,6 +370,11 @@ public class TacticActor : MonoBehaviour
 
     public void NPCStartTurn()
     {
+        if (AIType == 1)
+        {
+            SupportAction();
+            return;
+        }
         // Pick a target, based on goals.
         CheckGoal();
         GetPath();
@@ -372,11 +387,21 @@ public class TacticActor : MonoBehaviour
     private void CheckGoal()
     {
         // Randomly move around if you don't have a target.
-        // Look for the closest enemy.
-        UpdateTarget(terrainMap.FindNearestEnemy());
+        // Look for a target in range.
+        UpdateTarget(terrainMap.FindClosestEnemyInAttackRange());
+        if (attackTarget == null)
+        {
+            UpdateTarget(terrainMap.FindNearestEnemy());
+        }
+        // Otherwise go for the closest enemy.
         UpdateDest(attackTarget.locationIndex);
         // Attack your target if you have one.
         // If you're injured then start looking for targets? Depends on the type of AI.
+    }
+
+    private void CheckEnemyInRange()
+    {
+
     }
 
     public void UpdateDest(int newDest)
