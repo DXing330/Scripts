@@ -24,7 +24,7 @@ public class TacticActor : MonoBehaviour
     public int energy;
     public int baseMovement = 3;
     public int currentMovespeed;
-    public int baseActions = 4;
+    public int baseActions = 2;
     public int actionsLeft;
     public int attackRange = 1;
     public int actionsToAttack = 1;
@@ -304,7 +304,7 @@ public class TacticActor : MonoBehaviour
         // Otherwise look for another target.
         else
         {
-            attackTarget = terrainMap.ReturnEnemyInRange(locationIndex, team, currentAttackRange);
+            attackTarget = terrainMap.ReturnEnemyInRange(this);
             if (attackTarget == null){return;}
             if (CheckSkillActivatable())
             {
@@ -438,7 +438,7 @@ public class TacticActor : MonoBehaviour
         {
             return false;
         }
-        if (terrainMap.CheckTargetInRange(locationIndex, attackTarget, currentAttackRange))
+        if (terrainMap.CheckTargetInRange(this, attackTarget))
         {
             return false;
         }
@@ -493,9 +493,28 @@ public class TacticActor : MonoBehaviour
         return false;
     }
 
-    public int ReturnMaxPossibleDistance()
+    public int ReturnMaxPossibleDistance(bool current = false)
     {
+        if (!current)
+        {
+            return currentMovespeed * baseActions;
+        }
         return movement + (currentMovespeed * actionsLeft);
+    }
+
+    public int MaxMovePerTurn()
+    {
+        // Doesn't work if there are some effects decreasing actions.
+        return currentMovespeed * baseActions;
+    }
+
+    public int MaxMovementWhileAttacking(bool current = false)
+    {
+        if (current)
+        {
+            return movement + (currentMovespeed * (actionsLeft - 1));
+        }
+        return currentMovespeed * (baseActions - 1);
     }
 
     public void UseActionsOnMovement()

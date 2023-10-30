@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,7 +18,10 @@ public class TerrainMap : Map
     public List<int> allUnoccupied;
     public List<int> occupiedTiles;
     public List<int> highlightedTiles;
+    public List<int> redHighlightedTiles;
     public List<int> targetableTiles;
+    // 0 = none, 1 = viewing(ie attack range), 2 = moving, 3 = ST skill, 4 = aoe skill
+    private int currentHighlighting = 0;
     private int currentTarget = 0;
     private int currentViewed = 0;
     private int skillCenter;
@@ -150,6 +154,7 @@ public class TerrainMap : Map
     public void ActorStopMoving()
     {
         ViewCurrentActor();
+        ClearHighlightedTiles();
         // Auto end turn when out of moves and actions.
         if (!actors[turnIndex].Delayable())
         {
@@ -198,6 +203,7 @@ public class TerrainMap : Map
         }
         else
         {
+            currentTarget = 0;
             skillCenter = actors[turnIndex].locationIndex;
             SeeSkillRange();
             GetTargetableTiles(actors[turnIndex].activeSkill.range, actors[turnIndex].activeSkill.skillTarget);
@@ -389,10 +395,11 @@ public class TerrainMap : Map
         return actors[occupiedTiles[tileNumber]-1];
     }
 
-    public TacticActor ReturnEnemyInRange(int currentLocation, int team, int attackRange)
+    public TacticActor ReturnEnemyInRange(TacticActor actor)
     {
         TacticActor tempActor = null;
-        targetableTiles = new List<int>(pathFinder.FindTilesInRange(currentLocation, attackRange, -1));
+        int team = actor.team;
+        targetableTiles = new List<int>(pathFinder.FindTilesInAttackRange(actor));
         for (int i = 0; i < targetableTiles.Count; i++)
         {
             tempActor = ReturnActorOnTile(targetableTiles[i]);
@@ -402,15 +409,21 @@ public class TerrainMap : Map
         return null;
     }
 
-    public bool CheckTargetInRange(int location, TacticActor target, int range)
+    public bool CheckTargetInRange(TacticActor actor, TacticActor target)
     {
-        targetableTiles = new List<int>(pathFinder.FindTilesInRange(location, range, -1));
+        int distance = pathFinder.CalculateDistance(actor.locationIndex, target.locationIndex);
+        if (distance <= actor.currentAttackRange)
+        {
+            return true;
+        }
+        return false;
+        /*targetableTiles = new List<int>(pathFinder.FindTilesInAttackRange(actor));
         for (int i = 0; i < targetableTiles.Count; i++)
         {
             if (ReturnActorOnTile(targetableTiles[i]) == null){continue;}
             if (ReturnActorOnTile(targetableTiles[i]) == target){return true;}
         }
-        return false;
+        return false;*/
     }
 
     public void ActorStopAttacking()
@@ -502,7 +515,8 @@ public class TerrainMap : Map
         actorInfo.UpdateInfo(actors[currentViewed]);
         UpdateCenterTile(actors[currentViewed].locationIndex);
         UpdateMap();
-        ViewReachableTiles();
+        //ViewReachableTiles();
+        ViewAttackableTiles();
     }
 
     public void ViewActorByIndex(int index)
@@ -737,6 +751,10 @@ public class TerrainMap : Map
         else
         {
             startIndex = index;
+            if (startIndex < 0)
+            {
+                startIndex = actors[turnIndex].locationIndex;   
+            }
         }
         DetermineCornerRowColumn();
         DetermineCurrentTiles();
@@ -791,18 +809,74 @@ public class TerrainMap : Map
 
     private void GetReachableTiles()
     {
-        int start = actors[turnIndex].locationIndex;
-        int movement = actors[turnIndex].ReturnMaxPossibleDistance();
-        highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, movement, actors[turnIndex].movementType));
+        currentHighlighting = 2;
+        highlightedTiles = new List<int>(pathFinder.FindTilesInMoveRange(actors[turnIndex], true));
         HighlightTiles();
     }
 
-    private void ViewReachableTiles()
+    private void ViewAttackableTiles()
     {
-        int start = actors[currentViewed].locationIndex;
-        int movement = actors[currentViewed].baseMovement * actors[currentViewed].baseActions;
-        highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, movement, actors[currentViewed].movementType));
-        HighlightTiles();
+        currentHighlighting = 1;
+        bool current = false;
+        if (currentViewed == turnIndex)
+        {
+            current = true;
+        }
+        redHighlightedTiles = new List<int>(pathFinder.FindTilesInAttackRange(actors[currentViewed], current));
+        highlightedTiles = new List<int>(pathFinder.FindTilesInMoveRange(actors[currentViewed], current));
+        highlightedTiles = new List<int>(highlightedTiles.Except(redHighlightedTiles));
+        HighlightAttackableTilesInReach();
+    }
+
+    private void ClearHighlightedTiles()
+    {
+        highlightedTiles.Clear();
+        targetableTiles.Clear();
+        redHighlightedTiles.Clear();
+        currentHighlighting = 0;
+    }
+
+    private void Rehighlight()
+    {
+        switch (currentHighlighting)
+        {
+            case 0:
+                break;
+            case 1:
+                HighlightAttackableTilesInReach();
+                break;
+            case 2:
+                HighlightTiles();
+                break;
+            case 3:
+                HighlightTiles(false);
+                break;
+            case 4:
+                HighlightTiles();
+                HighlightSkillAOE();
+                break;
+        }
+    }
+
+    private void HighlightAttackableTilesInReach()
+    {
+        int index = -1;
+        for (int i = 0; i < redHighlightedTiles.Count; i++)
+        {
+            index = currentTiles.IndexOf(redHighlightedTiles[i]);
+            if (index >= 0)
+            {
+                HighlightTile(index, false);
+            }
+        }
+        for (int i = 0; i < highlightedTiles.Count; i++)
+        {
+            index = currentTiles.IndexOf(highlightedTiles[i]);
+            if (index >= 0)
+            {
+                HighlightTile(index, true);
+            }
+        }
     }
 
     private void HighlightTiles(bool cyan = true)
@@ -837,6 +911,10 @@ public class TerrainMap : Map
 
     private void AOEHighlightTile(int imageIndex, bool red = true)
     {
+        if (imageIndex < 0)
+        {
+            return;
+        }
         terrainTiles[imageIndex].AoeHighlight(red);
     }
 
@@ -846,14 +924,15 @@ public class TerrainMap : Map
         currentTarget = 0;
         UpdateOccupiedTiles();
         targetableTiles.Clear();
-        int start = actors[turnIndex].locationIndex;
         // Need a new list so that they don't both point to the same thing and automatically update with each other.
-        highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, targetRange, -1));
+        highlightedTiles = new List<int>(pathFinder.FindTilesInSkillRange(actors[turnIndex], targetRange));
+        // Some skills can target the user.
         if (targetsType != 0)
         {
-            highlightedTiles.Add(start);
+            highlightedTiles.Add(actors[turnIndex].locationIndex);
         }
         // Check if the tiles in attack range have targets.
+        //targetableTiles.AddRange(highlightedTiles);
         for (int i = 0; i < highlightedTiles.Count; i++)
         {
             if (occupiedTiles[highlightedTiles[i]] > 0)
@@ -880,21 +959,21 @@ public class TerrainMap : Map
         return false;
     }
 
-    private void SeeTarget(bool blue = false)
+    private void SeeTarget()
     {
+        currentHighlighting = 3;
         UpdateCenterTile(targetableTiles[currentTarget]);
         UpdateMap();
-        HighlightTiles(blue);
+        HighlightTiles(false);
         // Update some info about the target.
     }
 
     // Just do this once at the beginning of skill movement to get the highlighted range of the skill.
     private void SeeSkillRange()
     {
-        int start = actors[turnIndex].locationIndex;
         int skillRange = actors[turnIndex].activeSkill.range;
-        highlightedTiles = new List<int>(pathFinder.FindTilesInRange(start, skillRange, -1));
-        highlightedTiles.Add(start);
+        highlightedTiles = new List<int>(pathFinder.FindTilesInSkillRange(actors[turnIndex], skillRange));
+        highlightedTiles.Add(actors[turnIndex].locationIndex);
     }
 
     // Move the skill around.
@@ -927,12 +1006,13 @@ public class TerrainMap : Map
 
     private void SeeSkillSpan()
     {
+        currentHighlighting = 4;
         UpdateCenterTile(skillCenter);
         UpdateMap();
         HighlightTiles();
         // Need to keep track of the skill's center location.
         // Highlight the center location and tiles around it within the span.
-        targetableTiles = new List<int>(pathFinder.FindTilesInRange(skillCenter, skillSpan, -1));
+        targetableTiles = new List<int>(pathFinder.FindTilesInSkillSpan(skillCenter, skillSpan));
         targetableTiles.Add(skillCenter);
         HighlightSkillAOE();
     }
@@ -993,7 +1073,9 @@ public class TerrainMap : Map
         }
         UpdateCenterTile(fixedCenter);
         UpdateMap();
-        HighlightTiles();
+        // Need to maintain the highlights according to what the player was doing.
+        // Moving -> move highlights, skill -> skill highlights, etc.
+        Rehighlight();
     }
 
     public void ChangeLockMapView()

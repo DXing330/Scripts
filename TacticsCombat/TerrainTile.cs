@@ -109,7 +109,7 @@ public class TerrainTile : MonoBehaviour
         {
             tempColor = Color.green;
         }
-        tempColor.a = 0.9f;
+        tempColor.a = 0.8f;
         AOEHighlight.color = tempColor;
     }
 

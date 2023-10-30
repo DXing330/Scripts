@@ -1,3 +1,5 @@
+using System.IO;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,6 +25,8 @@ public class TerrainPathfinder : MonoBehaviour
     private int fullSize;
     private int bigInt = 999999;
     public List<int> adjacentTiles;
+    public List<int> tempAdjTiles;
+    public List<int> adjTracker;
     public List<int> distances;
     // Shortest path tree.
     public List<int> checkedTiles;
@@ -161,24 +165,49 @@ public class TerrainPathfinder : MonoBehaviour
     }
 
     // O(1);
-    private void AdjacentFromIndex(int location)
+    private List<int> AdjacentFromIndex(int location)
     {
+        tempAdjTiles.Clear();
         if (location%fullSize > 0)
         {
-            adjacentTiles.Add(location-1);
+            tempAdjTiles.Add(location-1);
         }
         if (location%fullSize < fullSize - 1)
         {
-            adjacentTiles.Add(location+1);
+            tempAdjTiles.Add(location+1);
         }
         if (location < (fullSize - 1) * fullSize)
         {
-            adjacentTiles.Add(location+fullSize);
+            tempAdjTiles.Add(location+fullSize);
         }
         if (location > fullSize - 1)
         {
-            adjacentTiles.Add(location-fullSize);
+            tempAdjTiles.Add(location-fullSize);
         }
+        return tempAdjTiles;
+    }
+
+    // Hard code test, come back to this later.
+    private List<int> AdjacentWithinRange(int location, int range)
+    {
+        tempAdjTiles.Clear();
+        if (location%fullSize > range - 1)
+        {
+            tempAdjTiles.Add(location-range);
+        }
+        if (location%fullSize < fullSize - range - 1)
+        {
+            tempAdjTiles.Add(location+range);
+        }
+        if (location < (fullSize - range - 1) * fullSize)
+        {
+            tempAdjTiles.Add(location+(fullSize*range));
+        }
+        if (location > fullSize - range - 1)
+        {
+            tempAdjTiles.Add(location-(fullSize*range));
+        }
+        return tempAdjTiles;
     }
 
     public void RecurviseAdjacency(int location, int range = 1)
@@ -188,16 +217,23 @@ public class TerrainPathfinder : MonoBehaviour
         {
             return;
         }
-        AdjacentFromIndex(location);
+        adjacentTiles = new List<int>(AdjacentFromIndex(location));
         if (range == 1)
         {
             return;
         }
+        adjTracker = new List<int>(adjacentTiles);
         for (int i = 0; i < range - 1; i++)
         {
-            for (int j = 0; j < adjacentTiles.Count; j++)
+            if (i > 0)
             {
-                AdjacentFromIndex(adjacentTiles[j]);
+                // Only add newly added tiles.
+                adjTracker = new List<int>(adjacentTiles.Except(adjTracker));
+            }
+            for (int j = 0; j < adjTracker.Count; j++)
+            {
+                AdjacentFromIndex(adjTracker[j]);
+                adjacentTiles.AddRange(tempAdjTiles.Except(adjacentTiles));
             }
         }
     }
@@ -242,14 +278,10 @@ public class TerrainPathfinder : MonoBehaviour
         return location;
     }
 
-    public List<int> FindTilesInRange(int startIndex, int range, int moveType = 0)
+    private List<int> FindTilesInRange(int start, int range, int moveType = -1)
     {
         reachableTiles.Clear();
-        if (range <= 0)
-        {
-            return reachableTiles;
-        }
-        ResetDistances(startIndex);
+        ResetDistances(start);
         int distance = 0;
         while (distance <= range && reachableTiles.Count < fullSize * fullSize)
         {
@@ -265,8 +297,25 @@ public class TerrainPathfinder : MonoBehaviour
         return reachableTiles;
     }
 
-    public List<int> FindTilesInAttackRange(int startIndex, int moveRange, int moveType = 0, int attackRange = 1)
+    public List<int> FindTilesInMoveRange(TacticActor actor, bool current = false)
     {
+        reachableTiles.Clear();
+        int startIndex = actor.locationIndex;
+        int range = actor.ReturnMaxPossibleDistance(current);
+        int moveType = actor.movementType;
+        if (range <= 0)
+        {
+            return reachableTiles;
+        }
+        return FindTilesInRange(startIndex, range, moveType);
+    }
+
+    public List<int> FindTilesInAttackRange(TacticActor currentActor, bool currentTurn = true)
+    {
+        int startIndex = currentActor.locationIndex;
+        int moveRange = currentActor.MaxMovementWhileAttacking(currentTurn);
+        int moveType = currentActor.movementType;
+        int attackRange = currentActor.currentAttackRange;
         attackableTiles.Clear();
         reachableTiles.Clear();
         if (attackRange <= 0)
@@ -290,9 +339,34 @@ public class TerrainPathfinder : MonoBehaviour
         for (int i = 0; i < reachableTiles.Count; i++)
         {
             RecurviseAdjacency(reachableTiles[i], attackRange);
-            attackableTiles.AddRange(adjacentTiles);
+            attackableTiles.AddRange(adjacentTiles.Except(attackableTiles));
         }
+        attackableTiles.Remove(startIndex);
         return attackableTiles;
+    }
+
+    public List<int> FindTilesInSkillRange(TacticActor skillUser, int skillRange)
+    {
+        reachableTiles.Clear();
+        int startIndex = skillUser.locationIndex;
+        int moveType = -1;
+        if (skillRange <= 0)
+        {
+            return reachableTiles;
+        }
+        return FindTilesInRange(startIndex, skillRange, moveType);
+    }
+
+    public List<int> FindTilesInSkillSpan(int center, int span)
+    {
+        reachableTiles.Clear();
+        reachableTiles.Add(center);
+        int moveType = -1;
+        if (span <= 0)
+        {
+            return reachableTiles;
+        }
+        return FindTilesInRange(center, span, moveType);
     }
 
     public int CalculateDistance(int pointOne, int pointTwo)
@@ -346,7 +420,7 @@ public class TerrainPathfinder : MonoBehaviour
         int targetDistance = bigInt;
         int currentDistance = bigInt;
         int location = currentActor.locationIndex;
-        FindTilesInAttackRange(location, currentActor.ReturnMaxPossibleDistance(), currentActor.movementType, currentActor.attackRange);
+        FindTilesInAttackRange(currentActor);
         for (int i = 0; i < allActors.Count; i++)
         {
             if (allActors[i].team == currentActor.team)
