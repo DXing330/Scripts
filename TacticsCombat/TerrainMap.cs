@@ -225,7 +225,6 @@ public class TerrainMap : Map
         }
         else
         {
-            currentTarget = 0;
             skillCenter = actors[turnIndex].locationIndex;
             int range = SeeSkillRange();
             GetTargetableTiles(range, actors[turnIndex].activeSkill.skillTarget);
@@ -285,7 +284,6 @@ public class TerrainMap : Map
     private void LockOnSkillActivate()
     {
         bool specialEffect = false;
-        ActorStopMoving();
         specialEffect = skillManager.ApplySkillEffect(ReturnCurrentTarget(), actors[turnIndex].activeSkill, actors[turnIndex]);
         if (specialEffect)
         {
@@ -293,6 +291,7 @@ public class TerrainMap : Map
         }
         actors[turnIndex].ActivateSkill();
         actorInfo.UpdateInfo(actors[turnIndex]);
+        ActorStopMoving();
     }
 
     private void NonLockOnSkillActivate()
@@ -857,6 +856,7 @@ public class TerrainMap : Map
     private void ClearHighlightedTiles()
     {
         highlightedTiles.Clear();
+        // Clearing this makes an error when you try to get a actor on a targeted tile.
         targetableTiles.Clear();
         redHighlightedTiles.Clear();
         currentHighlighting = 0;
