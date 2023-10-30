@@ -120,6 +120,8 @@ public class GameManager : MonoBehaviour
             armyData.Load();
             upgradeData.Load();
         }
+        player.UpdateStats();
+        familiar.UpdateStats();
     }
 
     [ContextMenu("New Game")]
@@ -186,6 +188,8 @@ public class GameManager : MonoBehaviour
         {
             bloodCrystals -= playerLevel * playerLevel;
             playerLevel++;
+            player.UpdateStats();
+            familiar.UpdateStats();
             SaveData();
         }
     }
