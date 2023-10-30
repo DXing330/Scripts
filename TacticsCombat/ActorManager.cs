@@ -8,6 +8,8 @@ public class ActorManager : MonoBehaviour
     public ActorSprites actorSprites;
     public TacticActor actorPrefab;
     public TerrainMap terrainMap;
+    public int winCondition = 0;
+    public string winConditionSpecifics = null;
     private int teamOneCount = 0;
     private int teamZeroCount = 0;
     public TerrainTile terrainTile;
@@ -95,6 +97,19 @@ public class ActorManager : MonoBehaviour
         for (int i = 0; i < enemies.Length; i++)
         {
             GenerateActor(usedTiles[i], enemies[i], 1);
+        }
+    }
+
+    public void LoadFixedEnemyTeam()
+    {
+        List<string> allEnemies = GameManager.instance.fixedBattleActors;
+        for (int i = 0; i < allEnemies.Count; i++)
+        {
+            if (allEnemies[i].Length < 3)
+            {
+                continue;
+            }
+            GenerateActor(i, allEnemies[i], 1);
         }
     }
 
@@ -208,6 +223,7 @@ public class ActorManager : MonoBehaviour
 
     public int WinningTeam()
     {
+        // You can always win/lose by being defeated.
         CountTeams();
         if (teamZeroCount <= 0)
         {
@@ -217,7 +233,18 @@ public class ActorManager : MonoBehaviour
         {
             return 0;
         }
+        // There may be other special win/loss conditions though.
+        switch (winCondition)
+        {
+            case 1:
+                break;
+        }
         return -1;
+    }
+
+    private int CheckTargetSlain()
+    {
+        return 0;
     }
 
     private void CountTeams()

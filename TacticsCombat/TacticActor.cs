@@ -139,7 +139,13 @@ public class TacticActor : MonoBehaviour
         if (AIType == 1)
         {
             AIType = 0;
+            terrainMap.AlertEnemyTeam();
         }
+    }
+
+    public void AlertedByAlly()
+    {
+        AIType = 0;
     }
 
     public void ReceiveDamage(int amount)
@@ -244,6 +250,15 @@ public class TacticActor : MonoBehaviour
         return true;
     }
 
+    public bool Actable()
+    {
+        if (health <= 0 || baseActions <= 0)
+        {
+            return false;
+        }
+        return true;
+    }
+
     public bool CheckActions(int actionCost = 1)
     {
         if (actionsLeft < actionCost)
@@ -283,7 +298,7 @@ public class TacticActor : MonoBehaviour
 
     private void AttackAction()
     {
-        if (actionsLeft < 1 || health <= 0)
+        if (actionsLeft < actionsToAttack || health <= 0)
         {
             return;
         }
@@ -299,7 +314,7 @@ public class TacticActor : MonoBehaviour
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
-            actionsLeft -= 1;
+            actionsLeft -= actionsToAttack;
         }
         // Otherwise look for another target.
         else
@@ -314,7 +329,7 @@ public class TacticActor : MonoBehaviour
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
-            actionsLeft -= 1;
+            actionsLeft -= actionsToAttack;
         }
         // Keep attacking until you're out of actions.
         CheckIfAttackAgain();

@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public ArmyDataManager armyData;
     public ActorDataManager actorData;
     public UnitUpgradeData upgradeData;
+    public ScriptedBattleDataManager fixedBattleData;
     private string saveDataPath;
     private string loadedData;
 
@@ -75,8 +76,14 @@ public class GameManager : MonoBehaviour
     public List<string> playerActives;
     public List<string> familiarPassives;
     public List<string> familiarActives;
+    public int randomBattle = 0;
+    public string battleName = "";
+    public List<int> fixedBattleTerrain;
+    public List<string> fixedBattleActors;
     public int battleLocationType;
     public int battleDifficulty;
+    public int battleWinCondition = 0;
+    public string winConSpecifics = "";
 
     public void SaveData()
     {
@@ -191,8 +198,43 @@ public class GameManager : MonoBehaviour
 
     public void SetRandomBattleLocationDifficulty(int location, int difficulty)
     {
+        ResetBattleRandomness();
         battleLocationType = location;
         battleDifficulty = difficulty;
         UnityEngine.SceneManagement.SceneManager.LoadScene("BattleMap");
+    }
+
+    public void ResetWinCon()
+    {
+        battleWinCondition = 0;
+        winConSpecifics = "";
+    }
+
+    public void UpdateWinCon(int type, string specifics)
+    {
+        battleWinCondition = type;
+        winConSpecifics = specifics;
+    }
+
+    public void ResetBattleRandomness()
+    {
+        randomBattle = 0;
+        battleName = "";
+        fixedBattleTerrain.Clear();
+        fixedBattleActors.Clear();
+    }
+
+    public void GenerateFixedBattle(string namedBattle)
+    {
+        randomBattle = 1;
+        battleName = namedBattle;
+        UpdateFixedBattleData();
+        UnityEngine.SceneManagement.SceneManager.LoadScene("BattleMap");
+    }
+
+    private void UpdateFixedBattleData()
+    {
+        fixedBattleTerrain = fixedBattleData.ReturnFixedBattleTerrain(battleName);
+        fixedBattleActors = fixedBattleData.ReturnFixedBattleActors(battleName);
     }
 }

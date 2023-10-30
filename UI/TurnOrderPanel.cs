@@ -30,7 +30,7 @@ public class TurnOrderPanel : MonoBehaviour
         {
             int actorIndex = (currentTurnIndex+i)%terrainMap.actors.Count;
             // Don't draw dead actors.
-            if (terrainMap.actors[actorIndex].health <= 0)
+            if (!terrainMap.actors[actorIndex].Actable())
             {
                 currentTurnIndex++;
                 i--;

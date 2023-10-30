@@ -31,4 +31,15 @@ public class SceneManager : MonoBehaviour
     {
         GameManager.instance.battleLocationType = terrainType;
     }
+
+    public void SetBattleWinCon(string winCon = "")
+    {
+        if (winCon.Length < 5)
+        {
+            GameManager.instance.ResetWinCon();
+        }
+        string[] conSpecifics = winCon.Split("=");
+        GameManager.instance.battleWinCondition = int.Parse(conSpecifics[0]);
+        GameManager.instance.winConSpecifics = conSpecifics[1];
+    }
 }

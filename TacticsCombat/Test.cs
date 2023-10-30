@@ -55,7 +55,7 @@ public class Test : MonoBehaviour
             {
                 AdjacentFromIndex(adjacentTiles[j]);
                 adjacentTiles.AddRange(tempAdjTiles.Except(adjacentTiles));
-                Debug.Log(string.Join(", ", adjacentTiles.Select(x => x.ToString())));
+                //Debug.Log(string.Join(", ", adjacentTiles.Select(x => x.ToString())));
             }
         }
     }

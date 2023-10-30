@@ -36,7 +36,6 @@ public class TerrainMap : Map
     public TurnOrderPanel turnOrder;
     public ActionManager actionManager;
 
-    public int GetTurnIndex(){return turnIndex;}
 
     public void StartBattle()
     {
@@ -47,10 +46,25 @@ public class TerrainMap : Map
     protected override void Start()
     {
         Application.targetFrameRate = 30;
-        GenerateMap(baseTerrain, fullSize);
-        UpdateCenterTile((fullSize * fullSize)/2);
         actorManager.GetActorData();
-        actorManager.LoadEnemyTeam();
+        if (GameManager.instance.randomBattle > 0)
+        {
+            terrainInfo = GameManager.instance.fixedBattleTerrain;
+            fullSize = (int) Mathf.Sqrt(terrainInfo.Count);
+            allUnoccupied.Clear();
+            for (int i = 0; i < fullSize * fullSize; i++)
+            {
+                allUnoccupied.Add(0);
+            }
+            actorManager.LoadFixedEnemyTeam();
+        }
+        else if (GameManager.instance.randomBattle <= 0)
+        {
+            baseTerrain = GameManager.instance.battleLocationType;
+            GenerateMap(baseTerrain, fullSize);
+            actorManager.LoadEnemyTeam();
+        }
+        UpdateCenterTile((fullSize * fullSize)/2);
         UpdateMap();
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
         fixedCenter=fullSize*fullSize/2;
@@ -99,7 +113,7 @@ public class TerrainMap : Map
     {
         //Debug.Log(turnIndex);
         //Debug.Log(actors.Count);
-        if (actors[turnIndex].health <= 0)
+        if (!actors[turnIndex].Actable())
         {
             NextTurn();
             return;
@@ -149,6 +163,14 @@ public class TerrainMap : Map
     public void ActorStartMoving()
     {
         GetReachableTiles();
+    }
+
+    public void AlertEnemyTeam()
+    {
+        for (int i = 0; i < actors.Count; i++)
+        {
+            actors[i].AlertedByAlly();
+        }
     }
 
     public void ActorStopMoving()
@@ -205,8 +227,7 @@ public class TerrainMap : Map
         {
             currentTarget = 0;
             skillCenter = actors[turnIndex].locationIndex;
-            int range = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
-            SeeSkillRange();
+            int range = SeeSkillRange();
             GetTargetableTiles(range, actors[turnIndex].activeSkill.skillTarget);
             if (targetableTiles.Count <= 0)
             {
@@ -512,7 +533,7 @@ public class TerrainMap : Map
 
     public void ViewActorInfo(bool right = true)
     {
-        if (actors[currentViewed].health <= 0)
+        if (!actors[currentViewed].Actable())
         {
             SwitchViewedActor(right);
             return;
@@ -641,8 +662,8 @@ public class TerrainMap : Map
     public void AddActor(TacticActor newActor)
     {
         actors.Insert(0, newActor);
-        UpdateOccupiedTiles();
-        UpdateMap();
+        //UpdateOccupiedTiles();
+        //UpdateMap();
     }
 
     public void RemoveActors(bool win = false)
@@ -771,7 +792,7 @@ public class TerrainMap : Map
         for (int i = 0; i < actors.Count; i++)
         {
             // Don't count the dead.
-            if (actors[i].health <= 0)
+            if (!actors[i].Actable())
             {
                 continue;
             }
@@ -974,11 +995,12 @@ public class TerrainMap : Map
     }
 
     // Just do this once at the beginning of skill movement to get the highlighted range of the skill.
-    private void SeeSkillRange()
+    private int SeeSkillRange()
     {
         int skillRange = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
         highlightedTiles = new List<int>(pathFinder.FindTilesInSkillRange(actors[turnIndex], skillRange));
         highlightedTiles.Add(actors[turnIndex].locationIndex);
+        return skillRange;
     }
 
     // Move the skill around.

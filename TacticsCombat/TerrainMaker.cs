@@ -31,6 +31,8 @@ public class TerrainMaker : MonoBehaviour
                 return RandomWaterTile();
             case 4:
                 return RandomDesertTile();
+            case 10:
+                return RandomVillageTile();
         }
         return 0;
     }
@@ -170,5 +172,34 @@ public class TerrainMaker : MonoBehaviour
                 return 3;
         }
         return 4;
+    }
+
+    protected int RandomVillageTile()
+    {
+        rng = Random.Range(0, 10);
+        switch (rng)
+        {
+            case 0:
+                return 0;
+            case 1:
+                return 0;
+            case 2:
+                return 0;
+            case 3:
+                return 0;
+            case 4:
+                return 0;
+            case 5:
+                return 0;
+            case 6:
+                return 0;
+            case 7:
+                return 0;
+            case 8:
+                return 0;
+            case 9:
+                return 0;
+        }
+        return 0;
     }
 }
