@@ -57,6 +57,10 @@ public class SkillMenu : MonoBehaviour
         {
             return;
         }
+        if (terrainMap.targetableTiles.Count <= 0)
+        {
+            return;
+        }
         if (activeSkill.lockOn == 0)
         {
             animator.SetTrigger("Use");

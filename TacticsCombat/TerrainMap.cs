@@ -205,8 +205,13 @@ public class TerrainMap : Map
         {
             currentTarget = 0;
             skillCenter = actors[turnIndex].locationIndex;
+            int range = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
             SeeSkillRange();
-            GetTargetableTiles(actors[turnIndex].activeSkill.range, actors[turnIndex].activeSkill.skillTarget);
+            GetTargetableTiles(range, actors[turnIndex].activeSkill.skillTarget);
+            if (targetableTiles.Count <= 0)
+            {
+                return;
+            }
             SeeTarget();
         }
     }
@@ -971,7 +976,7 @@ public class TerrainMap : Map
     // Just do this once at the beginning of skill movement to get the highlighted range of the skill.
     private void SeeSkillRange()
     {
-        int skillRange = actors[turnIndex].activeSkill.range;
+        int skillRange = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
         highlightedTiles = new List<int>(pathFinder.FindTilesInSkillRange(actors[turnIndex], skillRange));
         highlightedTiles.Add(actors[turnIndex].locationIndex);
     }
