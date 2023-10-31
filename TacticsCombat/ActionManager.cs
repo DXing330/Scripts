@@ -25,6 +25,10 @@ public class ActionManager : MonoBehaviour
     public void UpdateActionsLeft()
     {
         currentActor = terrainMap.ReturnCurrentTurnActor();
+        if (currentActor == null)
+        {
+            return;
+        }
         actionsLeft.text = currentActor.actionsLeft.ToString();
     }
 
@@ -164,6 +168,11 @@ public class ActionManager : MonoBehaviour
     public void CheckIfAttackAgain()
     {
         UpdateActionsLeft();
+        if (currentActor == null)
+        {
+            ChangeState(0);
+            return;
+        }
         if (currentActor.CheckActionsToAttack())
         {
             return;

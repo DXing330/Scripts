@@ -6,6 +6,7 @@ public class TurnOrderPanel : MonoBehaviour
 {
     private int turnOrderCount = 6;
     public List<FormationTile> turnOrder;
+    public List<int> actorIndices;
     public TerrainMap terrainMap;
 
     private void ResetTurnOrder()
@@ -24,6 +25,7 @@ public class TurnOrderPanel : MonoBehaviour
     public void UpdateTurnOrder(int currentTurnIndex)
     {
         ResetTurnOrder();
+        actorIndices.Clear();
         int updateIndex = 0;
         // Could be a problem if too many dead actors, you won't show all the actors.
         for (int i = 0; i < Mathf.Min(terrainMap.actors.Count, turnOrderCount); i++)
@@ -37,7 +39,17 @@ public class TurnOrderPanel : MonoBehaviour
                 continue;
             }
             UpdateTurnSprite(updateIndex, terrainMap.actors[actorIndex].spriteRenderer.sprite);
+            actorIndices.Add(actorIndex);
             updateIndex++;
         }
+    }
+
+    public int ReturnActorIndex(int imageIndex)
+    {
+        if (imageIndex >= actorIndices.Count)
+        {
+            return -1;
+        }
+        return actorIndices[imageIndex];
     }
 }

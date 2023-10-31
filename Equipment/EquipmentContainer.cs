@@ -15,6 +15,7 @@ public class EquipmentContainer : MonoBehaviour
     public int totalBonusEnergy;
     public int totalBonusMovement;
     public List<string> allPassives;
+    public List<string> allActives;
 
     public void UpdateStats()
     {

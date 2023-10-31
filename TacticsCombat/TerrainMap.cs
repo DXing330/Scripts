@@ -101,7 +101,6 @@ public class TerrainMap : Map
         CheckWinners();
         if (!battleStarted){return;}
         ActorsTurn();
-        actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
     public int ActorCurrentMovement()
@@ -111,8 +110,6 @@ public class TerrainMap : Map
 
     public void ActorsTurn()
     {
-        //Debug.Log(turnIndex);
-        //Debug.Log(actors.Count);
         if (!actors[turnIndex].Actable())
         {
             NextTurn();
@@ -388,6 +385,10 @@ public class TerrainMap : Map
 
     public TacticActor ReturnCurrentTurnActor()
     {
+        if (!battleStarted)
+        {
+            return null;
+        }
         return actors[turnIndex];
     }
 
@@ -484,8 +485,11 @@ public class TerrainMap : Map
             ActorStopMoving();
             actionManager.ChangeState(0);
         }
+        else
+        {
+            actorInfo.UpdateInfo(actors[turnIndex]);
+        }
         CheckWinners();
-        //actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
     private bool DetermineFlanking(TacticActor attackTarget)
@@ -545,7 +549,11 @@ public class TerrainMap : Map
     public void ViewActorByIndex(int index)
     {
         lockedView = false;
-        currentViewed = (turnIndex+index)%actors.Count;
+        currentViewed = turnOrder.ReturnActorIndex(index);
+        if (currentViewed < 0)
+        {
+            return;
+        }
         ViewActorInfo();
     }
 
