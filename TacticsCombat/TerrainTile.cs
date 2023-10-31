@@ -342,9 +342,9 @@ public class TerrainTile : MonoBehaviour
             case 0:
                 return 6;
             case 1:
-                return 7;
+                return 6;
             case 2:
-                return 8;
+                return 7;
             case 3:
                 return 4;
             case 4:
@@ -362,9 +362,9 @@ public class TerrainTile : MonoBehaviour
             case 0:
                 return 6;
             case 1:
-                return 7;
+                return 6;
             case 2:
-                return 7;
+                return 5;
             case 3:
                 return 8;
             case 4:
