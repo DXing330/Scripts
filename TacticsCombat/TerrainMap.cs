@@ -463,7 +463,6 @@ public class TerrainMap : Map
         if (attackerDied && attacker.team == 0)
         {
             ActorStopMoving();
-            NextTurn();
             actionManager.ChangeState(0);
         }
         CheckWinners();
@@ -483,11 +482,10 @@ public class TerrainMap : Map
         if (attackerDied)
         {
             ActorStopMoving();
-            NextTurn();
             actionManager.ChangeState(0);
         }
         CheckWinners();
-        actorInfo.UpdateInfo(actors[turnIndex]);
+        //actorInfo.UpdateInfo(actors[turnIndex]);
     }
 
     private bool DetermineFlanking(TacticActor attackTarget)

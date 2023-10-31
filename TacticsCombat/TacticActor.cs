@@ -247,6 +247,10 @@ public class TacticActor : MonoBehaviour
         {
             return false;
         }
+        if (health <= 0)
+        {
+            return false;
+        }
         return true;
     }
 
