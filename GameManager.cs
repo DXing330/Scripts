@@ -238,6 +238,8 @@ public class GameManager : MonoBehaviour
 
     private void UpdateFixedBattleData()
     {
+        string[] newWinCons = fixedBattleData.ReturnFixedWinCons(battleName).Split("=");
+        UpdateWinCon(int.Parse(newWinCons[0]), newWinCons[1]);
         fixedBattleTerrain = fixedBattleData.ReturnFixedBattleTerrain(battleName);
         fixedBattleActors = fixedBattleData.ReturnFixedBattleActors(battleName);
     }

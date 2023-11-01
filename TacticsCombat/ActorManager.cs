@@ -29,6 +29,8 @@ public class ActorManager : MonoBehaviour
     public void GetActorData()
     {
         actorData = GameManager.instance.actorData;
+        winCondition = GameManager.instance.battleWinCondition;
+        winConditionSpecifics = GameManager.instance.winConSpecifics;
     }
 
     public void RemoveFromPlayerTeam(TacticActor actor)
@@ -237,9 +239,55 @@ public class ActorManager : MonoBehaviour
         switch (winCondition)
         {
             case 1:
+                if (CheckWinConditionOne())
+                {
+                    return 0;
+                }
+                break;
+            case 2:
+                if (!CheckWinConditionTwo())
+                {
+                    return 1;
+                }
                 break;
         }
         return -1;
+    }
+
+    private bool CheckWinConditionOne()
+    {
+        // Basic alternate win con, kill a key target.
+        for (int i = 0; i < terrainMap.actors.Count; i++)
+        {
+            if (terrainMap.actors[i].health <= 0)
+            {
+                continue;
+            }
+            if (terrainMap.actors[i].typeName == winConditionSpecifics)
+            {
+                return false;
+            }
+        }
+        // If you can't find the key target then they're dead.
+        return true;
+    }
+
+    private bool CheckWinConditionTwo()
+    {
+        // Alternate loss condition, fail to protect a key target.
+        for (int i = 0; i < terrainMap.actors.Count; i++)
+        {
+            if (terrainMap.actors[i].health <= 0)
+            {
+                continue;
+            }
+            if (terrainMap.actors[i].typeName == winConditionSpecifics)
+            {
+                return true;
+            }
+        }
+        // If they die then you lose.
+        return false;
     }
 
     private int CheckTargetSlain()

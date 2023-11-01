@@ -6,8 +6,19 @@ using UnityEngine;
 public class ScriptedBattleDataManager : MonoBehaviour
 {
     public List<string> fixedBattleNames;
+    public List<string> fixedBattleWinCons;
     public List<string> fixedBattleTerrains;
     public List<string> fixedBattleActors;
+
+    public string ReturnFixedWinCons(string battleName)
+    {
+        int index = fixedBattleNames.IndexOf(battleName);
+        if (index < 0)
+        {
+            return "0=0";
+        }
+        return fixedBattleWinCons[index];
+    }
 
     public List<string> ReturnFixedBattleActors(string battleName)
     {

@@ -42,7 +42,7 @@ public class SkillMenu : MonoBehaviour
         string skillDetailsText = "";
         // Need to show the energy and action cost.
         skillName.text = activeSkill.skillName;
-        skillEnergyCost.text = "Energy:\n"+activeSkill.cost;
+        skillEnergyCost.text = activeSkill.cost.ToString();
         skillDetailsText += activeSkill.flavorText;
         skillDetailsText += "\n"+activeSkill.ReturnEffectDescription();
         skillDetails.text = skillDetailsText;
