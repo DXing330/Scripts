@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class SkillMenu : MonoBehaviour
 {
     public Text skillName;
+    public Text skillEnergyCost;
     public Text skillDetails;
     public TacticActiveSkill activeSkill;
     public AttackMenu lockOnMenu;
@@ -40,8 +41,10 @@ public class SkillMenu : MonoBehaviour
     {
         string skillDetailsText = "";
         // Need to show the energy and action cost.
-        skillName.text = activeSkill.skillName+", Cost: "+activeSkill.cost;;
+        skillName.text = activeSkill.skillName;
+        skillEnergyCost.text = "Energy:\n"+activeSkill.cost;
         skillDetailsText += activeSkill.flavorText;
+        skillDetailsText += "\n"+activeSkill.ReturnEffectDescription();
         skillDetails.text = skillDetailsText;
     }
 

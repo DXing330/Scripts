@@ -70,4 +70,33 @@ public class TacticActiveSkill : MonoBehaviour
         // Can make it consume all actions and increase power based on actions consumed.
         return int.Parse(actionCost);
     }
+
+    public string ReturnEffectDescription()
+    {
+        string description = "";
+        switch (effect)
+        {
+            case ("Support"):
+                return SupportEffectDescription();
+            case ("Battle"):
+                return BattleEffectDescription();
+            case ("Damage"):
+                return BattleEffectDescription();
+            case ("Heal"):
+                break;
+        }
+        return description;
+    }
+
+    private string SupportEffectDescription()
+    {
+        string description = "Applies "+effectSpecifics+" for "+basePower.ToString()+" turns.";
+        return description;
+    }
+
+    private string BattleEffectDescription()
+    {
+        string description = "Deals "+(basePower * 10).ToString()+"% damage.";
+        return description;
+    }
 }

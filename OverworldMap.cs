@@ -21,6 +21,12 @@ public class OverworldMap : Map
     public List<string> allLocations;
     public List<string> locationSpecifics;
     public List<string> exploredTiles;
+
+    protected void Save()
+    {}
+
+    protected void Load()
+    {}
     
     protected override void Start()
     {
