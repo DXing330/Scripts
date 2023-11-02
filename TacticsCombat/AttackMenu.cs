@@ -14,7 +14,7 @@ public class AttackMenu : MonoBehaviour
     public void UpdateTarget(TacticActor newTarget, bool name = false)
     {
         target = newTarget;
-        if (target == null)
+        if (target == null || target.health <= 0)
         {
             ResetTargetInfo();
             return;
@@ -79,6 +79,6 @@ public class AttackMenu : MonoBehaviour
             return;
         }
         terrainMap.StartViewingActorInfo();
-        UpdateTarget(terrainMap.ReturnCurrentAttackTarget(), true);
+        UpdateTarget(terrainMap.ReturnCurrentViewedTarget(), true);
     }
 }

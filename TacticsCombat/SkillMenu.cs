@@ -60,16 +60,20 @@ public class SkillMenu : MonoBehaviour
         {
             return;
         }
-        if (terrainMap.targetableTiles.Count <= 0)
+        /*if (terrainMap.targetableTiles.Count <= 0)
         {
             return;
-        }
+        }*/
         if (activeSkill.lockOn == 0)
         {
             animator.SetTrigger("Use");
         }
         else if (activeSkill.lockOn == 1)
         {
+            if (terrainMap.targetableTiles.Count <= 0)
+            {
+                return;
+            }
             animator.SetTrigger("Lock");
             lockOnMenu.UpdateTarget(terrainMap.ReturnCurrentTarget());
         }

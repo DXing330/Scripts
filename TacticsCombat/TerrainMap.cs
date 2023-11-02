@@ -8,6 +8,7 @@ public class TerrainMap : Map
 {
     public bool battleStarted = false;
     private int turnIndex = 0;
+    public int roundIndex = 0;
     private int fixedCenter;
     private bool lockedView = false;
     public new int fullSize = 13;
@@ -23,6 +24,7 @@ public class TerrainMap : Map
     // 0 = none, 1 = viewing(ie attack range), 2 = moving, 3 = ST skill, 4 = aoe skill
     private int currentHighlighting = 0;
     private int currentTarget = 0;
+    private int currentSkill = 0;
     private int currentViewed = 0;
     private int skillCenter;
     private int skillSpan;
@@ -97,6 +99,7 @@ public class TerrainMap : Map
         {
             RemoveActors();
             turnIndex = 0;
+            roundIndex++;
         }
         CheckWinners();
         if (!battleStarted){return;}
@@ -202,12 +205,12 @@ public class TerrainMap : Map
     public void ActorStartUsingSkills()
     {
         // Reuse it for skills.
-        currentTarget = 0;
+        currentSkill = 0;
     }
 
     public void SelectSkill()
     {
-        string skillName = actors[turnIndex].LoadSkillName(currentTarget);
+        string skillName = actors[turnIndex].LoadSkillName(currentSkill);
         actorManager.LoadSkillData(actors[turnIndex].activeSkill, skillName);
         if (!CheckSkillActivatable())
         {
@@ -319,24 +322,24 @@ public class TerrainMap : Map
         int skillsAmount = actors[turnIndex].activeSkillNames.Count;
         if (right)
         {
-            if (currentTarget + 1 < skillsAmount)
+            if (currentSkill + 1 < skillsAmount)
             {
-                currentTarget++;
+                currentSkill++;
             }
             else
             {
-                currentTarget = 0;
+                currentSkill = 0;
             }
         }
         else
         {
-            if (currentTarget > 0)
+            if (currentSkill > 0)
             {
-                currentTarget--;
+                currentSkill--;
             }
             else
             {
-                currentTarget = skillsAmount - 1;
+                currentSkill = skillsAmount - 1;
             }
         }
     }
@@ -347,7 +350,7 @@ public class TerrainMap : Map
         {
             return null;
         }
-        string skillName = actors[turnIndex].LoadSkillName(currentTarget);
+        string skillName = actors[turnIndex].LoadSkillName(currentSkill);
         actorManager.LoadSkillData(actors[turnIndex].activeSkill, skillName);
         return actors[turnIndex].activeSkill;
     }
@@ -490,6 +493,7 @@ public class TerrainMap : Map
             actorInfo.UpdateInfo(actors[turnIndex]);
         }
         CheckWinners();
+        GetTargetableTiles(actors[turnIndex].currentAttackRange);
     }
 
     private bool DetermineFlanking(TacticActor attackTarget)
