@@ -27,6 +27,8 @@ public class SkillEffectManager : MonoBehaviour
                 break;
             case "Battle":
                 return true;
+            case "Summon":
+                return true;
         }
         power /= powerDenominator;
         skill.AffectActor(target, power);

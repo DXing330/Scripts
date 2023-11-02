@@ -144,7 +144,7 @@ public class ActorManager : MonoBehaviour
         newActor.QuickStart();
     }
 
-    public void GenerateActor(int location, string name = "Mob", int team = 0)
+    public void GenerateActor(int location, string name = "Mob", int team = 0, bool start = true)
     {
         TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
         newActor.typeName = name;
@@ -157,7 +157,7 @@ public class ActorManager : MonoBehaviour
             GameManager.instance.upgradeData.AdjustUnitStats(newActor);
         }
         newActor.SetMap(terrainMap);
-        terrainMap.AddActor(newActor);
+        terrainMap.AddActor(newActor, start);
         newActor.QuickStart();
     }
 

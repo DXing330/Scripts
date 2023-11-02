@@ -278,7 +278,22 @@ public class TerrainMap : Map
             case "Battle":
                 BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower);
                 break;
+            case "Summon":
+                SummonSkillActivate(targetableTiles[currentTarget]);
+                break;
         }
+    }
+
+    private void SummonSkillActivate(int location)
+    {
+        // Can't summon on occupied tiles.
+        if (occupiedTiles[location] > 0)
+        {
+            return;
+        }
+        actorManager.GenerateActor(location, actors[turnIndex].activeSkill.effectSpecifics, actors[turnIndex].team, false);
+        UpdateOccupiedTiles();
+        UpdateMap();
     }
 
     private void LockOnSkillActivate()
@@ -668,9 +683,16 @@ public class TerrainMap : Map
         return false;
     }
 
-    public void AddActor(TacticActor newActor)
+    public void AddActor(TacticActor newActor, bool start = true)
     {
-        actors.Insert(0, newActor);
+        if (start)
+        {
+            actors.Insert(0, newActor);
+        }
+        else
+        {
+            actors.Add(newActor);
+        }
         //UpdateOccupiedTiles();
         //UpdateMap();
     }
@@ -954,7 +976,7 @@ public class TerrainMap : Map
         terrainTiles[imageIndex].AoeHighlight(red);
     }
 
-    // 0 for enemies, 1 for allies, 2 for everyone.
+    // 0 for enemies, 1 for allies, 2 for everyone, 3 for self, 4 for unoccupied.
     private void GetTargetableTiles(int targetRange, int targetsType = 0)
     {
         currentTarget = 0;
@@ -963,7 +985,7 @@ public class TerrainMap : Map
         // Need a new list so that they don't both point to the same thing and automatically update with each other.
         highlightedTiles = new List<int>(pathFinder.FindTilesInSkillRange(actors[turnIndex], targetRange));
         // Some skills can target the user.
-        if (targetsType != 0)
+        if (targetsType != 0 && targetsType != 4)
         {
             highlightedTiles.Add(actors[turnIndex].locationIndex);
         }
@@ -971,6 +993,14 @@ public class TerrainMap : Map
         //targetableTiles.AddRange(highlightedTiles);
         for (int i = 0; i < highlightedTiles.Count; i++)
         {
+            if (targetsType == 4)
+            {
+                if (occupiedTiles[highlightedTiles[i]] <= 0)
+                {
+                    targetableTiles.Add(highlightedTiles[i]);
+                }
+                continue;
+            }
             if (occupiedTiles[highlightedTiles[i]] > 0)
             {
                 if (targetsType == 0 && SameTeam(actors[turnIndex], ReturnActorOnTile(highlightedTiles[i])))
