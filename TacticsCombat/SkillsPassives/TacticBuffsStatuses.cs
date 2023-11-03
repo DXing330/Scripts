@@ -34,6 +34,12 @@ public class TacticBuffsStatuses : MonoBehaviour
             case "MOV-":
                 actor.currentMovespeed--;
                 break;
+            case "ENGY+":
+                actor.GainEnergy(1);
+                break;
+            case "ENGY-":
+                actor.LoseEnergy(1);
+                break;
         }
     }
 }

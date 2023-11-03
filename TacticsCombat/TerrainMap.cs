@@ -508,7 +508,10 @@ public class TerrainMap : Map
             actorInfo.UpdateInfo(actors[turnIndex]);
         }
         CheckWinners();
-        GetTargetableTiles(actors[turnIndex].currentAttackRange);
+        if (battleStarted)
+        {
+            GetTargetableTiles(actors[turnIndex].currentAttackRange);
+        }
     }
 
     private bool DetermineFlanking(TacticActor attackTarget)
@@ -823,7 +826,7 @@ public class TerrainMap : Map
         for (int i = 0; i < actors.Count; i++)
         {
             // Don't count the dead.
-            if (!actors[i].Actable())
+            if (actors[i].health <= 0)
             {
                 continue;
             }
@@ -952,6 +955,16 @@ public class TerrainMap : Map
                 HighlightTile(index, cyan);
             }
         }
+        /*if (currentHighlighting != 3)
+        {
+            return;
+        }*/
+        int targetedTile = ReturnCurrentTargetTile();
+        index = currentTiles.IndexOf(targetedTile);
+        if (index >= 0 && targetedTile >= 0)
+        {
+            HighlightTile(index, !cyan);
+        }
     }
 
     private void HighlightTile(int imageIndex, bool blue = true)
@@ -982,6 +995,11 @@ public class TerrainMap : Map
         currentTarget = 0;
         UpdateOccupiedTiles();
         targetableTiles.Clear();
+        if (targetsType == 3)
+        {
+            targetableTiles.Add(actors[turnIndex].locationIndex);
+            return;
+        }
         // Need a new list so that they don't both point to the same thing and automatically update with each other.
         highlightedTiles = new List<int>(pathFinder.FindTilesInSkillRange(actors[turnIndex], targetRange));
         // Some skills can target the user.
@@ -1032,6 +1050,15 @@ public class TerrainMap : Map
         UpdateMap();
         HighlightTiles(false);
         // Update some info about the target.
+    }
+
+    private int ReturnCurrentTargetTile()
+    {
+        if (targetableTiles.Count <= 0)
+        {
+            return -1;
+        }
+        return targetableTiles[currentTarget];
     }
 
     // Just do this once at the beginning of skill movement to get the highlighted range of the skill.

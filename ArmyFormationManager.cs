@@ -226,6 +226,14 @@ public class ArmyFormationManager : MonoBehaviour
 
     private Sprite SpriteDictionary(string actorName)
     {
+        if (actorName == "Player")
+        {
+            return actorSprites.allSprites[0];
+        }
+        if (actorName == "Familiar")
+        {
+            return actorSprites.allSprites[1];
+        }
         return actorSprites.SpriteDictionary(actorName);
     }
 }

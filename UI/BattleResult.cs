@@ -40,8 +40,20 @@ public class BattleResult : MonoBehaviour
             resultText.text = "Victory!!!";
             resultText.color = Color.green;
             goldText.text = goldGain.ToString();
+            if (goldGain <= 0)
+            {
+                rewardGold.SetActive(false);
+            }
             manaText.text = manaGain.ToString();
+            if (manaGain <= 0)
+            {
+                rewardMana.SetActive(false);
+            }
             bloodText.text = bloodGain.ToString();
+            if (bloodGain <= 0)
+            {
+                rewardBlood.SetActive(false);
+            }
         }
         else
         {

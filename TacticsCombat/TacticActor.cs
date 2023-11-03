@@ -151,6 +151,11 @@ public class TacticActor : MonoBehaviour
     public void ReceiveDamage(int amount)
     {
         TriggerAggro();
+        // Ignore damage that's too weak?
+        if (defense/2 > amount)
+        {
+            return;
+        }
         health -= Mathf.Max(amount - defense, 1);
         if (health <= 0)
         {

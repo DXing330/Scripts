@@ -8,14 +8,6 @@ public class ActorSprites : MonoBehaviour
 
     public Sprite SpriteDictionary(string actorName)
     {
-        if (actorName == "Player")
-        {
-            return allSprites[0];
-        }
-        if (actorName == "Familiar")
-        {
-            return allSprites[1];
-        }
         for (int i = 0; i < allSprites.Count; i++)
         {
             if (allSprites[i].name == actorName)

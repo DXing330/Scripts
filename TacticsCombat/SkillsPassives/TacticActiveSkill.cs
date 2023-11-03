@@ -42,6 +42,9 @@ public class TacticActiveSkill : MonoBehaviour
             case "Support":
                 AddBuffDebuff(actor, effectSpecifics, power);
                 break;
+            case "Act":
+                actor.actionsLeft += power;
+                break;
         }
     }
 
@@ -84,6 +87,10 @@ public class TacticActiveSkill : MonoBehaviour
                 return BattleEffectDescription();
             case ("Heal"):
                 break;
+            case ("Move"):
+                return MoveEffectDescription();
+            case ("Act"):
+                return ActEffectDescription();
         }
         return description;
     }
@@ -97,6 +104,18 @@ public class TacticActiveSkill : MonoBehaviour
     private string BattleEffectDescription()
     {
         string description = "Deals "+(basePower * 10).ToString()+"% damage.";
+        return description;
+    }
+
+    private string MoveEffectDescription()
+    {
+        string description = "Move "+((basePower * 10) - 100).ToString()+"% faster.";
+        return description;
+    }
+
+    private string ActEffectDescription()
+    {
+        string description = "Gain "+(basePower - 1).ToString()+" extra actions.";
         return description;
     }
 }

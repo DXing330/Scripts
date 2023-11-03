@@ -18,11 +18,15 @@ public class SkillEffectManager : MonoBehaviour
                 power *= user.baseHealth/10;
                 // Limit healing.
                 power = Mathf.Min(power, Mathf.Max(skill.basePower, skill.currentPower)*powerDenominator);
+                Debug.Log("Healing power: "+power);
                 break;
             case "Move":
-                power *= user.baseMovement;
+                power *= user.currentMovespeed;
                 break;
             case "Support":
+                power *= powerDenominator;
+                break;
+            case "Act":
                 power *= powerDenominator;
                 break;
             case "Battle":
