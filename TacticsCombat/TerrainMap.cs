@@ -230,8 +230,18 @@ public class TerrainMap : Map
         else
         {
             skillCenter = actors[turnIndex].locationIndex;
-            int range = SeeSkillRange();
-            GetTargetableTiles(range, actors[turnIndex].activeSkill.skillTarget);
+            int range = 0;
+            string targetShape = actors[turnIndex].activeSkill.targetingShape;
+            switch (targetShape)
+            {
+                case "none":
+                    range = SeeSkillRange();
+                    break;
+                case "Line":
+                    range = LineSkillRange();
+                    break;
+            }
+            SkillTargetableTiles(actors[turnIndex].activeSkill.skillTarget);
             if (targetableTiles.Count <= 0)
             {
                 return;
@@ -1044,6 +1054,45 @@ public class TerrainMap : Map
         }
     }
 
+    private void SkillTargetableTiles(int targetsType = 0)
+    {
+        currentTarget = 0;
+        UpdateOccupiedTiles();
+        targetableTiles.Clear();
+        if (targetsType == 3)
+        {
+            targetableTiles.Add(actors[turnIndex].locationIndex);
+            return;
+        }
+        if (targetsType != 0 && targetsType != 4)
+        {
+            highlightedTiles.Add(actors[turnIndex].locationIndex);
+        }
+        for (int i = 0; i < highlightedTiles.Count; i++)
+        {
+            if (targetsType == 4)
+            {
+                if (occupiedTiles[highlightedTiles[i]] <= 0)
+                {
+                    targetableTiles.Add(highlightedTiles[i]);
+                }
+                continue;
+            }
+            if (occupiedTiles[highlightedTiles[i]] > 0)
+            {
+                if (targetsType == 0 && SameTeam(actors[turnIndex], ReturnActorOnTile(highlightedTiles[i])))
+                {
+                    continue;
+                }
+                if (targetsType == 1 && !SameTeam(actors[turnIndex], ReturnActorOnTile(highlightedTiles[i])))
+                {
+                    continue;
+                }
+                targetableTiles.Add(highlightedTiles[i]);
+            }
+        }
+    }
+
     private bool SameTeam(TacticActor actorOne, TacticActor actorTwo)
     {
         if (actorOne.team == actorTwo.team)
@@ -1076,6 +1125,14 @@ public class TerrainMap : Map
     {
         int skillRange = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
         highlightedTiles = new List<int>(pathFinder.FindTilesInSkillRange(actors[turnIndex], skillRange));
+        highlightedTiles.Add(actors[turnIndex].locationIndex);
+        return skillRange;
+    }
+
+    private int LineSkillRange()
+    {
+        int skillRange = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
+        highlightedTiles = new List<int>(pathFinder.FindTilesInLineRange(actors[turnIndex], skillRange));
         highlightedTiles.Add(actors[turnIndex].locationIndex);
         return skillRange;
     }

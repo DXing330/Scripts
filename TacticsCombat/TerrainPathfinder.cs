@@ -394,6 +394,27 @@ public class TerrainPathfinder : MonoBehaviour
         return FindTilesInRange(startIndex, skillRange, moveType);
     }
 
+    public List<int> FindTilesInLineRange(TacticActor actor, int range)
+    {
+        reachableTiles.Clear();
+        for (int i = 0; i < 4; i++)
+        {
+            // Start wherever the actor is.
+            int start = actor.locationIndex;
+            for (int k = 0; k < range; k++)
+            {
+                // Check if you can add the tile in the direction.
+                if (DirectionCheck(start, i))
+                {
+                    // If you can then add it and check if you can keep adding.
+                    start = GetDestination(start, i);
+                    reachableTiles.Add(start);
+                }
+            }
+        }
+        return reachableTiles;
+    }
+
     public List<int> FindTilesInSkillSpan(int center, int span)
     {
         reachableTiles.Clear();
