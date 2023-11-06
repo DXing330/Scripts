@@ -93,6 +93,7 @@ public class TerrainMap : Map
 
     public void NextTurn()
     {
+        CheckWinners();
         if (!battleStarted){return;}
         turnIndex++;
         if (turnIndex >= actors.Count)
@@ -101,8 +102,6 @@ public class TerrainMap : Map
             turnIndex = 0;
             roundIndex++;
         }
-        CheckWinners();
-        if (!battleStarted){return;}
         ActorsTurn();
     }
 
@@ -137,6 +136,7 @@ public class TerrainMap : Map
 
     public void ActorEndTurn()
     {
+        ClearHighlightedTiles();
         NextTurn();
     }
 
@@ -146,6 +146,7 @@ public class TerrainMap : Map
         {
             NextTurn();
             ActorStopMoving();
+            return;
         }
         if (turnIndex == actors.Count - 1)
         {
@@ -260,8 +261,9 @@ public class TerrainMap : Map
         if (actors[turnIndex].activeSkill.lockOn == 1)
         {
             TacticActor skillTarget = ReturnActorOnTile(skillTargetLocation);
+            string targetName = skillTarget.typeName;
             bool specialEffect = false;
-            Debug.Log(actors[turnIndex].typeName+" used "+actors[turnIndex].activeSkill.skillName+" on "+skillTarget.typeName+".");
+            Debug.Log(actors[turnIndex].typeName+" used "+actors[turnIndex].activeSkill.skillName+" on "+targetName+".");
             specialEffect = skillManager.ApplySkillEffect(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);
             if (specialEffect)
             {
@@ -719,6 +721,8 @@ public class TerrainMap : Map
             UpdateMap();
         }
         // If you win make sure you collect the drops from all the enemies.
+        // This is not needed on some maps and my be causing bugs elsewhere.
+        /*
         if (win)
         {
             for (int i = 0; i < actors.Count; i++)
@@ -728,7 +732,7 @@ public class TerrainMap : Map
                     actorManager.GetDrops(actors[i]);
                 }
             }
-        }
+        }*/
     }
 
     public void GenerateActor(int location, string type, int team)

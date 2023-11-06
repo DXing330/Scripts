@@ -264,7 +264,7 @@ public class OverworldMap : Map
     {
         // Not every tile has a random battle.
         int rng = Random.Range(0, 6);
-        if (rng > 3)
+        if (rng > 4)
         {
             return;
         }

@@ -261,6 +261,7 @@ public class TacticActor : MonoBehaviour
 
     public bool Actable()
     {
+        // Only the dead and things that can never act.
         if (health <= 0 || baseActions <= 0)
         {
             return false;
@@ -315,6 +316,10 @@ public class TacticActor : MonoBehaviour
         // Try to hit the first target.
         if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= currentAttackRange)
         {
+            if (attackTarget == null || attackTarget.health <= 0)
+            {
+                return;
+            }
             if (CheckSkillActivatable())
             {
                 terrainMap.NPCActivateSkill(attackTarget.locationIndex);

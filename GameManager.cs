@@ -135,6 +135,7 @@ public class GameManager : MonoBehaviour
         time = 0;
         location = 2203;
         armyData.NewGame();
+        upgradeData.NewGame();
         SaveData();
     }
 
