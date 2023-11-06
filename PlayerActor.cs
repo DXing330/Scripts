@@ -16,6 +16,8 @@ public class PlayerActor : MonoBehaviour
     public int attackRange = 1;
     public int baseActions = 4;
     public int moveType = 0;
+    public int size = 1;
+    public string species = "Undead";
     public List<string> learntPassives;
     public List<string> learntSkills;
     public EquipmentContainer allEquipment;
@@ -38,6 +40,8 @@ public class PlayerActor : MonoBehaviour
         playerActor.attackRange = attackRange;
         playerActor.baseActions = baseActions;
         playerActor.movementType = moveType;
+        playerActor.size = size;
+        playerActor.species = species;
         if (learntSkills.Count <= 0)
         {
             return;

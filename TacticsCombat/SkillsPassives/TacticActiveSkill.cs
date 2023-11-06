@@ -12,6 +12,7 @@ public class TacticActiveSkill : MonoBehaviour
     // 0/1/2 implies total squares covered =
     // 1/5/13/etc. always diamond shaped
     public int span = 0;
+    public string targetingShape = "none";
     // Ally/enemy/all/etc.
     public int skillTarget;
     // Energy cost.

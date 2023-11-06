@@ -11,6 +11,7 @@ public class SkillDataManager : MonoBehaviour
     public List<string> skillLockOns;
     public List<string> skillRanges;
     public List<string> skillSpans;
+    public List<string> skillTargetingShapes;
     public List<string> skillTargets;
     public List<string> skillCosts;
     public List<string> skillEffects;
@@ -34,6 +35,7 @@ public class SkillDataManager : MonoBehaviour
         skillBasePowers = configBlocks[9].Split("|").ToList();
         skillactionCosts = configBlocks[10].Split("|").ToList();
         skillFlavorTexts = configBlocks[11].Split("|").ToList();
+        skillTargetingShapes = configBlocks[12].Split("|").ToList();
     }
 
     public void LoadDataForSkill(TacticActiveSkill activeSkill, string skillName)
@@ -58,5 +60,6 @@ public class SkillDataManager : MonoBehaviour
         activeSkill.basePower = int.Parse(skillBasePowers[skillIndex]);
         activeSkill.actionCost = skillactionCosts[skillIndex];
         activeSkill.flavorText = (skillFlavorTexts[skillIndex]);
+        activeSkill.targetingShape = skillTargetingShapes[skillIndex];
     }
 }

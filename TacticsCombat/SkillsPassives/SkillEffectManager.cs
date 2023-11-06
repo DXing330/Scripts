@@ -33,6 +33,8 @@ public class SkillEffectManager : MonoBehaviour
                 return true;
             case "Summon":
                 return true;
+            case "Displace":
+                return true;
         }
         power /= powerDenominator;
         skill.AffectActor(target, power);

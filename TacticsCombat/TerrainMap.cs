@@ -286,6 +286,9 @@ public class TerrainMap : Map
             case "Summon":
                 SummonSkillActivate(targetableTiles[currentTarget]);
                 break;
+            case "Displace":
+                moveManager.Displace(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower, actors[turnIndex].activeSkill.effectSpecifics);
+                break;
         }
     }
 

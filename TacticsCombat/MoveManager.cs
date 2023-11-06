@@ -56,6 +56,11 @@ public class MoveManager : MonoBehaviour
         return pathfinder.DirectionCheck(location, direction);
     }
 
+    private int LineCheck(int locOne, int locTwo)
+    {
+        return pathfinder.SameLine(locOne, locTwo);
+    }
+
     private int GetDestination(int location, int direction)
     {
         // Don't move if you can't move.
@@ -73,6 +78,133 @@ public class MoveManager : MonoBehaviour
         {
             actor.locationIndex = destination;
             actor.movement -= DetermineMoveCost(actor.movementType, destination);
+        }
+    }
+
+    private void ForceMovement(TacticActor actor, int direction)
+    {
+        // Need to check if the direction is occupied or out of bounds.
+        // This checks if it's in bounds.
+        int destination = GetDestination(actor.locationIndex, direction);
+        // This checks if it's occupied.
+        if (!pathfinder.CheckTileOccupied(destination))
+        {
+            actor.locationIndex = destination;
+        }
+    }
+
+    public void Displace(TacticActor displacer, TacticActor displacedActor, int displacementPower, string pushorpull = "Push")
+    {
+        int push = 1;
+        if (pushorpull != "Push")
+        {
+            push = 0;
+        }
+        int line = LineCheck(displacer.locationIndex, displacedActor.locationIndex);
+        int power = displacementPower + displacer.size - displacedActor.size;
+        if (power <= 0)
+        {
+            return;
+        }
+        if (line < 0)
+        {
+            return;
+        }
+        else if (line == 0)
+        {
+            DisplaceHorizontally(displacedActor, displacer.locationIndex, power, push);
+        }
+        else if (line == 1)
+        {
+            DisplaceVertically(displacedActor, displacer.locationIndex, power, push);
+        }
+    }
+
+    private void DisplaceHorizontally(TacticActor displaced, int displacerLocation, int power, int direction)
+    {
+        // Check if the displacer is left of the target.
+        if (pathfinder.Left(displacerLocation, displaced.locationIndex))
+        {
+            // Push them right.
+            if (direction == 1)
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 1);
+                }
+            }
+            // Pull them left.
+            else
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 3);
+                }
+            }
+        }
+        // Otherwise the displacer started right of the target.
+        else
+        {
+            // Push them left.
+            if (direction == 1)
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 3);
+                }
+            }
+            // Pull them right.
+            else
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 1);
+                }
+            }
+        }
+    }
+
+    private void DisplaceVertically(TacticActor displaced, int displacerLocation, int power, int direction)
+    {
+        // Check if the displacer is above of the target.
+        if (pathfinder.Up(displacerLocation, displaced.locationIndex))
+        {
+            // Push them down.
+            if (direction == 1)
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 2);
+                }
+            }
+            // Pull them up.
+            else
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 0);
+                }
+            }
+        }
+        // Otherwise the displacer started below the target.
+        else
+        {
+            // Push them up.
+            if (direction == 1)
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 0);
+                }
+            }
+            // Pull them down.
+            else
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 2);
+                }
+            }
         }
     }
 }

@@ -86,6 +86,15 @@ public class TerrainPathfinder : MonoBehaviour
         }
     }
 
+    public bool CheckTileOccupied(int location)
+    {
+        if (occupiedTiles[location] > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    
     // Returns a list of tiles to pass through, not including the start or end points, so you will end up adjacent to the destination.
     public List<int> FindPathIndex(int startIndex, int destIndex)
     {
@@ -256,6 +265,34 @@ public class TerrainPathfinder : MonoBehaviour
                 return (location%fullSize > 0);
         }
         return false;   
+    }
+
+    public int SameLine(int locOne, int locTwo)
+    {
+        // 0 = same row, 1 = same column, -1 = neither
+        int rowOne = GetRow(locOne);
+        int rowTwo = GetRow(locTwo);
+        if (rowOne == rowTwo)
+        {
+            return 0;
+        }
+        int colOne = GetColumn(locOne);
+        int colTwo = GetColumn(locTwo);
+        if (colOne == colTwo)
+        {
+            return 1;
+        }
+        return -1;
+    }
+
+    public bool Left(int locOne, int locTwo)
+    {
+        return (GetColumn(locOne) < GetColumn(locTwo));
+    }
+
+    public bool Up(int locOne, int locTwo)
+    {
+        return (GetRow(locOne) < GetRow(locTwo));
     }
 
     public int GetDestination(int location, int direction)

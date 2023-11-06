@@ -14,6 +14,8 @@ public class TacticActor : MonoBehaviour
     public bool delayable = true;
     // Race/class/etc.
     public string typeName;
+    public int size;
+    public string species;
     public int locationIndex;
     public int level;
     public int movementType = 0;
@@ -93,6 +95,8 @@ public class TacticActor : MonoBehaviour
         attackRange = actorToCopy.attackRange;
         movementType = actorToCopy.movementType;
         activeSkillNames = actorToCopy.activeSkillNames;
+        size = actorToCopy.size;
+        species = actorToCopy.species;
         SetSprite(actorToCopy.spriteRenderer.sprite);
     }
 

@@ -22,6 +22,8 @@ public class ActorDataManager : MonoBehaviour
     public List<string> actorDropTypes;
     public List<string> actorDropAmounts;
     public List<string> actorAITypes;
+    public List<string> actorSizes;
+    public List<string> actorSpecies;
 
     void Start()
     {
@@ -42,7 +44,8 @@ public class ActorDataManager : MonoBehaviour
         actorDropTypes = configBlocks[13].Split("|").ToList();
         actorDropAmounts = configBlocks[14].Split("|").ToList();
         actorAITypes = configBlocks[15].Split("|").ToList();
-
+        actorSizes = configBlocks[16].Split("|").ToList();
+        actorSpecies = configBlocks[17].Split("|").ToList();
     }
 
     public void LoadActorData(TacticActor actor, string newName)
@@ -67,6 +70,8 @@ public class ActorDataManager : MonoBehaviour
         actor.dropType = int.Parse(actorDropTypes[index]);
         actor.dropAmount = int.Parse(actorDropAmounts[index]);
         actor.AIType = int.Parse(actorAITypes[index]);
+        actor.size = int.Parse(actorSizes[index]);
+        actor.species = actorSpecies[index];
     }
 
     public string ReturnActorBaseStats(string actorName)
