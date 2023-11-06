@@ -93,7 +93,8 @@ public class TerrainMap : Map
 
     public void NextTurn()
     {
-        CheckWinners();
+        // Need this first one in case they try to click the end turn button before player team loads in.
+        // Maybe remove it as a feature for an autolose option?
         if (!battleStarted){return;}
         turnIndex++;
         if (turnIndex >= actors.Count)
@@ -102,6 +103,9 @@ public class TerrainMap : Map
             turnIndex = 0;
             roundIndex++;
         }
+        CheckWinners();
+        if (!battleStarted){return;}
+        ClearHighlightedTiles();
         ActorsTurn();
     }
 
@@ -136,7 +140,6 @@ public class TerrainMap : Map
 
     public void ActorEndTurn()
     {
-        ClearHighlightedTiles();
         NextTurn();
     }
 

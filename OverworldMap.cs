@@ -262,12 +262,6 @@ public class OverworldMap : Map
 
     private void EnterBattle(string locationDifficulty)
     {
-        // Not every tile has a random battle.
-        int rng = Random.Range(0, 6);
-        if (rng > 4)
-        {
-            return;
-        }
         string[] locDiff = locationDifficulty.Split("=");
         GameManager.instance.SetRandomBattleLocationDifficulty(int.Parse(locDiff[0]), int.Parse(locDiff[1]));
     }

@@ -11,6 +11,7 @@ public class TacticActor : MonoBehaviour
     public int dropType = 2;
     public int dropAmount = 1;
     public bool delayed = false;
+    public bool delayable = true;
     // Race/class/etc.
     public string typeName;
     public int locationIndex;
@@ -111,8 +112,10 @@ public class TacticActor : MonoBehaviour
         if (delayed)
         {
             delayed = false;
+            delayable = false;
             return;
         }
+        delayable = true;
         attackDamage = baseAttack;
         actionsLeft = baseActions;
         defense = baseDefense;
@@ -248,6 +251,10 @@ public class TacticActor : MonoBehaviour
 
     public bool Delayable()
     {
+        if (!delayable)
+        {
+            return false;
+        }
         if (movement <= 0 && actionsLeft <= 0)
         {
             return false;
