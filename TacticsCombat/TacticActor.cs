@@ -314,9 +314,9 @@ public class TacticActor : MonoBehaviour
         }
         NPCLoadSkill(1);
         // Try to hit the first target.
-        if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= currentAttackRange)
+        if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= currentAttackRange && attackTarget.health > 0)
         {
-            if (attackTarget == null || attackTarget.health <= 0)
+            if (attackTarget == null)
             {
                 return;
             }
