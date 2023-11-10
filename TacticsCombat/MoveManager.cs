@@ -207,4 +207,14 @@ public class MoveManager : MonoBehaviour
             }
         }
     }
+
+    public void MoveActorToTile(TacticActor actor, int location, int moveCost)
+    {
+        actor.locationIndex = location;
+        actor.movement -= moveCost;
+        while (actor.movement < 0)
+        {
+            actor.UseActionsOnMovement();
+        }
+    }
 }

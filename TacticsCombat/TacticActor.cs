@@ -410,7 +410,7 @@ public class TacticActor : MonoBehaviour
 
     private void GetPath()
     {
-        currentPath = terrainMap.pathFinder.FindPathIndex(locationIndex, destinationIndex);
+        currentPath = terrainMap.pathFinder.FindPathIndex(locationIndex, destinationIndex, movementType);
     }
 
     public void NPCStartTurn()

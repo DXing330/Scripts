@@ -4,15 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TerrainMap : Map
+public class TerrainMap : MonoBehaviour
 {
     public bool battleStarted = false;
+    protected int startIndex;
+    protected int cornerColumn;
+    protected int cornerRow;
     private int turnIndex = 0;
     public int roundIndex = 0;
     private int fixedCenter;
     private bool lockedView = false;
-    public new int fullSize = 13;
+    public int gridSize = 9;
+    public int fullSize = 13;
     public int baseTerrain = 0;
+    public List<TerrainTile> terrainTiles;
+    public List<int> currentTiles;
     public List<int> terrainInfo;
     public List<int> terrainEffects;
     public List<int> terrainEffectDurations;
@@ -30,6 +36,7 @@ public class TerrainMap : Map
     private int skillSpan;
     public TerrainMaker terrainMaker;
     public TerrainPathfinder pathFinder;
+    public List<Sprite> tileSprites;
     public List<TacticActor> actors;
     public List<TacticActor> allActors;
     public ActorManager actorManager;
@@ -47,7 +54,7 @@ public class TerrainMap : Map
         ActorsTurn();
     }
 
-    protected override void Start()
+    protected void Start()
     {
         Application.targetFrameRate = 30;
         actorManager.GetActorData();
@@ -595,7 +602,6 @@ public class TerrainMap : Map
         actorInfo.UpdateInfo(actors[currentViewed]);
         UpdateCenterTile(actors[currentViewed].locationIndex);
         UpdateMap();
-        //ViewReachableTiles();
         ViewAttackableTiles();
     }
 
@@ -659,9 +665,7 @@ public class TerrainMap : Map
         if (actors[turnIndex].team == 0)
         {
             moveManager.MoveInDirection(actors[turnIndex], direction);
-            UpdateOnActorTurn();
-            GetReachableTiles();
-            actorInfo.UpdateInfo(actors[turnIndex]);
+            UpdateAfterMovingActor();
         }
     }
 
@@ -669,6 +673,14 @@ public class TerrainMap : Map
     {
         actors[turnIndex].NPCStartTurn();
         NextTurn();
+    }
+
+    private void UpdateAfterMovingActor()
+    {
+        UpdateOnActorTurn();
+        GetReachableTiles();
+        actorInfo.UpdateInfo(actors[turnIndex]);
+        actionManager.UpdateActionsLeft();
     }
 
     public void UpdateOnActorTurn()
@@ -780,7 +792,7 @@ public class TerrainMap : Map
         }
     }
 
-    protected override void DetermineCurrentTiles()
+    protected void DetermineCurrentTiles()
     {
         currentTiles.Clear();
         int cColumn = 0;
@@ -797,7 +809,7 @@ public class TerrainMap : Map
         }
     }
 
-    protected override void AddCurrentTile(int row, int column)
+    protected void AddCurrentTile(int row, int column)
     {
         if (row < 0 || column < 0 || column >= fullSize || row >= fullSize)
         {
@@ -807,7 +819,7 @@ public class TerrainMap : Map
         currentTiles.Add((row*fullSize)+column);
     }
 
-    protected override void DetermineCornerRowColumn()
+    protected void DetermineCornerRowColumn()
     {
         int start = startIndex;
         cornerRow = -(gridSize/2);
@@ -820,7 +832,7 @@ public class TerrainMap : Map
         cornerColumn += start;
     }
 
-    protected override void UpdateTile(int imageIndex, int tileIndex)
+    protected void UpdateTile(int imageIndex, int tileIndex)
     {
         // Undefined tiles are black.
         if (tileIndex < 0 || tileIndex >= (fullSize * fullSize))
@@ -1290,6 +1302,17 @@ public class TerrainMap : Map
         {
             case 0:
                 ViewActorByTile(tileNumber);
+                break;
+            case 1:
+                if (highlightedTiles.Contains(currentTiles[tileNumber]))
+                {
+                    moveManager.MoveActorToTile(actors[turnIndex], currentTiles[tileNumber], pathFinder.CalculateDistanceToLocation(actors[turnIndex], currentTiles[tileNumber]));
+                    UpdateAfterMovingActor();
+                }
+                break;
+            case 2:
+                break;
+            case 3:
                 break;
         }
     }

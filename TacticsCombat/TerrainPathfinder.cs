@@ -96,7 +96,7 @@ public class TerrainPathfinder : MonoBehaviour
     }
     
     // Returns a list of tiles to pass through, not including the start or end points, so you will end up adjacent to the destination.
-    public List<int> FindPathIndex(int startIndex, int destIndex)
+    public List<int> FindPathIndex(int startIndex, int destIndex, int moveType)
     {
         checkedTiles.Clear();
         savedPathList.Clear();
@@ -106,7 +106,7 @@ public class TerrainPathfinder : MonoBehaviour
         // Each loop checks one tile.
         for (int i = 0; i < bigInt; i++)
         {
-            CheckClosestTile();
+            CheckClosestTile(true, moveType);
             if (checkedTiles.Contains(destIndex))
             {
                 break;
@@ -121,6 +121,33 @@ public class TerrainPathfinder : MonoBehaviour
             pathIndex = savedPathList[pathIndex];
         }
         return actualPath;
+    }
+
+    private int DetermineMovementCost(int tile, int moveType)
+    {
+        int moveCost = 0;
+        switch (moveType)
+        {
+            case -1:
+                moveCost = 1;
+                break;
+            case 0:
+                moveCost = moveCostList[tile];
+                break;
+            case 1:
+                moveCost = flyingMoveCosts[tile];
+                break;
+            case 2:
+                moveCost = ridingMoveCosts[tile];
+                break;
+            case 3:
+                moveCost = swimmingMoveCosts[tile];
+                break;
+            case 4:
+                moveCost = scoutingMoveCosts[tile];
+                break;
+        }
+        return moveCost;
     }
 
     private void CheckClosestTile(bool path = true, int type = 0)
@@ -141,28 +168,7 @@ public class TerrainPathfinder : MonoBehaviour
         {
             // If the cost to move to the path from this tile is less than what we've already recorded;
             // Based on movement type check a different list.
-            int moveCost = 0;
-            switch (type)
-            {
-                case -1:
-                    moveCost = 1;
-                    break;
-                case 0:
-                    moveCost = moveCostList[adjacentTiles[i]];
-                    break;
-                case 1:
-                    moveCost = flyingMoveCosts[adjacentTiles[i]];
-                    break;
-                case 2:
-                    moveCost = ridingMoveCosts[adjacentTiles[i]];
-                    break;
-                case 3:
-                    moveCost = swimmingMoveCosts[adjacentTiles[i]];
-                    break;
-                case 4:
-                    moveCost = scoutingMoveCosts[adjacentTiles[i]];
-                    break;
-            }
+            int moveCost = DetermineMovementCost(adjacentTiles[i], type);
             if (distances[closestTile]+moveCost < distances[adjacentTiles[i]])
             {
                 // Then update the distance and the previous tile.
@@ -434,6 +440,18 @@ public class TerrainPathfinder : MonoBehaviour
         int rowTwo = GetRow(pointTwo);
         int columnTwo = GetColumn(pointTwo);
         return Mathf.Abs(rowOne-rowTwo)+Mathf.Abs(columnOne-columnTwo);
+    }
+
+    public int CalculateDistanceToLocation(TacticActor actor, int destination)
+    {
+        int distance = 0;
+        FindPathIndex(actor.locationIndex, destination, actor.movementType);
+        for (int i = 0; i < actualPath.Count; i++)
+        {
+            int addedDist = DetermineMovementCost(actualPath[i], actor.movementType);
+            distance += addedDist;
+        }
+        return distance;
     }
 
     private int GetRow(int location)
