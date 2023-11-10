@@ -532,7 +532,7 @@ public class TerrainMap : MonoBehaviour
         TacticActor target = ReturnCurrentTarget();
         bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex].locationIndex, target), DetermineFlanking(target));
         // If they die while attacking, automatically end their turn.
-        if (attackerDied)
+        if (attackerDied || actors[turnIndex].actionsLeft <= 0)
         {
             ActorStopMoving();
             actionManager.ChangeState(0);
@@ -546,9 +546,10 @@ public class TerrainMap : MonoBehaviour
         CheckWinners();
         if (battleStarted)
         {
-            GetTargetableTiles(actors[turnIndex].currentAttackRange);
+            GetTargetableTiles(actors[turnIndex].currentAttackRange, 0, false);
             UpdateMap();
             HighlightTiles(false);
+            actionManager.UpdateActionsLeft();
         }
     }
 
@@ -1048,9 +1049,12 @@ public class TerrainMap : MonoBehaviour
     }
 
     // 0 for enemies, 1 for allies, 2 for everyone, 3 for self, 4 for unoccupied.
-    private void GetTargetableTiles(int targetRange, int targetsType = 0)
+    private void GetTargetableTiles(int targetRange, int targetsType = 0, bool reset = true)
     {
-        currentTarget = 0;
+        if (reset)
+        {
+            currentTarget = 0;
+        }
         UpdateOccupiedTiles();
         targetableTiles.Clear();
         if (targetsType == 3)
@@ -1311,8 +1315,39 @@ public class TerrainMap : MonoBehaviour
                 }
                 break;
             case 2:
+                int tempTarget = targetableTiles.IndexOf(currentTiles[tileNumber]);
+                if (tempTarget < 0)
+                {
+                    return;
+                }
+                if (currentTarget == tempTarget)
+                {
+                    CurrentActorAttack();
+                }
+                else
+                {
+                    currentTarget = tempTarget;
+                    SeeTarget();
+                }
+                actionManager.attackMenu.UpdateTarget(ReturnCurrentTarget());
                 break;
             case 3:
+                int tempSTarget = targetableTiles.IndexOf(currentTiles[tileNumber]);
+                if (tempSTarget < 0)
+                {
+                    return;
+                }
+                if (currentTarget == tempSTarget)
+                {
+                    ActivateSkill();
+                    actionManager.ChangeState(0);
+                }
+                else
+                {
+                    currentTarget = tempSTarget;
+                    SeeTarget();
+                }
+                actionManager.skillMenu.lockOnMenu.UpdateTarget(ReturnCurrentTarget());
                 break;
         }
     }

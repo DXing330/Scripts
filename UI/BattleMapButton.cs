@@ -66,6 +66,10 @@ public class BattleMapButton : MonoBehaviour
 
     public void MousePosOnClick()
     {
+        if (Input.touches.Length > 1)
+        {
+            return;
+        }
         Vector3 mousePos = Input.mousePosition;
         int tileNumber = ClickedTile((int) mousePos.x, (int) mousePos.y);
         terrainMap.ClickOnTile(tileNumber);
