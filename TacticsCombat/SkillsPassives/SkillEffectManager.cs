@@ -34,6 +34,8 @@ public class SkillEffectManager : MonoBehaviour
                 return true;
             case "Displace":
                 return true;
+            case "Teleport":
+                return true;
         }
         power /= powerDenominator;
         skill.AffectActor(target, power);

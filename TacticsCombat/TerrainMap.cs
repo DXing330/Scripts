@@ -204,7 +204,7 @@ public class TerrainMap : MonoBehaviour
     {
         ViewActorClearHighlights();
         // Auto end turn when out of moves and actions.
-        if (!actors[turnIndex].Delayable())
+        if (!actors[turnIndex].Delayable() && actors[turnIndex].actionsLeft <= 0)
         {
             ActorEndTurn();
         }
@@ -212,6 +212,10 @@ public class TerrainMap : MonoBehaviour
 
     public void ViewCurrentActor()
     {
+        if (turnIndex >= actors.Count)
+        {
+            return;
+        }
         UpdateCenterTile(actors[turnIndex].locationIndex);
         UpdateMap();
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -320,6 +324,9 @@ public class TerrainMap : MonoBehaviour
                 break;
             case "Displace":
                 moveManager.Displace(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower, actors[turnIndex].activeSkill.effectSpecifics);
+                break;
+            case "Teleport":
+                moveManager.Teleport(actors[turnIndex], targetableTiles[currentTarget]);
                 break;
         }
     }
@@ -444,6 +451,10 @@ public class TerrainMap : MonoBehaviour
     public TacticActor ReturnCurrentTurnActor()
     {
         if (!battleStarted)
+        {
+            return null;
+        }
+        if (turnIndex >= actors.Count)
         {
             return null;
         }
@@ -623,6 +634,7 @@ public class TerrainMap : MonoBehaviour
         int tileNumber = currentTiles[tile];
         TacticActor tempActor = ReturnActorOnTile(tileNumber);
         if (tempActor == null){return;}
+        if (!tempActor.Actable()){return;}
         currentViewed = actors.IndexOf(tempActor);
         ViewActorInfo();
     }

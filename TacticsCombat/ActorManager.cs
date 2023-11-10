@@ -35,15 +35,10 @@ public class ActorManager : MonoBehaviour
 
     public void RemoveFromPlayerTeam(TacticActor actor)
     {
-        if (actor.typeName == "Player" || actor.typeName == "Familiar" || actor.typeName == "")
-        {
-            return;
-        }
+        if (actor == null){return;}
+        if (actor.typeName == "Player" || actor.typeName == "Familiar" || actor.typeName == ""){return;}
         int indexOf = GameManager.instance.armyData.armyFormation.IndexOf(actor.typeName);
-        if (indexOf < 0)
-        {
-            return;
-        }
+        if (indexOf < 0){return;}
         GameManager.instance.armyData.armyFormation[indexOf] = "none";
     }
 

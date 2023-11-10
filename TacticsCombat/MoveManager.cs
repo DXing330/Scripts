@@ -217,4 +217,9 @@ public class MoveManager : MonoBehaviour
             actor.UseActionsOnMovement();
         }
     }
+
+    public void Teleport(TacticActor actor, int location)
+    {
+        actor.locationIndex = location;
+    }
 }
