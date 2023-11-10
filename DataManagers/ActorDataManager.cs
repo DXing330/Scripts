@@ -24,6 +24,7 @@ public class ActorDataManager : MonoBehaviour
     public List<string> actorAITypes;
     public List<string> actorSizes;
     public List<string> actorSpecies;
+    public List<string> actorInitiatives;
 
     void Start()
     {
@@ -46,6 +47,7 @@ public class ActorDataManager : MonoBehaviour
         actorAITypes = configBlocks[15].Split("|").ToList();
         actorSizes = configBlocks[16].Split("|").ToList();
         actorSpecies = configBlocks[17].Split("|").ToList();
+        actorInitiatives = configBlocks[18].Split("|").ToList();
     }
 
     public void LoadActorData(TacticActor actor, string newName)
@@ -72,6 +74,7 @@ public class ActorDataManager : MonoBehaviour
         actor.AIType = int.Parse(actorAITypes[index]);
         actor.size = int.Parse(actorSizes[index]);
         actor.species = actorSpecies[index];
+        actor.baseInitiative = int.Parse(actorInitiatives[index]);
     }
 
     public string ReturnActorBaseStats(string actorName)

@@ -37,6 +37,8 @@ public class TacticActor : MonoBehaviour
     public int baseDefense = 5;
     public int defense;
     public int movement;
+    public int baseInitiative = 10;
+    public int initiative;
     // 0 is offensive, 1 is defensive
     public int AIType;
     private int destinationIndex;
@@ -68,6 +70,7 @@ public class TacticActor : MonoBehaviour
         attackDamage = baseAttack;
         defense = baseDefense;
         currentAttackRange = attackRange;
+        initiative = baseInitiative;
     }
 
     public void SetBaseStats(string baseStats, int newLevel = 1)
@@ -97,6 +100,7 @@ public class TacticActor : MonoBehaviour
         activeSkillNames = actorToCopy.activeSkillNames;
         size = actorToCopy.size;
         species = actorToCopy.species;
+        baseInitiative = actorToCopy.baseInitiative;
         SetSprite(actorToCopy.spriteRenderer.sprite);
     }
 
@@ -126,6 +130,7 @@ public class TacticActor : MonoBehaviour
         currentMovespeed = baseMovement;
         currentAttackRange = attackRange;
         energy = Mathf.Min(energy+1, baseEnergy);
+        initiative = baseInitiative;
         ApplyBuffDebuffEffects();
         movement = 0;
     }

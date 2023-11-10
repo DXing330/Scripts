@@ -18,6 +18,7 @@ public class PlayerActor : MonoBehaviour
     public int moveType = 0;
     public int size = 1;
     public string species = "Undead";
+    public int baseInitiative = 10;
     public List<string> learntPassives;
     public List<string> learntSkills;
     public EquipmentContainer allEquipment;
@@ -42,6 +43,7 @@ public class PlayerActor : MonoBehaviour
         playerActor.movementType = moveType;
         playerActor.size = size;
         playerActor.species = species;
+        playerActor.baseInitiative = baseInitiative;
         if (learntSkills.Count <= 0)
         {
             return;

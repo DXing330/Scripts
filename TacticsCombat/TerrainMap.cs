@@ -31,6 +31,7 @@ public class TerrainMap : Map
     public TerrainMaker terrainMaker;
     public TerrainPathfinder pathFinder;
     public List<TacticActor> actors;
+    public List<TacticActor> allActors;
     public ActorManager actorManager;
     public MoveManager moveManager;
     public SkillEffectManager skillManager;
@@ -42,6 +43,7 @@ public class TerrainMap : Map
     public void StartBattle()
     {
         battleStarted = true;
+        actors = turnOrder.InitiativeThreadedByTeam(allActors);
         ActorsTurn();
     }
 
@@ -102,6 +104,7 @@ public class TerrainMap : Map
             RemoveActors();
             turnIndex = 0;
             roundIndex++;
+            actors = turnOrder.InitiativeThreadedByTeam(allActors);
         }
         CheckWinners();
         if (!battleStarted){return;}
@@ -147,7 +150,6 @@ public class TerrainMap : Map
     {
         if (!actors[turnIndex].Delayable())
         {
-            Debug.Log(actors[turnIndex].typeName+" can't be delayed.");
             NextTurn();
             ViewActorClearHighlights();
             return;
@@ -712,33 +714,32 @@ public class TerrainMap : Map
 
     public void AddActor(TacticActor newActor, bool start = true)
     {
-        if (start)
+        allActors.Add(newActor);
+        /*if (start)
         {
             actors.Insert(0, newActor);
         }
         else
         {
             actors.Add(newActor);
-        }
-        //UpdateOccupiedTiles();
-        //UpdateMap();
+        }*/
     }
 
     public void RemoveActors(bool win = false)
     {
-        for (int i = 0; i < actors.Count; i++)
+        for (int i = 0; i < allActors.Count; i++)
         {
-            if (actors[i].health <= 0)
+            if (allActors[i].health <= 0)
             {
-                if (actors[i].team != 0)
+                if (allActors[i].team != 0)
                 {
-                    actorManager.GetDrops(actors[i]);
+                    actorManager.GetDrops(allActors[i]);
                 }
                 else
                 {
-                    actorManager.RemoveFromPlayerTeam(actors[i]);
+                    actorManager.RemoveFromPlayerTeam(allActors[i]);
                 }
-                actors.RemoveAt(i);
+                allActors.RemoveAt(i);
             }
             UpdateMap();
         }
