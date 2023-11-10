@@ -123,7 +123,7 @@ public class TurnOrderPanel : MonoBehaviour
                 }
                 for (int k = playerTeam.Count; k < enemyTeam.Count; k++)
                 {
-                    sortedActors.Add(playerTeam[k]);
+                    sortedActors.Add(enemyTeam[k]);
                 }
             }
             else

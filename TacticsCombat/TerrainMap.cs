@@ -43,7 +43,7 @@ public class TerrainMap : Map
     public void StartBattle()
     {
         battleStarted = true;
-        actors = turnOrder.InitiativeThreadedByTeam(allActors);
+        SortByInitiative();
         ActorsTurn();
     }
 
@@ -93,6 +93,12 @@ public class TerrainMap : Map
         turnOrder.UpdateTurnOrder(turnIndex);
     }
 
+    private void SortByInitiative()
+    {
+        actors = turnOrder.InitiativeThreadedByTeam(allActors);
+        UpdateOccupiedTiles();
+    }
+
     public void NextTurn()
     {
         // Need this first one in case they try to click the end turn button before player team loads in.
@@ -104,7 +110,7 @@ public class TerrainMap : Map
             RemoveActors();
             turnIndex = 0;
             roundIndex++;
-            actors = turnOrder.InitiativeThreadedByTeam(allActors);
+            SortByInitiative();
         }
         CheckWinners();
         if (!battleStarted){return;}
@@ -169,6 +175,7 @@ public class TerrainMap : Map
 
     public void ActorStartMoving()
     {
+        ClearHighlightedTiles();
         GetReachableTiles();
     }
 
@@ -511,6 +518,7 @@ public class TerrainMap : Map
             actionManager.ChangeState(0);
         }
         CheckWinners();
+        UpdateMap();
     }
 
     public void CurrentActorAttack()
@@ -537,6 +545,7 @@ public class TerrainMap : Map
         if (battleStarted)
         {
             GetTargetableTiles(actors[turnIndex].currentAttackRange);
+            UpdateMap();
         }
     }
 
@@ -850,14 +859,27 @@ public class TerrainMap : Map
     private void UpdateOccupiedTiles()
     {
         occupiedTiles = new List<int>(allUnoccupied);
-        for (int i = 0; i < actors.Count; i++)
+        if (battleStarted)
+        {
+            for (int i = 0; i < actors.Count; i++)
+            {
+                // Don't count the dead.
+                if (actors[i].health <= 0)
+                {
+                    continue;
+                }
+                occupiedTiles[actors[i].locationIndex] = i+1;
+            }
+            return;
+        }
+        for (int i = 0; i < allActors.Count; i++)
         {
             // Don't count the dead.
-            if (actors[i].health <= 0)
+            if (allActors[i].health <= 0)
             {
                 continue;
             }
-            occupiedTiles[actors[i].locationIndex] = i+1;
+            occupiedTiles[allActors[i].locationIndex] = i+1;
         }
     }
 
@@ -875,23 +897,23 @@ public class TerrainMap : Map
             UpdateTile(i, currentTiles[i]);
         }
         // O(n^2)
-        for (int i = 0; i < actors.Count; i++)
+        for (int i = 0; i < allActors.Count; i++)
         {
-            if (actors[i].health <= 0)
+            if (allActors[i].health <= 0)
             {
                 continue;
             }
-            int indexOfActor = currentTiles.IndexOf(actors[i].locationIndex);
+            int indexOfActor = currentTiles.IndexOf(allActors[i].locationIndex);
             if (indexOfActor >= 0)
             {
-                UpdateActor(indexOfActor, i);
+                UpdateActorImage(indexOfActor, i);
             }
         }
     }
 
-    private void UpdateActor(int imageIndex, int actorIndex)
+    private void UpdateActorImage(int imageIndex, int actorIndex)
     {
-        terrainTiles[imageIndex].UpdateImage(actors[actorIndex].spriteRenderer.sprite);
+        terrainTiles[imageIndex].UpdateImage(allActors[actorIndex].spriteRenderer.sprite);
     }
 
     private void GetReachableTiles()
@@ -1262,6 +1284,5 @@ public class TerrainMap : Map
     public void ActorDied()
     {
         UpdateMap();
-        pathFinder.UpdateOccupiedTiles(occupiedTiles);
     }
 }

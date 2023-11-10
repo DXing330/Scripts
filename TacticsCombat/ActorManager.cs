@@ -47,6 +47,19 @@ public class ActorManager : MonoBehaviour
         GameManager.instance.armyData.armyFormation[indexOf] = "none";
     }
 
+    private void LosePlayerArmy()
+    {
+        for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
+        {
+            string name = GameManager.instance.armyData.armyFormation[i];
+            if (name == "Player" || name == "Familiar")
+            {
+                continue;
+            }
+            GameManager.instance.armyData.armyFormation[i] = "none";
+        }
+    }
+
     public void LoadPlayerTeam()
     {
         int column = 0;
@@ -229,6 +242,7 @@ public class ActorManager : MonoBehaviour
         CountTeams();
         if (teamZeroCount <= 0)
         {
+            LosePlayerArmy();
             return 1;
         }
         else if (teamOneCount <= 0)
