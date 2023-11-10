@@ -127,6 +127,33 @@ public class OverworldMap : Map
         MoveIntoTile();
     }
 
+    public void MovePlayerOntoTile(int tile)
+    {
+        if (!CheckIfTileMoveable(tile))
+        {
+            return;
+        }
+        playerLocation = currentTiles[tile];
+        GameManager.instance.UpdateLocation(playerLocation);
+        UpdateCenterTile();
+        UpdateMap();
+        MoveIntoTile();
+    }
+
+    protected bool CheckIfTileMoveable(int tile)
+    {
+        if (currentTiles[tile] < 0)
+        {
+            return false;
+        }
+        if (int.Parse(allTiles[currentTiles[tile]]) == 2)
+        {
+            return false;
+        }
+        // Also need to check if a mountain range is in the way.
+        return true;
+    }
+
     protected bool CheckIfMoveable(int direction)
     {
         DetermineRowColumn();
@@ -264,5 +291,10 @@ public class OverworldMap : Map
     {
         string[] locDiff = locationDifficulty.Split("=");
         GameManager.instance.SetRandomBattleLocationDifficulty(int.Parse(locDiff[0]), int.Parse(locDiff[1]));
+    }
+
+    public void ClickOnTile(int tileNumber)
+    {
+        //MovePlayerOntoTile(tileNumber);
     }
 }

@@ -494,13 +494,6 @@ public class TerrainMap : Map
             return true;
         }
         return false;
-        /*targetableTiles = new List<int>(pathFinder.FindTilesInAttackRange(actor));
-        for (int i = 0; i < targetableTiles.Count; i++)
-        {
-            if (ReturnActorOnTile(targetableTiles[i]) == null){continue;}
-            if (ReturnActorOnTile(targetableTiles[i]) == target){return true;}
-        }
-        return false;*/
     }
 
     public void ActorStopAttacking()
@@ -527,15 +520,17 @@ public class TerrainMap : Map
         {
             return;
         }
-        // If they die while attacking, automatically end their turn.
         actors[turnIndex].actionsLeft--;
         // Find if they can counter attack.
         TacticActor target = ReturnCurrentTarget();
         bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex].locationIndex, target), DetermineFlanking(target));
+        // If they die while attacking, automatically end their turn.
         if (attackerDied)
         {
             ActorStopMoving();
             actionManager.ChangeState(0);
+            CheckWinners();
+            return;
         }
         else
         {
@@ -546,6 +541,7 @@ public class TerrainMap : Map
         {
             GetTargetableTiles(actors[turnIndex].currentAttackRange);
             UpdateMap();
+            HighlightTiles(false);
         }
     }
 
@@ -611,6 +607,16 @@ public class TerrainMap : Map
         {
             return;
         }
+        ViewActorInfo();
+    }
+
+    public void ViewActorByTile(int tile)
+    {
+        // Check if an actor is actually on the tile.
+        int tileNumber = currentTiles[tile];
+        TacticActor tempActor = ReturnActorOnTile(tileNumber);
+        if (tempActor == null){return;}
+        currentViewed = actors.IndexOf(tempActor);
         ViewActorInfo();
     }
 
@@ -724,14 +730,6 @@ public class TerrainMap : Map
     public void AddActor(TacticActor newActor, bool start = true)
     {
         allActors.Add(newActor);
-        /*if (start)
-        {
-            actors.Insert(0, newActor);
-        }
-        else
-        {
-            actors.Add(newActor);
-        }*/
     }
 
     public void RemoveActors(bool win = false)
@@ -754,17 +752,16 @@ public class TerrainMap : Map
         }
         // If you win make sure you collect the drops from all the enemies.
         // This is not needed on some maps and my be causing bugs elsewhere.
-        /*
         if (win)
         {
-            for (int i = 0; i < actors.Count; i++)
+            for (int i = 0; i < allActors.Count; i++)
             {
-                if (actors[i].team != 0)
+                if (allActors[i].team != 0 && allActors[i].health <= 0)
                 {
-                    actorManager.GetDrops(actors[i]);
+                    actorManager.GetDrops(allActors[i]);
                 }
             }
-        }*/
+        }
     }
 
     public void GenerateActor(int location, string type, int team)
@@ -1284,5 +1281,16 @@ public class TerrainMap : Map
     public void ActorDied()
     {
         UpdateMap();
+    }
+
+    public void ClickOnTile(int tileNumber)
+    {
+        if (!battleStarted){return;}
+        switch (actionManager.state)
+        {
+            case 0:
+                ViewActorByTile(tileNumber);
+                break;
+        }
     }
 }
