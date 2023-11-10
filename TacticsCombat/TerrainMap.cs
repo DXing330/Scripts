@@ -147,8 +147,9 @@ public class TerrainMap : Map
     {
         if (!actors[turnIndex].Delayable())
         {
+            Debug.Log(actors[turnIndex].typeName+" can't be delayed.");
             NextTurn();
-            ActorStopMoving();
+            ViewActorClearHighlights();
             return;
         }
         if (turnIndex == actors.Count - 1)
@@ -161,7 +162,7 @@ public class TerrainMap : Map
         actors.Add(tempActor);
         turnIndex--;
         NextTurn();
-        ActorStopMoving();
+        ViewActorClearHighlights();
     }
 
     public void ActorStartMoving()
@@ -177,10 +178,15 @@ public class TerrainMap : Map
         }
     }
 
-    public void ActorStopMoving()
+    private void ViewActorClearHighlights()
     {
         ViewCurrentActor();
         ClearHighlightedTiles();
+    }
+
+    public void ActorStopMoving()
+    {
+        ViewActorClearHighlights();
         // Auto end turn when out of moves and actions.
         if (!actors[turnIndex].Delayable())
         {
@@ -1064,7 +1070,7 @@ public class TerrainMap : Map
             targetableTiles.Add(actors[turnIndex].locationIndex);
             return;
         }
-        if (targetsType != 0 && targetsType != 4)
+        if (targetsType == 1 || targetsType == 2)
         {
             highlightedTiles.Add(actors[turnIndex].locationIndex);
         }
@@ -1089,6 +1095,14 @@ public class TerrainMap : Map
                     continue;
                 }
                 targetableTiles.Add(highlightedTiles[i]);
+            }
+        }
+        if (targetsType == 5)
+        {
+            int selfIndex = targetableTiles.IndexOf(actors[turnIndex].locationIndex);
+            if (selfIndex >= 0)
+            {
+                targetableTiles.RemoveAt(selfIndex);
             }
         }
     }
