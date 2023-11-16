@@ -50,9 +50,9 @@ public class TacticActor : MonoBehaviour
     public List<int> buffDebuffsDurations;
     public List<string> passiveNames;
     public List<string> activeSkillNames;
-    public string npcMoveSkill;
-    public string npcAttackSkill;
-    public string npcSupportSkill;
+    public string npcMoveSkill = "none";
+    public string npcAttackSkill = "none";
+    public string npcSupportSkill = "none";
     public TacticActiveSkill activeSkill;
     public TacticBuffsStatuses buffDebuff;
 
@@ -296,6 +296,10 @@ public class TacticActor : MonoBehaviour
 
     public bool CheckSkillActivatable()
     {
+        if (activeSkill.skillName.Length < 3)
+        {
+            return false;
+        }
         // No such thing as a skill that costs zero energy.
         if (actionsLeft < activeSkill.ReturnActionCost(this) || energy < activeSkill.cost || activeSkill.cost <= 0)
         {

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class TerrainMap : MonoBehaviour
 {
     public bool battleStarted = false;
+    public bool auto = false;
     protected int startIndex;
     protected int cornerColumn;
     protected int cornerRow;
@@ -54,6 +55,23 @@ public class TerrainMap : MonoBehaviour
         ActorsTurn();
     }
 
+    public void AutoTurn()
+    {
+        if (!battleStarted)
+        {
+            auto = true;
+            actorManager.LoadPlayerTeam();
+            StartBattle();
+        }
+        else
+        {
+            if (actors[turnIndex].team == 0)
+            {
+                NPCActorsTurn();
+            }
+        }
+    }
+
     protected void Start()
     {
         Application.targetFrameRate = 30;
@@ -99,7 +117,10 @@ public class TerrainMap : MonoBehaviour
             actorManager.ReturnToHub(win);
             return;
         }
-        turnOrder.UpdateTurnOrder(turnIndex);
+        if (battleStarted)
+        {
+            turnOrder.UpdateTurnOrder(turnIndex);
+        }
     }
 
     private void SortByInitiative()
@@ -113,6 +134,8 @@ public class TerrainMap : MonoBehaviour
         // Need this first one in case they try to click the end turn button before player team loads in.
         // Maybe remove it as a feature for an autolose option?
         if (!battleStarted){return;}
+        CheckWinners();
+        if (!battleStarted){return;}
         turnIndex++;
         if (turnIndex >= actors.Count)
         {
@@ -121,8 +144,8 @@ public class TerrainMap : MonoBehaviour
             roundIndex++;
             SortByInitiative();
         }
-        CheckWinners();
-        if (!battleStarted){return;}
+        //CheckWinners();
+        //if (!battleStarted){return;}
         ClearHighlightedTiles();
         ActorsTurn();
     }
@@ -144,7 +167,7 @@ public class TerrainMap : MonoBehaviour
         UpdateCenterTile(actors[turnIndex].locationIndex);
         UpdateMap();
         actors[turnIndex].StartTurn();
-        if (actors[turnIndex].team > 0)
+        if (actors[turnIndex].team > 0 || auto)
         {
             NPCActorsTurn();
         }
@@ -531,7 +554,10 @@ public class TerrainMap : MonoBehaviour
             actionManager.ChangeState(0);
         }
         CheckWinners();
-        UpdateMap();
+        if (battleStarted)
+        {
+            UpdateMap();
+        }
     }
 
     public void CurrentActorAttack()
@@ -593,7 +619,6 @@ public class TerrainMap : MonoBehaviour
             return;
         }
         BattleBetweenActors(actors[turnIndex], attackTarget, actors[turnIndex].activeSkill.basePower);
-        CheckWinners();
     }
 
     public TacticActor FindNearestEnemy()
