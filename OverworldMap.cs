@@ -21,6 +21,7 @@ public class OverworldMap : Map
     public List<string> allLocations;
     public List<string> locationSpecifics;
     public List<string> exploredTiles;
+    public OverworldPathfinder pathfinder;
 
     protected void Save()
     {}
@@ -39,6 +40,7 @@ public class OverworldMap : Map
         playerLocation = GameManager.instance.location;
         UpdateCenterTile();
         UpdateMap();
+        pathfinder.SetTerrainInfo(allLocations, fullSize);
     }
 
     protected override void AddCurrentTile(int row, int column)
@@ -130,6 +132,10 @@ public class OverworldMap : Map
     public void MovePlayerOntoTile(int tile)
     {
         if (!CheckIfTileMoveable(tile))
+        {
+            return;
+        }
+        if (!pathfinder.Reachable(playerLocation, currentTiles[tile]))
         {
             return;
         }
@@ -295,6 +301,6 @@ public class OverworldMap : Map
 
     public void ClickOnTile(int tileNumber)
     {
-        //MovePlayerOntoTile(tileNumber);
+        MovePlayerOntoTile(tileNumber);
     }
 }

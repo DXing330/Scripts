@@ -160,7 +160,6 @@ public class TacticActor : MonoBehaviour
                 AIType = 2;
                 // Buff damage.
                 baseAttack += baseAttack/5;
-                Debug.Log(typeName+" started fleeing.");
             }
             if (health > baseHealth/2 && AIType == 2)
             {
