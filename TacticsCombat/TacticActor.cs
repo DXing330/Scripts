@@ -40,7 +40,7 @@ public class TacticActor : MonoBehaviour
     public int baseInitiative = 10;
     public int initiative;
     // 0 is offensive, 1 is defensive
-    public int AIType;
+    public int AIType = 0;
     private int destinationIndex;
     private TacticActor attackTarget;
     public SpriteRenderer spriteRenderer;

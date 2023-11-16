@@ -20,7 +20,7 @@ public class TerrainMap : MonoBehaviour
     public List<TerrainTile> terrainTiles;
     public List<int> currentTiles;
     public List<int> terrainInfo;
-    public List<int> terrainEffects;
+    public List<string> terrainEffects;
     public List<int> terrainEffectDurations;
     public List<int> allUnoccupied;
     public List<int> occupiedTiles;
@@ -66,6 +66,8 @@ public class TerrainMap : MonoBehaviour
             for (int i = 0; i < fullSize * fullSize; i++)
             {
                 allUnoccupied.Add(0);
+                terrainEffects.Add("none");
+                terrainEffectDurations.Add(0);
             }
             actorManager.LoadFixedEnemyTeam();
         }
@@ -1117,10 +1119,6 @@ public class TerrainMap : MonoBehaviour
         {
             targetableTiles.Add(actors[turnIndex].locationIndex);
             return;
-        }
-        if (targetsType == 1 || targetsType == 2)
-        {
-            highlightedTiles.Add(actors[turnIndex].locationIndex);
         }
         for (int i = 0; i < highlightedTiles.Count; i++)
         {

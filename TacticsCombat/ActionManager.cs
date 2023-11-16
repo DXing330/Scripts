@@ -24,12 +24,17 @@ public class ActionManager : MonoBehaviour
 
     public void UpdateActionsLeft()
     {
+        actionsLeft.text = "";
         currentActor = terrainMap.ReturnCurrentTurnActor();
-        if (currentActor == null)
+        if (currentActor == null || currentActor.actionsLeft <= 0)
         {
             return;
         }
-        actionsLeft.text = currentActor.actionsLeft.ToString();
+        for (int i = 0; i < currentActor.actionsLeft; i++)
+        {
+            actionsLeft.text += " o ";
+        }
+        //actionsLeft.text = currentActor.actionsLeft.ToString();
     }
 
     public void ChangeState(int newState)
