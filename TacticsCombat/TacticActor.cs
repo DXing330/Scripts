@@ -39,7 +39,7 @@ public class TacticActor : MonoBehaviour
     public int movement;
     public int baseInitiative = 10;
     public int initiative;
-    // 0 is offensive, 1 is defensive
+    // 0 is offensive, 1 is passive, 2 is fleeing
     public int AIType = 0;
     private int destinationIndex;
     private TacticActor attackTarget;
@@ -146,12 +146,28 @@ public class TacticActor : MonoBehaviour
         //Destroy(gameObject);
     }
 
-    public void TriggerAggro()
+    private void ChangeAI()
     {
         if (AIType == 1)
         {
             AIType = 0;
             terrainMap.AlertEnemyTeam();
+        }
+        if (species == "Beast")
+        {
+            if (health < baseHealth/2 && AIType != 2)
+            {
+                AIType = 2;
+                // Buff damage.
+                baseAttack += baseAttack/5;
+                Debug.Log(typeName+" started fleeing.");
+            }
+            if (health > baseHealth/2 && AIType == 2)
+            {
+                AIType = 0;
+                // Stop rage mode.
+                baseAttack -= baseAttack/6;
+            }
         }
     }
 
@@ -162,13 +178,13 @@ public class TacticActor : MonoBehaviour
 
     public void ReceiveDamage(int amount)
     {
-        TriggerAggro();
         // Ignore damage that's too weak?
         if (defense/2 > amount)
         {
             return;
         }
         health -= Mathf.Max(amount - defense, 1);
+        ChangeAI();
         if (health <= 0)
         {
             Death();
@@ -178,6 +194,7 @@ public class TacticActor : MonoBehaviour
     public void RegainHealth(int amount)
     {
         health += amount;
+        ChangeAI();
         if (health > baseHealth)
         {
             health = baseHealth;
@@ -260,46 +277,28 @@ public class TacticActor : MonoBehaviour
 
     public bool Delayable()
     {
-        if (!delayable)
-        {
-            return false;
-        }
-        if (movement <= 0 && actionsLeft <= 0)
-        {
-            return false;
-        }
-        if (health <= 0)
-        {
-            return false;
-        }
+        if (!delayable){return false;}
+        if (movement <= 0 && actionsLeft <= 0){return false;}
+        if (health <= 0){return false;}
         return true;
     }
 
     public bool Actable()
     {
         // Only the dead and things that can never act.
-        if (health <= 0 || baseActions <= 0)
-        {
-            return false;
-        }
+        if (health <= 0 || baseActions <= 0){return false;}
         return true;
     }
 
     public bool CheckActions(int actionCost = 1)
     {
-        if (actionsLeft < actionCost)
-        {
-            return false;
-        }
+        if (actionsLeft < actionCost){return false;}
         return true;
     }
 
     public bool CheckSkillActivatable()
     {
-        if (activeSkill.skillName.Length < 3)
-        {
-            return false;
-        }
+        if (activeSkill.skillName.Length < 3){return false;}
         // No such thing as a skill that costs zero energy.
         if (actionsLeft < activeSkill.ReturnActionCost(this) || energy < activeSkill.cost || activeSkill.cost <= 0)
         {
@@ -328,18 +327,12 @@ public class TacticActor : MonoBehaviour
 
     private void AttackAction()
     {
-        if (actionsLeft < actionsToAttack || health <= 0)
-        {
-            return;
-        }
+        if (actionsLeft < actionsToAttack || health <= 0){return;}
         NPCLoadSkill(1);
         // Try to hit the first target.
         if (terrainMap.pathFinder.CalculateDistance(locationIndex, attackTarget.locationIndex) <= currentAttackRange && attackTarget.health > 0)
         {
-            if (attackTarget == null)
-            {
-                return;
-            }
+            if (attackTarget == null){return;}
             if (CheckSkillActivatable())
             {
                 terrainMap.NPCActivateSkill(attackTarget.locationIndex);
@@ -388,10 +381,7 @@ public class TacticActor : MonoBehaviour
 
     private void SupportAction()
     {
-        if (actionsLeft <= 0 || health <= 0)
-        {
-            return;
-        }
+        if (actionsLeft <= 0 || health <= 0){return;}
         NPCLoadSkill(2);
         if (CheckSkillActivatable())
         {
@@ -438,12 +428,27 @@ public class TacticActor : MonoBehaviour
         // Randomly move around if you don't have a target.
         // Look for a target in range.
         UpdateTarget(terrainMap.FindClosestEnemyInAttackRange());
+        // Otherwise go for the closest enemy.
         if (attackTarget == null)
         {
             UpdateTarget(terrainMap.FindNearestEnemy());
         }
-        // Otherwise go for the closest enemy.
-        UpdateDest(attackTarget.locationIndex);
+        switch (AIType)
+        {
+            case 0:
+                // Aggresive means you run towards the enemy.
+                UpdateDest(attackTarget.locationIndex);
+                break;
+            case 1:
+                // Passive means you don't move.
+                UpdateDest(locationIndex);
+                break;
+            case 2:
+                // Defensive means run away from the closest enemy.
+                UpdateDest(terrainMap.FindFurthestTileFromTarget(this, attackTarget));
+                break;
+        }
+        //UpdateDest(attackTarget.locationIndex);
         // Attack your target if you have one.
         // If you're injured then start looking for targets? Depends on the type of AI.
     }

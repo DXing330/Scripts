@@ -103,6 +103,8 @@ public class TerrainMap : MonoBehaviour
 
     private void CheckWinners()
     {
+        // If you delay turn then the turnIndex might go negative which messes things up.
+        if (turnIndex < 0){return;}
         int winners = actorManager.WinningTeam();
         if (winners >= 0)
         {
@@ -132,7 +134,6 @@ public class TerrainMap : MonoBehaviour
     public void NextTurn()
     {
         // Need this first one in case they try to click the end turn button before player team loads in.
-        // Maybe remove it as a feature for an autolose option?
         if (!battleStarted){return;}
         CheckWinners();
         if (!battleStarted){return;}
@@ -763,6 +764,11 @@ public class TerrainMap : MonoBehaviour
             return randomLocation;
         }
         return RandomDestination(currentLocation);
+    }
+
+    public int FindFurthestTileFromTarget(TacticActor actor, TacticActor target)
+    {
+        return pathFinder.FindFurthestTileFromTarget(actor, target);
     }
 
     public bool CheckAdjacency(int location, int target)

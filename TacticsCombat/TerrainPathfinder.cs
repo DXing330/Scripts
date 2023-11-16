@@ -519,4 +519,25 @@ public class TerrainPathfinder : MonoBehaviour
         }
         return null;
     }
+
+    public int FindFurthestTileFromTarget(TacticActor currentActor, TacticActor target)
+    {
+        // Get the reachable tiles.
+        int awayFrom = target.locationIndex;
+        int destination = currentActor.locationIndex;
+        int distance = CalculateDistance(awayFrom, destination);
+        int tempDist = 0;
+        FindTilesInMoveRange(currentActor, true);
+        for (int i = 0; i < reachableTiles.Count; i++)
+        {
+            tempDist = CalculateDistance(awayFrom, reachableTiles[i]);
+            // Run as far as possible.
+            if (tempDist > distance)
+            {
+                distance = tempDist;
+                destination = reachableTiles[i];
+            }
+        }
+        return destination;
+    }
 }
