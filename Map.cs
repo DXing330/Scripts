@@ -16,7 +16,7 @@ public class Map : MonoBehaviour
 
     protected virtual void Start()
     {
-        InitializeTiles();
+        //InitializeTiles();
     }
 
     protected virtual void InitializeTiles()
