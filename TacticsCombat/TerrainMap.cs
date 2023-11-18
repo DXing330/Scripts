@@ -831,6 +831,21 @@ public class TerrainMap : MonoBehaviour
     {
         terrainInfo = terrainMaker.GenerateTerrain(type, size);
         fullSize = size;
+        if (type == 1)
+        {
+            int terrainIndex = Random.Range(0, GameManager.instance.forestFixedTerrains.Count);
+            if (GameManager.instance.forestFixedTerrains[terrainIndex].Length > size)
+            {
+                // Get the terrain from the GameManager.
+                string[] fixedTerrain = GameManager.instance.forestFixedTerrains[terrainIndex].Split("|");
+                fullSize = (int) Mathf.Sqrt(fixedTerrain.Length);
+                terrainInfo.Clear();
+                for (int j = 0; j < fixedTerrain.Length; j++)
+                {
+                    terrainInfo.Add(int.Parse(fixedTerrain[j]));
+                }
+            }
+        }
         allUnoccupied.Clear();
         for (int i = 0; i < fullSize * fullSize; i++)
         {

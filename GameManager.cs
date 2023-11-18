@@ -78,6 +78,7 @@ public class GameManager : MonoBehaviour
     public List<string> familiarActives;
     public int randomBattle = 0;
     public string battleName = "";
+    public List<string> forestFixedTerrains;
     public List<int> fixedBattleTerrain;
     public List<string> fixedBattleActors;
     public int battleLocationType;
@@ -122,6 +123,17 @@ public class GameManager : MonoBehaviour
         }
         player.UpdateStats();
         familiar.UpdateStats();
+        if (File.Exists(saveDataPath+"/Maps_1.txt"))
+        {
+            forestFixedTerrains = File.ReadAllText(saveDataPath+"/Maps_1.txt").Split("#").ToList();
+            for (int i = 0; i < forestFixedTerrains.Count; i++)
+            {
+                if (forestFixedTerrains[i].Length < 9)
+                {
+                    forestFixedTerrains.RemoveAt(i);
+                }
+            }
+        }
     }
 
     [ContextMenu("New Game")]

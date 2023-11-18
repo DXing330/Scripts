@@ -1,11 +1,20 @@
+using System.IO;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class MapEditor : Map
 {
-    // This is the all the tiles.
+    public string allMaps;
+    public List<string> allMapsList;
+    private string saveDataPath;
+    public TMP_Text indexText;
+    public int mapIndex = -1;
     public List<string> mapToEdit;
+    public List<string> tempTiles;
     public List<string> possibleTerrains;
     public int currentlySelectedTerrain = -1;
     public List<GameObject> possibleTerrainButtons;
@@ -13,9 +22,101 @@ public class MapEditor : Map
     public string baseTerrain = "1";
     public string[] baseTerrains;
 
+    private void UpdateIndexText()
+    {
+        if (mapIndex < 0)
+        {
+            indexText.text = "New Map";
+        }
+        else
+        {
+            indexText.text = "Map "+(mapIndex+1).ToString();
+        }
+    }
+
+    public void ChangeIndex(bool right = true)
+    {
+        if (right)
+        {
+            if (mapIndex + 1 < allMapsList.Count)
+            {
+                mapIndex++;
+            }
+            else
+            {
+                mapIndex = 0;
+            }
+        }
+        else
+        {
+            if (mapIndex > 0)
+            {
+                mapIndex--;
+            }
+            else
+            {
+                mapIndex = allMapsList.Count - 1;
+            }
+        }
+        UpdateIndexText();
+        LoadMap(allMapsList[mapIndex].Split("|").ToList());
+        UpdateCenterTile();
+        UpdateMap();
+    }
+
+    protected override void Start()
+    {
+        DeterminePossibleTerrains();
+        saveDataPath = Application.persistentDataPath;
+        allMaps = File.ReadAllText(saveDataPath+"/Maps_"+baseTerrain+".txt");
+        UpdateAllMapsList();
+        ChangeIndex();
+    }
+
+    private void UpdateAllMapsList()
+    {
+        allMapsList = allMaps.Split("#").ToList();
+        for (int i = 0; i < allMapsList.Count; i++)
+        {
+            if (allMapsList[i].Length < gridSize)
+            {
+                allMapsList.RemoveAt(i);
+            }
+        }
+    }
+
+    public void PublishMap()
+    {
+        if (File.Exists(saveDataPath+"/Maps_"+baseTerrain+".txt"))
+        {
+            allMaps = File.ReadAllText(saveDataPath+"/Maps_"+baseTerrain+".txt");
+        }
+        else
+        {
+            allMaps = "";
+        }
+        SaveMap();
+        // If its a new map then add it to the rest.
+        if (mapIndex < 0)
+        {
+            allMaps += "#"+GameManager.instance.ConvertListToString(mapToEdit);
+            UpdateAllMapsList();
+            mapIndex = allMapsList.Count-1;
+            UpdateIndexText();
+        }
+        // Otherwise just edit it.
+        else
+        {
+            allMapsList[mapIndex] = GameManager.instance.ConvertListToString(mapToEdit);
+            allMaps = GameManager.instance.ConvertListToString(allMapsList, "#");
+        }
+        File.WriteAllText(saveDataPath+"/Maps_"+baseTerrain+".txt", allMaps);
+    }
+
     public void NewMap()
     {
-        Debug.Log("New Map");
+        mapIndex = -1;
+        UpdateIndexText();
         if (fullSize < gridSize){fullSize = gridSize;}
         allTiles.Clear();
         for (int i = 0; i < fullSize * fullSize; i++)
@@ -24,7 +125,6 @@ public class MapEditor : Map
         }
         UpdateCenterTile();
         UpdateMap();
-        DeterminePossibleTerrains();
     }
 
     public void SaveMap()
@@ -35,6 +135,8 @@ public class MapEditor : Map
     public void UndoEdits()
     {
         allTiles = new List<string>(mapToEdit);
+        fullSize = (int) Mathf.Sqrt(allTiles.Count);
+        UpdateCenterTile();
         UpdateMap();
     }
 
@@ -60,7 +162,7 @@ public class MapEditor : Map
         }
     }
 
-    public void LoadMap(List<string> loadedMap, string terrain = "2")
+    public void LoadMap(List<string> loadedMap, string terrain = "1")
     {
         baseTerrain = terrain;
         allTiles = loadedMap;
@@ -92,7 +194,17 @@ public class MapEditor : Map
 
     private void UpdateCenterTile(int tileNumber = -1)
     {
-        if (tileNumber < 0){startIndex = (fullSize*fullSize/2);}
+        if (tileNumber < 0)
+        {
+            if (fullSize%2 == 1)
+            {
+                startIndex = (fullSize*fullSize/2);
+            }
+            else
+            {
+                startIndex = (fullSize/2)+(fullSize*fullSize/2);
+            }
+        }
         else{startIndex = tileNumber;}
         DetermineCornerRowColumn();
         DetermineCurrentTiles();
@@ -104,7 +216,7 @@ public class MapEditor : Map
         switch (direction)
         {
             case -1:
-                startIndex=fullSize*fullSize/2;
+                UpdateCenterTile();
                 break;
             case 0:
                 if (previousIndex < fullSize)
@@ -169,5 +281,66 @@ public class MapEditor : Map
         if (type == currentlySelectedTerrain){currentlySelectedTerrain = -1;}
         else{currentlySelectedTerrain = type;}
         UpdateHighlights();
+    }
+
+    public void AdjustSize(bool increase = true)
+    {
+        tempTiles.Clear();
+        if (increase)
+        {
+            IncreaseMapSize();
+        }
+        else
+        {
+            DecreaseMapSize();
+        }
+    }
+
+    private void IncreaseMapSize()
+    {
+        if (fullSize >= gridSize*2){return;}
+        // Copy the list and add a row and column.
+        int index = 0;
+        for (int i = 0; i < fullSize + 1; i++)
+        {
+            for (int j = 0; j < fullSize + 1; j++)
+            {
+                if (i == fullSize || j == fullSize)
+                {
+                    tempTiles.Add(baseTerrain);
+                    continue;
+                }
+                tempTiles.Add(allTiles[index]);
+                index++;
+            }
+        }
+        fullSize++;
+        allTiles = new List<string>(tempTiles);
+        UpdateCenterTile();
+        UpdateMap();
+    }
+
+    private void DecreaseMapSize()
+    {
+        if (fullSize <= gridSize){return;}
+        // Copy the list and remove a row and column;
+        int index = 0;
+        for (int i = 0; i < fullSize - 1; i++)
+        {
+            for (int j = 0; j < fullSize; j++)
+            {
+                if (j == fullSize - 1)
+                {
+                    index++;
+                    continue;
+                }
+                tempTiles.Add(allTiles[index]);
+                index++;
+            }
+        }
+        fullSize--;
+        allTiles = new List<string>(tempTiles);
+        UpdateCenterTile();
+        UpdateMap();
     }
 }
