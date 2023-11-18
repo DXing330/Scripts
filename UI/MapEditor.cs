@@ -6,7 +6,12 @@ public class MapEditor : Map
 {
     // This is the all the tiles.
     public List<string> mapToEdit;
+    public List<string> possibleTerrains;
+    public int currentlySelectedTerrain = -1;
+    public List<GameObject> possibleTerrainButtons;
+    public List<TerrainTile> possibleTerrainTiles;
     public string baseTerrain = "1";
+    public string[] baseTerrains;
 
     public void NewMap()
     {
@@ -19,12 +24,59 @@ public class MapEditor : Map
         }
         UpdateCenterTile();
         UpdateMap();
+        DeterminePossibleTerrains();
     }
 
-    public void LoadMap(List<string> loadedMap)
+    public void SaveMap()
     {
+        mapToEdit = new List<string>(allTiles);
+    }
+
+    public void UndoEdits()
+    {
+        allTiles = new List<string>(mapToEdit);
+        UpdateMap();
+    }
+
+    private void DeterminePossibleTerrains()
+    {
+        baseTerrains = possibleTerrains[int.Parse(baseTerrain)].Split("|");
+        for (int i = 0; i < possibleTerrainButtons.Count; i++)
+        {
+            if (i < baseTerrains.Length)
+            {
+                possibleTerrainButtons[i].SetActive(true);
+            }
+            else
+            {
+                possibleTerrainButtons[i].SetActive(false);
+            }
+        }
+        for (int j = 0; j < baseTerrains.Length; j++)
+        {
+            int type = int.Parse(baseTerrains[j]);
+            possibleTerrainTiles[j].UpdateColor(type);
+            possibleTerrainTiles[j].UpdateImage(tileSprites[type]);
+        }
+    }
+
+    public void LoadMap(List<string> loadedMap, string terrain = "2")
+    {
+        baseTerrain = terrain;
         allTiles = loadedMap;
         fullSize = (int) Mathf.Sqrt(allTiles.Count);
+    }
+
+    private void UpdateHighlights()
+    {
+        for (int i = 0; i < baseTerrains.Length; i++)
+        {
+            possibleTerrainTiles[i].ResetHighlight();
+        }
+        if (currentlySelectedTerrain >= 0)
+        {
+            possibleTerrainTiles[currentlySelectedTerrain].Highlight();
+        }
     }
 
     private void UpdateMap()
@@ -102,5 +154,20 @@ public class MapEditor : Map
         DetermineCornerRowColumn();
         DetermineCurrentTiles();
         UpdateMap();
+    }
+
+    public void ClickOnTile(int tileNumber)
+    {
+        if (currentlySelectedTerrain < 0){return;}
+        allTiles[currentTiles[tileNumber]] = baseTerrains[currentlySelectedTerrain];
+        UpdateMap();
+    }
+
+    public void ChangeCurrentlySelected(int type)
+    {
+        if (type >= baseTerrains.Length){return;}
+        if (type == currentlySelectedTerrain){currentlySelectedTerrain = -1;}
+        else{currentlySelectedTerrain = type;}
+        UpdateHighlights();
     }
 }

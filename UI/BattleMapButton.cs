@@ -7,6 +7,7 @@ public class BattleMapButton : MonoBehaviour
 {
     public TerrainMap terrainMap;
     public OverworldMap overworldMap;
+    public MapEditor mapEditor;
     public RectTransform rectTransform;
     public int gridSize = 9;
     // Need to make this not hard coded.
@@ -45,8 +46,8 @@ public class BattleMapButton : MonoBehaviour
         yScale = rectTransform.localScale.y;
         xMinAnchor = rectTransform.anchorMin.x;
         yMinAnchor = rectTransform.anchorMin.y;
-        //xMaxAnchor = rectTransform.anchorMax.x;
-        //yMaxAnchor = rectTransform.anchorMax.y;
+        xMaxAnchor = rectTransform.anchorMax.x;
+        yMaxAnchor = rectTransform.anchorMax.y;
         float width = Screen.width;
         float height = Screen.height;
         int xCenter = (int) (width * xPivot);
@@ -55,6 +56,13 @@ public class BattleMapButton : MonoBehaviour
         maxXPos = (int) (width * xScale) + minXPos;
         minYPos = yCenter - (int) ((yPivot - yMinAnchor) * height * yScale);
         maxYPos = (int) (height * yScale) + minYPos;
+    }
+
+    public void MousePosEditor()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        int tileNumber = ClickedTile((int) mousePos.x, (int) mousePos.y);
+        mapEditor.ClickOnTile(tileNumber);
     }
 
     public void MousePosWorldMap()
