@@ -21,8 +21,7 @@ public class TacticActor : MonoBehaviour
     public int movementType = 0;
     public int health;
     public int baseHealth = 20;
-    // Not sure if we need an initiative tracker it might make things more complex.
-    //private int initiative = 0;
+
     public int baseEnergy = 5;
     public int energy;
     public int baseMovement = 3;
@@ -130,7 +129,7 @@ public class TacticActor : MonoBehaviour
         currentMovespeed = baseMovement;
         currentAttackRange = attackRange;
         energy = Mathf.Min(energy+1, baseEnergy);
-        initiative = baseInitiative;
+        initiative = baseInitiative + Random.Range(-1,1);
         ApplyBuffDebuffEffects();
         movement = 0;
     }

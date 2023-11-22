@@ -36,6 +36,9 @@ public class SkillEffectManager : MonoBehaviour
                 return true;
             case "Teleport":
                 return true;
+            case "Battle+Status":
+                skill.AddBuffDebuff(target, skill.effectSpecifics, power);
+                return true;
         }
         power /= powerDenominator;
         skill.AffectActor(target, power);

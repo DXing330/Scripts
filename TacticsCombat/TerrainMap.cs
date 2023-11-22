@@ -348,6 +348,9 @@ public class TerrainMap : MonoBehaviour
             case "Battle":
                 BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower);
                 break;
+            case "Battle+Status":
+                BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower);
+                break;
             case "Summon":
                 SummonSkillActivate(targetableTiles[currentTarget]);
                 break;
