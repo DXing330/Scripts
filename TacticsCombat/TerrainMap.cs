@@ -46,6 +46,7 @@ public class TerrainMap : MonoBehaviour
     public TacticActorInfo actorInfo;
     public TurnOrderPanel turnOrder;
     public ActionManager actionManager;
+    public TerrainEffectManager terrainEffectManager;
 
 
     public void StartBattle()
@@ -158,6 +159,8 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorsTurn()
     {
+        // Check on terrain effects.
+        terrainEffectManager.AffectActorOnTerrain(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
         if (!actors[turnIndex].Actable())
         {
             NextTurn();

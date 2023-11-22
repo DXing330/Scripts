@@ -86,13 +86,19 @@ public class TerrainPathfinder : MonoBehaviour
         }
     }
 
-    public bool CheckTileOccupied(int location)
+    public bool CheckTileMoveable(TacticActor actor, int location)
     {
+        // Can't move into people.
         if (occupiedTiles[location] > 0)
         {
-            return true;
+            return false;
         }
-        return false;
+        // Can't move into boulders.
+        if (terrainInfo[location] == 6 && actor.movementType != 1)
+        {
+            return false;
+        }
+        return true;
     }
     
     // Returns a list of tiles to pass through, not including the start or end points, so you will end up adjacent to the destination.

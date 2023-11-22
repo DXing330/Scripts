@@ -87,7 +87,7 @@ public class MoveManager : MonoBehaviour
         // This checks if it's in bounds.
         int destination = GetDestination(actor.locationIndex, direction);
         // This checks if it's occupied.
-        if (!pathfinder.CheckTileOccupied(destination))
+        if (pathfinder.CheckTileMoveable(actor, destination))
         {
             actor.locationIndex = destination;
         }
@@ -101,15 +101,9 @@ public class MoveManager : MonoBehaviour
             push = 0;
         }
         int line = LineCheck(displacer.locationIndex, displacedActor.locationIndex);
-        int power = displacementPower + displacer.size - displacedActor.size;
-        if (power <= 0)
-        {
-            return;
-        }
-        if (line < 0)
-        {
-            return;
-        }
+        int power = displacementPower + (displacer.size) - (displacedActor.size);
+        if (power <= 0){return;}
+        if (line < 0){return;}
         else if (line == 0)
         {
             DisplaceHorizontally(displacedActor, displacer.locationIndex, power, push);
