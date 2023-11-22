@@ -13,6 +13,7 @@ public class MapEditor : Map
     private string saveDataPath;
     public TMP_Text indexText;
     public int mapIndex = -1;
+    public int currentPage = 0;
     public List<string> mapToEdit;
     public List<string> tempTiles;
     public List<string> possibleTerrains;
@@ -66,6 +67,7 @@ public class MapEditor : Map
 
     protected override void Start()
     {
+        UpdateBaseTerrains();
         DeterminePossibleTerrains();
         saveDataPath = Application.persistentDataPath;
         allMaps = File.ReadAllText(saveDataPath+"/Maps_"+baseTerrain+".txt");
@@ -140,12 +142,17 @@ public class MapEditor : Map
         UpdateMap();
     }
 
-    private void DeterminePossibleTerrains()
+    private void UpdateBaseTerrains()
     {
         baseTerrains = possibleTerrains[int.Parse(baseTerrain)].Split("|");
+    }
+
+    private void DeterminePossibleTerrains()
+    {
+        int pageShift = (currentPage * possibleTerrainButtons.Count);
         for (int i = 0; i < possibleTerrainButtons.Count; i++)
         {
-            if (i < baseTerrains.Length)
+            if (i < baseTerrains.Length - pageShift)
             {
                 possibleTerrainButtons[i].SetActive(true);
             }
@@ -154,9 +161,9 @@ public class MapEditor : Map
                 possibleTerrainButtons[i].SetActive(false);
             }
         }
-        for (int j = 0; j < baseTerrains.Length; j++)
+        for (int j = 0; j < Mathf.Min(possibleTerrainTiles.Count, baseTerrains.Length - pageShift); j++)
         {
-            int type = int.Parse(baseTerrains[j]);
+            int type = int.Parse(baseTerrains[j + pageShift]);
             possibleTerrainTiles[j].UpdateColor(type);
             possibleTerrainTiles[j].UpdateImage(tileSprites[type]);
         }
@@ -171,13 +178,13 @@ public class MapEditor : Map
 
     private void UpdateHighlights()
     {
-        for (int i = 0; i < baseTerrains.Length; i++)
+        for (int i = 0; i < Mathf.Min(possibleTerrainTiles.Count, baseTerrains.Length - (currentPage * possibleTerrainButtons.Count)); i++)
         {
             possibleTerrainTiles[i].ResetHighlight();
         }
         if (currentlySelectedTerrain >= 0)
         {
-            possibleTerrainTiles[currentlySelectedTerrain].Highlight();
+            possibleTerrainTiles[currentlySelectedTerrain%possibleTerrainButtons.Count].Highlight();
         }
     }
 
@@ -275,8 +282,9 @@ public class MapEditor : Map
         UpdateMap();
     }
 
-    public void ChangeCurrentlySelected(int type)
+    public void ChangeCurrentlySelected(int newType)
     {
+        int type = newType + (currentPage * possibleTerrainButtons.Count);
         if (type >= baseTerrains.Length){return;}
         if (type == currentlySelectedTerrain){currentlySelectedTerrain = -1;}
         else{currentlySelectedTerrain = type;}
@@ -298,7 +306,7 @@ public class MapEditor : Map
 
     private void IncreaseMapSize()
     {
-        if (fullSize >= gridSize*2){return;}
+        if (fullSize + 1 >= gridSize*2){return;}
         // Copy the list and add a row and column.
         int index = 0;
         for (int i = 0; i < fullSize + 1; i++)
@@ -342,5 +350,24 @@ public class MapEditor : Map
         allTiles = new List<string>(tempTiles);
         UpdateCenterTile();
         UpdateMap();
+    }
+
+    public void ChangePage(bool right = true)
+    {
+        if (!right)
+        {
+            if (currentPage > 0)
+            {
+                currentPage--;
+            }
+        }
+        else
+        {
+            if ((currentPage+1)*possibleTerrainButtons.Count < baseTerrains.Length)
+            {
+                currentPage++;
+            }   
+        }
+        DeterminePossibleTerrains();
     }
 }

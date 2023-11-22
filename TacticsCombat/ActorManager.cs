@@ -16,7 +16,9 @@ public class ActorManager : MonoBehaviour
     public ActorDataManager actorData;
     public EnemyGroupsData groupsData;
     public SkillDataManager skillData;
+    private int tries = 0;
     public List<int> usedTiles;
+    public List<int> unusableTiles;
     public int collectedGold = 0;
     public int collectedMana = 0;
     public int collectedBlood = 0;
@@ -57,9 +59,22 @@ public class ActorManager : MonoBehaviour
 
     public void LoadPlayerTeam()
     {
-        int column = 0;
-        int row = 0;
+        //int column = 0;
+        //int row = 0;
+        tries = 0;
+        int enemyCount = usedTiles.Count;
         for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
+        {
+            if (GameManager.instance.armyData.armyFormation[i] == "none")
+            {
+                continue;
+            }
+            // Randomly spawn in the player team.
+            GenerateRandomLocation();
+            // Spawn the player as soon as you get a location for them.
+            LoadPlayerTeamMember(GameManager.instance.armyData.armyFormation[i], usedTiles[^1]);
+        }
+        /*for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
         {
             string actorType = GameManager.instance.armyData.armyFormation[i];
             LoadPlayerTeamMember(actorType, row, column);
@@ -69,12 +84,11 @@ public class ActorManager : MonoBehaviour
                 column = 0;
                 row++;
             }
-        }
+        }*/
     }
 
-    private void LoadPlayerTeamMember(string type, int row, int column)
+    private void LoadPlayerTeamMember(string type, int location)
     {
-        int location = column + (row * terrainMap.fullSize);
         if (type == "Player")
         {
             LoadActor(GameManager.instance.player.playerActor, location);
@@ -99,12 +113,15 @@ public class ActorManager : MonoBehaviour
         int difficulty = GameManager.instance.battleDifficulty;
         string enemyGroup = groupsData.ReturnEnemyGroup(type, difficulty);
         string[] enemies = enemyGroup.Split(",");
+        tries = 0;
         usedTiles.Clear();
+        unusableTiles.Clear();
+        FindUnusableTiles();
         for (int i = 0; i < enemies.Length; i++)
         {
             GenerateRandomLocation();
         }
-        for (int i = 0; i < enemies.Length; i++)
+        for (int i = 0; i < Mathf.Min(usedTiles.Count, enemies.Length); i++)
         {
             GenerateActor(usedTiles[i], enemies[i], 1);
         }
@@ -123,17 +140,35 @@ public class ActorManager : MonoBehaviour
         }
     }
 
-    private void GenerateRandomLocation()
+    private bool GenerateRandomLocation()
     {
         int fullSize = terrainMap.fullSize;
-        int row = Random.Range(3, fullSize);
-        int column = Random.Range(3, fullSize);
+        if (tries > fullSize * fullSize){return false;}
+        int row = Random.Range(0,fullSize);
+        int column = Random.Range(0,fullSize);
         int index = column + (row*fullSize);
-        if (!usedTiles.Contains(index))
+        if (!usedTiles.Contains(index) && !unusableTiles.Contains(index))
         {
             usedTiles.Add(index);
         }
-        else{GenerateRandomLocation();}
+        else
+        {
+            tries++;
+            GenerateRandomLocation();
+        }
+        return true;
+    }
+
+    private void FindUnusableTiles()
+    {
+        for (int i = 0; i < terrainMap.terrainInfo.Count; i++)
+        {
+            int tileType = terrainMap.terrainInfo[i];
+            if (tileType == 6 || tileType == 7)
+            {
+                unusableTiles.Add(i);
+            }
+        }
     }
 
     public void LoadSkillData(TacticActiveSkill tacticActive, string skillName)

@@ -151,6 +151,14 @@ public class TerrainTile : MonoBehaviour
                 tempColor = Color.yellow;
                 tempColor.a = 0.3f;
                 break;
+            case 6:
+                tempColor = Color.green;
+                tempColor.a = 0.3f;
+                break;
+            case 7:
+                tempColor = Color.green;
+                tempColor.a = 0.3f;
+                break;
         }
         backgroundColor.color = tempColor;
     }
@@ -179,27 +187,11 @@ public class TerrainTile : MonoBehaviour
         return 999;
     }
 
-    // Maybe make it so fliers can share tiles with other units.
     public int ReturnFlyingMoveCost(int type, int occupied = 0)
     {
         if (type < 0 || occupied > 0)
         {
             return 999;
-        }
-        switch (type)
-        {
-            case 0:
-                return 1;
-            case 1:
-                return 1;
-            case 2:
-                return 1;
-            case 3:
-                return 1;
-            case 4:
-                return 1;
-            case 5:
-                return 1;
         }
         return 1;
     }
@@ -225,7 +217,7 @@ public class TerrainTile : MonoBehaviour
             case 5:
                 return 1;
         }
-        return 1;
+        return 999;
     }
 
     public int ReturnSwimmingMoveCost(int type, int occupied = 0)
@@ -249,7 +241,7 @@ public class TerrainTile : MonoBehaviour
             case 5:
                 return 6;
         }
-        return 1;
+        return 999;
     }
 
     public int ReturnScoutingMoveCost(int type, int occupied = 0)
@@ -273,7 +265,7 @@ public class TerrainTile : MonoBehaviour
             case 5:
                 return 1;
         }
-        return 1;
+        return 999;
     }
 
     public int ReturnDefenseBonus(int tileType, int moveType)

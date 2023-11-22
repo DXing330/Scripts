@@ -11,7 +11,9 @@ public class TerrainType : MonoBehaviour
         mountain = 2,
         water = 3,
         deepWater = 4,
-        desert = 5
+        desert = 5,
+        rock = 6,
+        chasm = 7
     };
 
     enum moveTypes
