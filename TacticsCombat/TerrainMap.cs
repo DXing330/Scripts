@@ -97,10 +97,10 @@ public class TerrainMap : MonoBehaviour
             actorManager.LoadEnemyTeam();
         }
         actorManager.LoadPlayerTeam();
-        UpdateCenterTile((fullSize * fullSize)/2);
-        UpdateMap();
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
-        fixedCenter=fullSize*fullSize/2;
+        UpdateCenterTile(((fullSize) * fullSize)/2);
+        UpdateMap();
+        fixedCenter=(fullSize)*fullSize/2;
         simulator.UpdateSimulation();
         simulator.RunNSimulations();
     }

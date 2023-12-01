@@ -40,7 +40,7 @@ public class TacticActor : MonoBehaviour
     public int initiative;
     // 0 is offensive, 1 is passive, 2 is fleeing
     public int AIType = 0;
-    private int destinationIndex;
+    public int destinationIndex;
     public TacticActor attackTarget;
     public SpriteRenderer spriteRenderer;
     // Path to target.
@@ -90,6 +90,8 @@ public class TacticActor : MonoBehaviour
     public void CopyStats(TacticActor actorToCopy)
     {
         level = actorToCopy.level;
+        team = actorToCopy.team;
+        locationIndex = actorToCopy.locationIndex;
         typeName = actorToCopy.typeName;
         baseHealth = actorToCopy.baseHealth;
         baseMovement = actorToCopy.baseMovement;
@@ -136,18 +138,22 @@ public class TacticActor : MonoBehaviour
         movement = 0;
     }
 
-    private void Death()
+    public void Death(bool real = true)
     {
         Color tempColor = Color.white;
         tempColor.a = 0f;
-        spriteRenderer.sprite = null;
+        //spriteRenderer.sprite = null;
         spriteRenderer.color = tempColor;
         actionsLeft = 0;
-        terrainMap.ActorDied();
+        if (real)
+        {
+            spriteRenderer.color = tempColor;
+            //terrainMap.ActorDied();
+        }
         //Destroy(gameObject);
     }
 
-    private void ChangeAI()
+    public void ChangeAI()
     {
         if (AIType == 1)
         {
@@ -176,7 +182,7 @@ public class TacticActor : MonoBehaviour
         AIType = 0;
     }
 
-    public void ReceiveDamage(int amount)
+    public void ReceiveDamage(int amount, bool real = true)
     {
         // Ignore damage that's too weak?
         if (defense/2 > amount)
@@ -187,7 +193,7 @@ public class TacticActor : MonoBehaviour
         ChangeAI();
         if (health <= 0)
         {
-            Death();
+            Death(real);
         }
     }
 
@@ -217,7 +223,7 @@ public class TacticActor : MonoBehaviour
         LoseEnergy(activeSkill.cost);
     }
 
-    private void ApplyBuffDebuffEffects()
+    public void ApplyBuffDebuffEffects()
     {
         if (buffDebuffNames.Count <= 0)
         {
@@ -325,7 +331,7 @@ public class TacticActor : MonoBehaviour
         return false;
     }
 
-    private void AttackAction(bool real = true)
+    public void AttackAction(bool real = true)
     {
         if (actionsLeft < actionsToAttack || health <= 0){return;}
         NPCLoadSkill(1);
@@ -362,7 +368,7 @@ public class TacticActor : MonoBehaviour
         CheckIfAttackAgain(real);
     }
 
-    private void CheckIfAttackAgain(bool real = true)
+    public void CheckIfAttackAgain(bool real = true)
     {
         if (actionsLeft >= actionsToAttack)
         {
@@ -379,7 +385,7 @@ public class TacticActor : MonoBehaviour
         return false;
     }
 
-    private void SupportAction()
+    public void SupportAction()
     {
         if (actionsLeft <= 0 || health <= 0){return;}
         NPCLoadSkill(2);
@@ -426,7 +432,7 @@ public class TacticActor : MonoBehaviour
         SupportAction();
     }
 
-    private void CheckGoal(bool real = true)
+    public void CheckGoal(bool real = true)
     {
         // Randomly move around if you don't have a target.
         // Look for a target in range.
@@ -459,7 +465,7 @@ public class TacticActor : MonoBehaviour
         // If you're injured then start looking for targets? Depends on the type of AI.
     }
 
-    private void CheckEnemyInRange()
+    public void CheckEnemyInRange()
     {
 
     }
@@ -515,7 +521,7 @@ public class TacticActor : MonoBehaviour
         }
     }
 
-    private bool Moveable()
+    public bool Moveable()
     {
         // Don't move if you can't.
         if (currentPath.Count <= 0 || currentPath[0] == locationIndex || health <= 0 || actionsLeft <= 0)
@@ -566,7 +572,7 @@ public class TacticActor : MonoBehaviour
         return false;
     }
 
-    private bool CheckDistance(int index)
+    public bool CheckDistance(int index)
     {
         int distance = terrainMap.ReturnMoveCost(index, movementType);
         if (distance > movement)

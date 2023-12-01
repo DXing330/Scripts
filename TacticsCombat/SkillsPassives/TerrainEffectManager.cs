@@ -20,14 +20,11 @@ public class TerrainEffectManager : MonoBehaviour
         // Fly or die.
         if (actor.movementType == 1)
         {
+            actor.LoseEnergy(2);
             // If fliers run out of energy they die.
             if (actor.energy <= 0)
             {
                 actor.ReceiveDamage(actor.health + actor.defense);
-            }
-            else
-            {
-                actor.LoseEnergy(2);
             }
         }
         else

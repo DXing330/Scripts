@@ -204,6 +204,14 @@ public class ActorManager : MonoBehaviour
         newActor.QuickStart();
     }
 
+    public TacticActor GenerateCopyActor(TacticActor copiedActor)
+    {
+        TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
+        newActor.CopyStats(copiedActor);
+        newActor.QuickStart();
+        return newActor;
+    }
+
     private void UpdateActorSprite(TacticActor actor, string spriteName)
     {
         // Need the sprite dictionary later.

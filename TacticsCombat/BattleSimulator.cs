@@ -10,6 +10,7 @@ public class BattleSimulator : MonoBehaviour
     public List<int> occupiedTiles;
     public TerrainPathfinder pathFinder;
     public List<TacticActor> actors;
+    public List<TacticActor> aliveActors;
     public List<TacticActor> allActors;
     public MoveManager moveManager;
     public SkillEffectManager skillManager;
@@ -24,8 +25,7 @@ public class BattleSimulator : MonoBehaviour
 
     public void UpdateSimulation()
     {
-        actors = new List<TacticActor>(simulatedBattle.actors);
-        allActors = new List<TacticActor>(simulatedBattle.allActors);
+        CreateCopyOfActors();
         terrainInfo = new List<int>(simulatedBattle.terrainInfo);
         allUnoccupied = new List<int>(simulatedBattle.allUnoccupied);
         pathFinder = simulatedBattle.pathFinder;
@@ -36,6 +36,15 @@ public class BattleSimulator : MonoBehaviour
         terrainEffectManager = simulatedBattle.terrainEffectManager;
     }
 
+    private void CreateCopyOfActors()
+    {
+        allActors.Clear();
+        for (int i = 0; i < simulatedBattle.allActors.Count; i++)
+        {
+            allActors.Add(simulatedBattle.actorManager.GenerateCopyActor(simulatedBattle.allActors[i]));
+        }
+    }
+
     public void RunNSimulations(int n = 10)
     {
         Debug.Log("Starting "+n+" simulations.");
@@ -43,8 +52,9 @@ public class BattleSimulator : MonoBehaviour
         {
             ResetSimulation();
             StartSimulation();
-            while (started)
+            for (int j = 0; j < 99; j++)
             {
+                if (!started){continue;}
                 ActorsTurn();
                 turnIndex++;
                 if (turnIndex >= actors.Count)
@@ -52,13 +62,26 @@ public class BattleSimulator : MonoBehaviour
                     turnIndex = 0;
                 }
             }
+            if (started)
+            {
+                CheckWinners(true);
+                plays++;
+            }
         }
         Debug.Log(wins*100/plays);
     }
 
     private void ResetSimulation()
     {
-        actors  = new List<TacticActor>(allActors);
+        for (int i = 0; i < actors.Count; i++)
+        {
+            Destroy(actors[i]);
+        }
+        actors.Clear();
+        for (int i = 0; i < allActors.Count; i++)
+        {
+            actors.Add(simulatedBattle.actorManager.GenerateCopyActor(allActors[i]));
+        }
     }
 
     private void StartSimulation()
@@ -66,9 +89,9 @@ public class BattleSimulator : MonoBehaviour
         started = true;
     }
 
-    private void CheckWinners()
+    private void CheckWinners(bool write = false)
     {
-        int winners = WinningTeam();
+        int winners = WinningTeam(write);
         if (winners >= 0)
         {
             started = false;
@@ -80,12 +103,16 @@ public class BattleSimulator : MonoBehaviour
         }
     }
 
-    private int WinningTeam()
+    private int WinningTeam(bool write = false)
     {
         int teamOneCount = 0;
         int teamZeroCount = 0;
         for (int i = 0; i < actors.Count; i++)
         {
+            /*if (write)
+            {
+                Debug.Log(actors[i].typeName+": "+actors[i].health);
+            }*/
             if (actors[i].health <= 0){continue;}
             switch (actors[i].team)
             {
@@ -115,7 +142,6 @@ public class BattleSimulator : MonoBehaviour
         {
             return;
         }
-        Debug.Log(tempActor.typeName+": "+tempActor.health);
         terrainEffectManager.AffectActorOnTerrain(tempActor, terrainInfo[tempActor.locationIndex]);
         UpdateOccupiedTiles();
         pathFinder.UpdateOccupiedTiles(occupiedTiles);
@@ -125,17 +151,99 @@ public class BattleSimulator : MonoBehaviour
         {
             tempActor.UpdateTarget(FindNearestEnemy());
         }
-        tempActor.GetPath();
-        tempActor.MoveAction();
+        ActorUpdateDestination();
+        //Debug.Log("Start: "+tempActor.locationIndex);
+        tempActor.currentPath = pathFinder.FindPathIndex(tempActor.locationIndex, tempActor.destinationIndex, tempActor.movementType);
+        tempActor.turnPath.Clear();
+        MoveAction();
         tempActor.MoveAlongPath(false);
+        //Debug.Log("Fin: "+tempActor.locationIndex);
         ActorAttackAction();
         CheckWinners();
+    }
+
+    private void ActorUpdateDestination()
+    {
+        switch (tempActor.AIType)
+        {
+            case 0:
+                // Aggresive means you run towards the enemy.
+                tempActor.UpdateDest(tempActor.attackTarget.locationIndex);
+                break;
+            case 1:
+                // Passive means you don't move.
+                tempActor.UpdateDest(tempActor.locationIndex);
+                break;
+            case 2:
+                // Defensive means run away from the closest enemy.
+                tempActor.UpdateDest(pathFinder.FindFurthestTileFromTarget(tempActor, tempActor.attackTarget));
+                break;
+        }
+    }
+
+    private void MoveAction()
+    {
+        if (ActorMoveable())
+        {
+            MoveAction();
+        }
+    }
+
+    private bool ActorMoveable()
+    {
+        // Don't move if you can't.
+        if (tempActor.currentPath.Count <= 0 || tempActor.currentPath[0] == tempActor.locationIndex || tempActor.health <= 0 || tempActor.actionsLeft <= 0)
+        {
+            return false;
+        }
+        // Don't move if you can attack your target.
+        if (CheckTargetInRange(tempActor, tempActor.attackTarget))
+        {
+            return false;
+        }
+        if (tempActor.currentPath.Contains(tempActor.locationIndex) && tempActor.turnPath.Count <= 0)
+        {
+            // Move to the next step on the path.
+            int cIndex = tempActor.currentPath.IndexOf(tempActor.locationIndex);
+            if (CheckDistance(tempActor.currentPath[cIndex-1]))
+            {
+                tempActor.turnPath.Add(tempActor.currentPath[cIndex-1]);
+                //locationIndex = currentPath[cIndex-1];
+                return true;
+            }
+        }
+        else if (tempActor.turnPath.Count > 0)
+        {
+            // Move to the next step on the path.
+            int cIndex = tempActor.currentPath.IndexOf(tempActor.turnPath[^1]);
+            // Don't move if you already reached the end.
+            if (cIndex <= 0)
+            {
+                return false;
+            }
+            if (CheckDistance(tempActor.currentPath[cIndex-1]))
+            {
+                tempActor.turnPath.Add(tempActor.currentPath[cIndex-1]);
+                return true;
+            }
+        }
+        else
+        {
+            // Start from the end of the path.
+            if (CheckDistance(tempActor.currentPath[^1]))
+            {
+                tempActor.turnPath.Add(tempActor.currentPath[^1]);
+                //locationIndex = currentPath[^1];
+                return true;
+            }
+        }
+        return false;
     }
 
     private void ActorAttackAction()
     {
         if (tempActor.health <= 0 || tempActor.actionsLeft <= 0){return;}
-        tempActor.NPCLoadSkill(1);
+        NPCLoadSkill(1);
         if (pathFinder.CalculateDistance(tempActor.locationIndex, tempActor.attackTarget.locationIndex) <= tempActor.currentAttackRange && tempActor.attackTarget.health > 0)
         {
             if (tempActor.attackTarget == null){return;}
@@ -167,6 +275,24 @@ public class BattleSimulator : MonoBehaviour
         CheckIfAttackAgain();
     }
 
+    private void NPCLoadSkill(int type)
+    {
+        string skillName = "";
+        switch (type)
+        {
+            case 0:
+                skillName = tempActor.npcMoveSkill;
+                break;
+            case 1:
+                skillName = tempActor.npcAttackSkill;
+                break;
+            case 2:
+                skillName = tempActor.npcSupportSkill;
+                break;
+        }
+        simulatedBattle.actorManager.LoadSkillData(tempActor.activeSkill, skillName);
+    }
+
     private void CheckIfAttackAgain()
     {
         if (tempActor.actionsLeft >= tempActor.actionsToAttack){ActorAttackAction();}
@@ -175,6 +301,7 @@ public class BattleSimulator : MonoBehaviour
     private void UpdateOccupiedTiles()
     {
         occupiedTiles = new List<int>(allUnoccupied);
+        aliveActors.Clear();
         if (started)
         {
             for (int i = 0; i < actors.Count; i++)
@@ -184,6 +311,7 @@ public class BattleSimulator : MonoBehaviour
                 {
                     continue;
                 }
+                aliveActors.Add(actors[i]);
                 occupiedTiles[actors[i].locationIndex] = i+1;
             }
             return;
@@ -192,12 +320,12 @@ public class BattleSimulator : MonoBehaviour
 
     public TacticActor FindNearestEnemy()
     {
-        return pathFinder.FindNearestEnemy(actors[turnIndex], actors);
+        return pathFinder.FindNearestEnemy(actors[turnIndex], aliveActors);
     }
 
     public TacticActor FindClosestEnemyInAttackRange()
     {
-        return pathFinder.FindClosestEnemyInAttackRange(actors[turnIndex], actors);
+        return pathFinder.FindClosestEnemyInAttackRange(actors[turnIndex], aliveActors);
     }
 
     public TacticActor ReturnActorOnTile(int tileNumber)
@@ -230,9 +358,9 @@ public class BattleSimulator : MonoBehaviour
         if (actors[turnIndex].activeSkill.lockOn == 1)
         {
             TacticActor skillTarget = ReturnActorOnTile(skillTargetLocation);
+            if (skillTarget == null){return;}
             string targetName = skillTarget.typeName;
             bool specialEffect = false;
-            Debug.Log(actors[turnIndex].typeName+" used "+actors[turnIndex].activeSkill.skillName+" on "+targetName+".");
             specialEffect = skillManager.ApplySkillEffect(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);
             if (specialEffect)
             {
@@ -296,5 +424,62 @@ public class BattleSimulator : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public bool CheckTargetInRange(TacticActor actor, TacticActor target)
+    {
+        int distance = 0;
+        if (actor.turnPath.Count > 0)
+        {
+            distance = pathFinder.CalculateDistance(actor.turnPath[^1], target.locationIndex);
+        }
+        else
+        {
+            distance = pathFinder.CalculateDistance(actor.locationIndex, target.locationIndex);
+        }
+        if (distance <= actor.currentAttackRange)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool CheckDistance(int index)
+    {
+        int distance = ReturnMoveCost(index, tempActor.movementType);
+        if (distance > tempActor.movement)
+        {
+            tempActor.CheckIfDistanceIsCoverable(distance);
+        }
+        if (distance <= tempActor.movement)
+        {
+            tempActor.movement -= distance;
+            return true;
+        }
+        return false;
+    }
+
+    public int ReturnMoveCost(int index, int moveType = 0)
+    {
+        int distance = 1;
+        switch (moveType)
+        {
+            case 0:
+                distance = pathFinder.terrainTile.ReturnMoveCost(terrainInfo[index], occupiedTiles[index]);
+                break;
+            case 1:
+                distance = pathFinder.terrainTile.ReturnFlyingMoveCost(terrainInfo[index], occupiedTiles[index]);
+                break;
+            case 2:
+                distance = pathFinder.terrainTile.ReturnRidingMoveCost(terrainInfo[index], occupiedTiles[index]);
+                break;
+            case 3:
+                distance = pathFinder.terrainTile.ReturnSwimmingMoveCost(terrainInfo[index], occupiedTiles[index]);
+                break;
+            case 4:
+                distance = pathFinder.terrainTile.ReturnScoutingMoveCost(terrainInfo[index], occupiedTiles[index]);
+                break;
+        }
+        return distance;   
     }
 }
