@@ -41,7 +41,7 @@ public class TacticActor : MonoBehaviour
     // 0 is offensive, 1 is passive, 2 is fleeing
     public int AIType = 0;
     private int destinationIndex;
-    private TacticActor attackTarget;
+    public TacticActor attackTarget;
     public SpriteRenderer spriteRenderer;
     // Path to target.
     public List<int> currentPath;
@@ -256,7 +256,7 @@ public class TacticActor : MonoBehaviour
         return (activeSkillNames[skillIndex]);
     }
 
-    private void NPCLoadSkill(int type)
+    public void NPCLoadSkill(int type)
     {
         // 0 = move, 1 = attack, 2 = support
         string skillName = "";
@@ -325,7 +325,7 @@ public class TacticActor : MonoBehaviour
         return false;
     }
 
-    private void AttackAction()
+    private void AttackAction(bool real = true)
     {
         if (actionsLeft < actionsToAttack || health <= 0){return;}
         NPCLoadSkill(1);
@@ -337,7 +337,7 @@ public class TacticActor : MonoBehaviour
             {
                 terrainMap.NPCActivateSkill(attackTarget.locationIndex);
                 ActivateSkill();
-                CheckIfAttackAgain();
+                CheckIfAttackAgain(real);
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
@@ -352,21 +352,21 @@ public class TacticActor : MonoBehaviour
             {
                 terrainMap.NPCActivateSkill(attackTarget.locationIndex);
                 ActivateSkill();
-                CheckIfAttackAgain();
+                CheckIfAttackAgain(real);
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
             actionsLeft -= actionsToAttack;
         }
         // Keep attacking until you're out of actions.
-        CheckIfAttackAgain();
+        CheckIfAttackAgain(real);
     }
 
-    private void CheckIfAttackAgain()
+    private void CheckIfAttackAgain(bool real = true)
     {
         if (actionsLeft >= actionsToAttack)
         {
-            AttackAction();
+            AttackAction(real);
         }
     }
 
@@ -392,7 +392,7 @@ public class TacticActor : MonoBehaviour
         }
     }
 
-    private void UpdateTarget(TacticActor newTarget)
+    public void UpdateTarget(TacticActor newTarget)
     {
         attackTarget = newTarget;
     }
@@ -402,13 +402,14 @@ public class TacticActor : MonoBehaviour
         terrainMap = newMap;
     }
 
-    private void GetPath()
+    public void GetPath()
     {
         currentPath = terrainMap.pathFinder.FindPathIndex(locationIndex, destinationIndex, movementType);
         turnPath.Clear();
     }
 
-    public void NPCStartTurn()
+    // Can skip some steps in simulated battles.
+    public void NPCStartTurn(bool real = true)
     {
         if (AIType == 1)
         {
@@ -416,23 +417,27 @@ public class TacticActor : MonoBehaviour
             return;
         }
         // Pick a target, based on goals.
-        CheckGoal();
+        CheckGoal(real);
         GetPath();
         MoveAction();
+        MoveAlongPath(real);
         // Check dps skill.
-        AttackAction();
+        AttackAction(real);
         SupportAction();
     }
 
-    private void CheckGoal()
+    private void CheckGoal(bool real = true)
     {
         // Randomly move around if you don't have a target.
         // Look for a target in range.
-        UpdateTarget(terrainMap.FindClosestEnemyInAttackRange());
-        // Otherwise go for the closest enemy.
-        if (attackTarget == null)
+        if (real)
         {
-            UpdateTarget(terrainMap.FindNearestEnemy());
+            UpdateTarget(terrainMap.FindClosestEnemyInAttackRange());
+            // Otherwise go for the closest enemy.
+            if (attackTarget == null)
+            {
+                UpdateTarget(terrainMap.FindNearestEnemy());
+            }
         }
         switch (AIType)
         {
@@ -464,16 +469,12 @@ public class TacticActor : MonoBehaviour
         destinationIndex = newDest;
     }
 
-    public void MoveAction()
+    public void MoveAction(bool real = true)
     {
         if (Moveable())
         {
             MoveAction();
             //terrainMap.UpdateOnActorTurn();
-        }
-        if (turnPath.Count > 0)
-        {
-            StartCoroutine(ShowMovementPath());
         }
         /*else
         {
@@ -489,6 +490,19 @@ public class TacticActor : MonoBehaviour
                 }
             }
         }*/
+    }
+
+    public void MoveAlongPath(bool real = true)
+    {
+        if (turnPath.Count > 0)
+        {
+            if (!real)
+            {
+                locationIndex = turnPath[^1];
+                return;
+            }
+            StartCoroutine(ShowMovementPath());
+        }
     }
 
     IEnumerator ShowMovementPath()

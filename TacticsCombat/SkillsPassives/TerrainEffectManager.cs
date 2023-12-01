@@ -18,7 +18,18 @@ public class TerrainEffectManager : MonoBehaviour
     {
         Debug.Log(actor.typeName+" is on a chasm.");
         // Fly or die.
-        if (actor.movementType == 1){return;}
+        if (actor.movementType == 1)
+        {
+            // If fliers run out of energy they die.
+            if (actor.energy <= 0)
+            {
+                actor.ReceiveDamage(actor.health + actor.defense);
+            }
+            else
+            {
+                actor.LoseEnergy(2);
+            }
+        }
         else
         {
             actor.ReceiveDamage(actor.health + actor.defense);

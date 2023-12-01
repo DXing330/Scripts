@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class TerrainMap : MonoBehaviour
 {
+    public BattleSimulator simulator;
     public bool battleStarted = false;
     public bool auto = false;
     protected int startIndex;
@@ -75,6 +76,7 @@ public class TerrainMap : MonoBehaviour
     protected void Start()
     {
         actorManager.GetActorData();
+        actorManager.skillData.LoadAllData();
         if (GameManager.instance.randomBattle > 0)
         {
             terrainInfo = GameManager.instance.fixedBattleTerrain;
@@ -99,6 +101,8 @@ public class TerrainMap : MonoBehaviour
         UpdateMap();
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
         fixedCenter=fullSize*fullSize/2;
+        simulator.UpdateSimulation();
+        simulator.RunNSimulations();
     }
 
     private void CheckWinners()

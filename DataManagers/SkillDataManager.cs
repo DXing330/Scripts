@@ -22,6 +22,11 @@ public class SkillDataManager : MonoBehaviour
 
     void Start()
     {
+        LoadAllData();
+    }
+
+    public void LoadAllData()
+    {
         string[] configBlocks = configData.Split("#");
         skillClass = configBlocks[0].Split("|").ToList();
         skillNames = configBlocks[1].Split("|").ToList();
