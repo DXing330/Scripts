@@ -43,7 +43,10 @@ public class TacticActor : MonoBehaviour
     private int destinationIndex;
     private TacticActor attackTarget;
     public SpriteRenderer spriteRenderer;
+    // Path to target.
     public List<int> currentPath;
+    // Tiles moved on turn.
+    public List<int> turnPath;
     public TerrainMap terrainMap;
     public List<string> buffDebuffNames;
     public List<int> buffDebuffsDurations;
@@ -129,7 +132,6 @@ public class TacticActor : MonoBehaviour
         currentMovespeed = baseMovement;
         currentAttackRange = attackRange;
         energy = Mathf.Min(energy+1, baseEnergy);
-        initiative = baseInitiative + Random.Range(-1,1);
         ApplyBuffDebuffEffects();
         movement = 0;
     }
@@ -403,6 +405,7 @@ public class TacticActor : MonoBehaviour
     private void GetPath()
     {
         currentPath = terrainMap.pathFinder.FindPathIndex(locationIndex, destinationIndex, movementType);
+        turnPath.Clear();
     }
 
     public void NPCStartTurn()
@@ -466,7 +469,11 @@ public class TacticActor : MonoBehaviour
         if (Moveable())
         {
             MoveAction();
-            terrainMap.UpdateOnActorTurn();
+            //terrainMap.UpdateOnActorTurn();
+        }
+        if (turnPath.Count > 0)
+        {
+            StartCoroutine(ShowMovementPath());
         }
         /*else
         {
@@ -484,23 +491,51 @@ public class TacticActor : MonoBehaviour
         }*/
     }
 
+    IEnumerator ShowMovementPath()
+    {
+        for (int i = 0; i < turnPath.Count; i++)
+        {
+            locationIndex = turnPath[i];
+            terrainMap.UpdateOnActorTurn();
+            yield return new WaitForSeconds(.1f);
+        }
+    }
+
     private bool Moveable()
     {
+        // Don't move if you can't.
         if (currentPath.Count <= 0 || currentPath[0] == locationIndex || health <= 0 || actionsLeft <= 0)
         {
             return false;
         }
+        // Don't move if you can attack your target.
         if (terrainMap.CheckTargetInRange(this, attackTarget))
         {
             return false;
         }
-        if (currentPath.Contains(locationIndex))
+        if (currentPath.Contains(locationIndex) && turnPath.Count <= 0)
         {
             // Move to the next step on the path.
             int cIndex = currentPath.IndexOf(locationIndex);
             if (CheckDistance(currentPath[cIndex-1]))
             {
-                locationIndex = currentPath[cIndex-1];
+                turnPath.Add(currentPath[cIndex-1]);
+                //locationIndex = currentPath[cIndex-1];
+                return true;
+            }
+        }
+        else if (turnPath.Count > 0)
+        {
+            // Move to the next step on the path.
+            int cIndex = currentPath.IndexOf(turnPath[^1]);
+            // Don't move if you already reached the end.
+            if (cIndex <= 0)
+            {
+                return false;
+            }
+            if (CheckDistance(currentPath[cIndex-1]))
+            {
+                turnPath.Add(currentPath[cIndex-1]);
                 return true;
             }
         }
@@ -509,7 +544,8 @@ public class TacticActor : MonoBehaviour
             // Start from the end of the path.
             if (CheckDistance(currentPath[^1]))
             {
-                locationIndex = currentPath[^1];
+                turnPath.Add(currentPath[^1]);
+                //locationIndex = currentPath[^1];
                 return true;
             }
         }

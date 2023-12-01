@@ -61,7 +61,6 @@ public class TerrainMap : MonoBehaviour
         if (!battleStarted)
         {
             auto = true;
-            actorManager.LoadPlayerTeam();
             StartBattle();
         }
         else
@@ -75,7 +74,6 @@ public class TerrainMap : MonoBehaviour
 
     protected void Start()
     {
-        Application.targetFrameRate = 30;
         actorManager.GetActorData();
         if (GameManager.instance.randomBattle > 0)
         {
@@ -96,6 +94,7 @@ public class TerrainMap : MonoBehaviour
             GenerateMap(baseTerrain, fullSize);
             actorManager.LoadEnemyTeam();
         }
+        actorManager.LoadPlayerTeam();
         UpdateCenterTile((fullSize * fullSize)/2);
         UpdateMap();
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
@@ -146,8 +145,6 @@ public class TerrainMap : MonoBehaviour
             roundIndex++;
             SortByInitiative();
         }
-        //CheckWinners();
-        //if (!battleStarted){return;}
         ClearHighlightedTiles();
         ActorsTurn();
     }
@@ -538,7 +535,15 @@ public class TerrainMap : MonoBehaviour
 
     public bool CheckTargetInRange(TacticActor actor, TacticActor target)
     {
-        int distance = pathFinder.CalculateDistance(actor.locationIndex, target.locationIndex);
+        int distance = 0;
+        if (actor.turnPath.Count > 0)
+        {
+            distance = pathFinder.CalculateDistance(actor.turnPath[^1], target.locationIndex);
+        }
+        else
+        {
+            distance = pathFinder.CalculateDistance(actor.locationIndex, target.locationIndex);
+        }
         if (distance <= actor.currentAttackRange)
         {
             return true;
