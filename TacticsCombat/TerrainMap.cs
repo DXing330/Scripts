@@ -42,6 +42,7 @@ public class TerrainMap : MonoBehaviour
     public List<Sprite> tileSprites;
     public List<TacticActor> actors;
     public List<TacticActor> allActors;
+    public List<TacticActor> aliveActors;
     public ActorManager actorManager;
     public MoveManager moveManager;
     public SkillEffectManager skillManager;
@@ -103,7 +104,8 @@ public class TerrainMap : MonoBehaviour
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
         UpdateCenterTile(((fullSize) * fullSize)/2);
         UpdateMap();
-        fixedCenter=(fullSize)*fullSize/2;
+        if (fullSize <= gridSize){lockedView = true;}
+        fixedCenter=fullSize*fullSize/2;
         simulator.UpdateSimulation();
         simulator.RunNSimulations();
         actionLog.ClearActionLog();
@@ -141,7 +143,15 @@ public class TerrainMap : MonoBehaviour
 
     private void SortByInitiative()
     {
-        actors = turnOrder.InitiativeThreadedByTeam(allActors);
+        aliveActors.Clear();
+        for (int i = 0; i < allActors.Count; i++)
+        {
+            if (allActors[i].health > 0)
+            {
+                aliveActors.Add(allActors[i]);
+            }
+        }
+        actors = turnOrder.InitiativeThreadedByTeam(aliveActors);
         UpdateOccupiedTiles();
     }
 
@@ -154,7 +164,7 @@ public class TerrainMap : MonoBehaviour
         turnIndex++;
         if (turnIndex >= actors.Count)
         {
-            RemoveActors();
+            //RemoveActors();
             turnIndex = 0;
             roundIndex++;
             SortByInitiative();
@@ -182,7 +192,7 @@ public class TerrainMap : MonoBehaviour
         UpdateCenterTile(actors[turnIndex].locationIndex);
         UpdateMap();
         actors[turnIndex].StartTurn();
-        if (actors[turnIndex].team > 0 || auto)
+        if (actors[turnIndex].team > 0 || (auto))
         {
             NPCActorsTurn();
         }
@@ -832,19 +842,11 @@ public class TerrainMap : MonoBehaviour
     {
         for (int i = 0; i < allActors.Count; i++)
         {
-            if (allActors[i].health <= 0)
+            if (allActors[i].health <= 0 && allActors[i].team == 0)
             {
-                if (allActors[i].team != 0)
-                {
-                    actorManager.GetDrops(allActors[i]);
-                }
-                else
-                {
-                    actorManager.RemoveFromPlayerTeam(allActors[i]);
-                }
+                actorManager.RemoveFromPlayerTeam(allActors[i]);
                 allActors.RemoveAt(i);
             }
-            UpdateMap();
         }
         // If you win make sure you collect the drops from all the enemies.
         // This is not needed on some maps and my be causing bugs elsewhere.
@@ -857,6 +859,7 @@ public class TerrainMap : MonoBehaviour
                     actorManager.GetDrops(allActors[i]);
                 }
             }
+            allActors.Clear();
         }
     }
 

@@ -338,7 +338,7 @@ public class TacticActor : MonoBehaviour
         return false;
     }
 
-    public void AttackAction(bool real = true)
+    public void AttackAction()
     {
         if (actionsLeft < actionsToAttack || health <= 0){return;}
         NPCLoadSkill(1);
@@ -350,7 +350,7 @@ public class TacticActor : MonoBehaviour
             {
                 terrainMap.NPCActivateSkill(attackTarget.locationIndex);
                 ActivateSkill();
-                CheckIfAttackAgain(real);
+                CheckIfAttackAgain();
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
@@ -365,21 +365,21 @@ public class TacticActor : MonoBehaviour
             {
                 terrainMap.NPCActivateSkill(attackTarget.locationIndex);
                 ActivateSkill();
-                CheckIfAttackAgain(real);
+                CheckIfAttackAgain();
                 return;
             }
             terrainMap.NPCActorAttack(attackTarget);
             actionsLeft -= actionsToAttack;
         }
         // Keep attacking until you're out of actions.
-        CheckIfAttackAgain(real);
+        CheckIfAttackAgain();
     }
 
-    public void CheckIfAttackAgain(bool real = true)
+    public void CheckIfAttackAgain()
     {
         if (actionsLeft >= actionsToAttack)
         {
-            AttackAction(real);
+            AttackAction();
         }
     }
 
@@ -433,10 +433,11 @@ public class TacticActor : MonoBehaviour
         CheckGoal();
         GetPath();
         MoveAction();
-        MoveAlongPath(real);
+        MoveAlongPath(false);
         // Check dps skill.
-        AttackAction(real);
+        AttackAction();
         SupportAction();
+        MoveAlongPath(real);
     }
 
     public void CheckGoal()
@@ -484,7 +485,6 @@ public class TacticActor : MonoBehaviour
         if (Moveable())
         {
             MoveAction();
-            //terrainMap.UpdateOnActorTurn();
         }
         /*else
         {
@@ -626,9 +626,9 @@ public class TacticActor : MonoBehaviour
     {
         if (current)
         {
-            return movement + (currentMovespeed * (actionsLeft - 1));
+            return movement + (currentMovespeed * (actionsLeft - actionsToAttack));
         }
-        return currentMovespeed * (baseActions - 1);
+        return currentMovespeed * (baseActions - actionsToAttack);
     }
 
     public void UseActionsOnMovement()
