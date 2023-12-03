@@ -123,6 +123,11 @@ public class GameManager : MonoBehaviour
         }
         player.UpdateStats();
         familiar.UpdateStats();
+        RefreshForestMaps();
+    }
+
+    public void RefreshForestMaps()
+    {
         if (File.Exists(saveDataPath+"/Maps_1.txt"))
         {
             forestFixedTerrains = File.ReadAllText(saveDataPath+"/Maps_1.txt").Split("#").ToList();

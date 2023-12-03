@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveMapJoystick : BasicJoystick
+public class MapEditorJoystick : BasicJoystick
 {
-    public TerrainMap map;
+    public MapEditor map;
 
     protected override void MoveHorizontally(int x)
     {

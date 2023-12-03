@@ -115,6 +115,17 @@ public class MapEditor : Map
         File.WriteAllText(saveDataPath+"/Maps_"+baseTerrain+".txt", allMaps);
     }
 
+    public void DeleteMap()
+    {
+        // Can't delete the last map.
+        if (allMapsList.Count <= 1){return;}
+        if (mapIndex < 0){return;}
+        allMapsList.RemoveAt(mapIndex);
+        allMaps = GameManager.instance.ConvertListToString(allMapsList, "#");
+        File.WriteAllText(saveDataPath+"/Maps_"+baseTerrain+".txt", allMaps);
+        ChangeIndex();
+    }
+
     public void NewMap()
     {
         mapIndex = -1;
