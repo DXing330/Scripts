@@ -241,15 +241,12 @@ public class ActorManager : MonoBehaviour
 
     private void ClaimDrops()
     {
-        //Debug.Log("G:"+GameManager.instance.goldCoins+", M:"+GameManager.instance.manaCrystals+", B:"+GameManager.instance.bloodCrystals);
-        //Debug.Log("+G:"+collectedGold+", +M:"+collectedMana+", +B:"+collectedBlood);
         GameManager.instance.GainResource(0, collectedBlood);
         GameManager.instance.GainResource(1, collectedMana);
         GameManager.instance.GainResource(2, collectedGold);
         GameManager.instance.recentlyGainedBlood = collectedBlood;
         GameManager.instance.recentlyGainedMana = collectedMana;
         GameManager.instance.recentlyGainedGold = collectedGold;
-        //Debug.Log("After; G:"+GameManager.instance.goldCoins+", M:"+GameManager.instance.manaCrystals+", B:"+GameManager.instance.bloodCrystals);
         GameManager.instance.recentlyWon = 1;
     }
 

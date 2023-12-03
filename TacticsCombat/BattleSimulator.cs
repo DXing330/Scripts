@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class BattleSimulator : MonoBehaviour
 {
     public TerrainMap simulatedBattle;
+    public TMP_Text winChance;
     public List<int> terrainInfo;
     public List<int> allUnoccupied;
     public List<int> occupiedTiles;
@@ -47,6 +49,11 @@ public class BattleSimulator : MonoBehaviour
         }
     }
 
+    public void ResetWinChanceText()
+    {
+        winChance.text = "Auto";
+    }
+
     public void RunNSimulations(int n = 20)
     {
         for (int i = 0; i < n; i++)
@@ -69,7 +76,7 @@ public class BattleSimulator : MonoBehaviour
                 plays++;
             }
         }
-        Debug.Log(wins*100/plays);
+        winChance.text = "Auto"+"\n"+"(Win:~"+(wins*100/plays)+"% )";
         for (int i = 0; i < allActors.Count; i++)
         {
             Destroy(allActors[i].gameObject);
@@ -110,11 +117,6 @@ public class BattleSimulator : MonoBehaviour
             if (winners == 0)
             {
                 wins++;
-                Debug.Log("Wins: "+wins);
-                for (int i = actionLog.actionLog.Count-1; i > 0; i--)
-                {
-                    Debug.Log(actionLog.actionLog[i]);
-                }
             }
             plays++;
         }

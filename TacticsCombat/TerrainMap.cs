@@ -54,6 +54,7 @@ public class TerrainMap : MonoBehaviour
 
     public void StartBattle()
     {
+        simulator.ResetWinChanceText();
         battleStarted = true;
         SortByInitiative();
         ActorsTurn();
@@ -734,8 +735,6 @@ public class TerrainMap : MonoBehaviour
         int defenderLocation = defender.locationIndex;
         int range = defender.currentAttackRange;
         int distance = pathFinder.CalculateDistance(defenderLocation, attackerLocation);
-        Debug.Log("Attacker: "+actors[turnIndex].typeName+", Range: "+actors[turnIndex].currentAttackRange);
-        Debug.Log("Defender: "+defender.typeName+", Range: "+defender.currentAttackRange);
         return (distance <= range);
     }
 
