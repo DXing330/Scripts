@@ -9,6 +9,7 @@ public class TerrainMap : MonoBehaviour
     public BattleSimulator simulator;
     public bool battleStarted = false;
     public bool auto = false;
+    public bool paused = false;
     protected int startIndex;
     protected int cornerColumn;
     protected int cornerRow;
@@ -46,6 +47,7 @@ public class TerrainMap : MonoBehaviour
     public SkillEffectManager skillManager;
     public TacticActorInfo actorInfo;
     public TurnOrderPanel turnOrder;
+    public ActionLog actionLog;
     public ActionManager actionManager;
     public TerrainEffectManager terrainEffectManager;
 
@@ -68,7 +70,7 @@ public class TerrainMap : MonoBehaviour
         {
             if (actors[turnIndex].team == 0)
             {
-                NPCActorsTurn();
+                NPCActorsTurn(false);
             }
         }
     }
@@ -103,10 +105,17 @@ public class TerrainMap : MonoBehaviour
         fixedCenter=(fullSize)*fullSize/2;
         simulator.UpdateSimulation();
         simulator.RunNSimulations();
+        actionLog.ClearActionLog();
     }
 
     private void CheckWinners()
     {
+        // Some kind of turn limit.
+        if (roundIndex > 99)
+        {
+            actorManager.ReturnToHub(false);
+            return;
+        }
         // If you delay turn then the turnIndex might go negative which messes things up.
         if (turnIndex < 0){return;}
         int winners = actorManager.WinningTeam();
@@ -330,9 +339,10 @@ public class TerrainMap : MonoBehaviour
         if (actors[turnIndex].activeSkill.lockOn == 1)
         {
             TacticActor skillTarget = ReturnActorOnTile(skillTargetLocation);
+            if (skillTarget == null){return;}
             string targetName = skillTarget.typeName;
             bool specialEffect = false;
-            Debug.Log(actors[turnIndex].typeName+" used "+actors[turnIndex].activeSkill.skillName+" on "+targetName+".");
+            actionLog.AddSkillAction(actors[turnIndex], skillTarget);
             specialEffect = skillManager.ApplySkillEffect(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);
             if (specialEffect)
             {
@@ -347,10 +357,10 @@ public class TerrainMap : MonoBehaviour
         switch (actors[turnIndex].activeSkill.effect)
         {
             case "Battle":
-                BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower);
+                BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower, false);
                 break;
             case "Battle+Status":
-                BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower);
+                BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower, false);
                 break;
             case "Summon":
                 SummonSkillActivate(targetableTiles[currentTarget]);
@@ -561,9 +571,14 @@ public class TerrainMap : MonoBehaviour
         UpdateMap();
     }
 
-    private void BattleBetweenActors(TacticActor attacker, TacticActor defender, int skillMultiplier = 0)
+    private void BattleBetweenActors(TacticActor attacker, TacticActor defender, int skillMultiplier = 0, bool actionText = true)
     {
-        bool attackerDied = actorManager.BattleBetweenActors(attacker, defender, Counterable(attacker.locationIndex, defender), DetermineFlanking(defender), skillMultiplier);
+        if (actionText)
+        {
+            actionLog.AddActionLog(attacker.typeName+" attacks "+defender.typeName+".");
+        }
+        // If you don't use the action text them it must be a skill that triggered the battle.
+        bool attackerDied = actorManager.BattleBetweenActors(attacker, defender, Counterable(attacker, defender, !actionText), DetermineFlanking(defender), skillMultiplier);
         if (attackerDied && attacker.team == 0)
         {
             ActorStopMoving();
@@ -585,7 +600,7 @@ public class TerrainMap : MonoBehaviour
         actors[turnIndex].actionsLeft--;
         // Find if they can counter attack.
         TacticActor target = ReturnCurrentTarget();
-        bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex].locationIndex, target), DetermineFlanking(target));
+        bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex], target), DetermineFlanking(target));
         // If they die while attacking, automatically end their turn.
         if (attackerDied || actors[turnIndex].actionsLeft <= 0)
         {
@@ -708,11 +723,19 @@ public class TerrainMap : MonoBehaviour
         ViewActorInfo(right);
     }
 
-    private bool Counterable(int attackerLocation, TacticActor defender)
+    private bool Counterable(TacticActor attacker, TacticActor defender, bool skill = false)
     {
+        // If they have the same attack range just counter.
+        if (!skill && attacker.currentAttackRange <= defender.currentAttackRange)
+        {
+            return true;
+        }
+        int attackerLocation = attacker.locationIndex;
         int defenderLocation = defender.locationIndex;
         int range = defender.currentAttackRange;
         int distance = pathFinder.CalculateDistance(defenderLocation, attackerLocation);
+        Debug.Log("Attacker: "+actors[turnIndex].typeName+", Range: "+actors[turnIndex].currentAttackRange);
+        Debug.Log("Defender: "+defender.typeName+", Range: "+defender.currentAttackRange);
         return (distance <= range);
     }
 
@@ -725,9 +748,10 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
-    private void NPCActorsTurn()
+    private void NPCActorsTurn(bool npc = true)
     {
-        actors[turnIndex].NPCStartTurn();
+        if (auto){npc = false;}
+        actors[turnIndex].NPCStartTurn(npc);
         NextTurn();
     }
 

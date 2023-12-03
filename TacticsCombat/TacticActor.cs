@@ -102,9 +102,13 @@ public class TacticActor : MonoBehaviour
         attackRange = actorToCopy.attackRange;
         movementType = actorToCopy.movementType;
         activeSkillNames = actorToCopy.activeSkillNames;
+        npcMoveSkill = actorToCopy.npcMoveSkill;
+        npcAttackSkill = actorToCopy.npcAttackSkill;
+        npcSupportSkill = actorToCopy.npcSupportSkill;
         size = actorToCopy.size;
         species = actorToCopy.species;
         baseInitiative = actorToCopy.baseInitiative;
+        terrainMap = actorToCopy.terrainMap;
         SetSprite(actorToCopy.spriteRenderer.sprite);
     }
 
@@ -190,16 +194,19 @@ public class TacticActor : MonoBehaviour
             return;
         }
         health -= Mathf.Max(amount - defense, 1);
+        terrainMap.actionLog.AddActionLog(typeName+" takes "+Mathf.Max(amount - defense, 1)+" DMG.");
         ChangeAI();
         if (health <= 0)
         {
             Death(real);
         }
+        
     }
 
     public void RegainHealth(int amount)
     {
         health += amount;
+        terrainMap.actionLog.AddActionLog(typeName+" regains "+amount+" HP.");
         ChangeAI();
         if (health > baseHealth)
         {
@@ -423,7 +430,7 @@ public class TacticActor : MonoBehaviour
             return;
         }
         // Pick a target, based on goals.
-        CheckGoal(real);
+        CheckGoal();
         GetPath();
         MoveAction();
         MoveAlongPath(real);
@@ -432,18 +439,15 @@ public class TacticActor : MonoBehaviour
         SupportAction();
     }
 
-    public void CheckGoal(bool real = true)
+    public void CheckGoal()
     {
         // Randomly move around if you don't have a target.
         // Look for a target in range.
-        if (real)
+        UpdateTarget(terrainMap.FindClosestEnemyInAttackRange());
+        // Otherwise go for the closest enemy.
+        if (attackTarget == null)
         {
-            UpdateTarget(terrainMap.FindClosestEnemyInAttackRange());
-            // Otherwise go for the closest enemy.
-            if (attackTarget == null)
-            {
-                UpdateTarget(terrainMap.FindNearestEnemy());
-            }
+            UpdateTarget(terrainMap.FindNearestEnemy());
         }
         switch (AIType)
         {
@@ -513,12 +517,14 @@ public class TacticActor : MonoBehaviour
 
     IEnumerator ShowMovementPath()
     {
+        //terrainMap.paused = true;
         for (int i = 0; i < turnPath.Count; i++)
         {
             locationIndex = turnPath[i];
             terrainMap.UpdateOnActorTurn();
             yield return new WaitForSeconds(.1f);
         }
+        //terrainMap.paused = false;
     }
 
     public bool Moveable()

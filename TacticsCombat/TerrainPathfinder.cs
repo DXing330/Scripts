@@ -33,6 +33,7 @@ public class TerrainPathfinder : MonoBehaviour
     // Reachable tiles.
     public List<int> reachableTiles;
     public List<int> attackableTiles;
+    public List<int> possibleTiles;
 
     public void SetTerrainInfo(List<int> newTerrain, int size, List<int> newOccupied)
     {
@@ -478,9 +479,9 @@ public class TerrainPathfinder : MonoBehaviour
 
     public TacticActor FindNearestEnemy(TacticActor currentActor, List<TacticActor> allActors)
     {
+        possibleTiles.Clear();
         int location = currentActor.locationIndex;
         int distance = bigInt;
-        int targetIndex = 0;
         for (int i = 0; i < allActors.Count; i++)
         {
             if (allActors[i].team != currentActor.team)
@@ -488,17 +489,24 @@ public class TerrainPathfinder : MonoBehaviour
                 int distanceToEnemy = CalculateDistance(location, allActors[i].locationIndex);
                 if (distanceToEnemy < distance)
                 {
+                    possibleTiles.Clear();
+                    possibleTiles.Add(i);
                     distance = distanceToEnemy;
-                    targetIndex = i;
+                }
+                else if (distanceToEnemy == distance)
+                {
+                    possibleTiles.Add(i);
                 }
             }
         }
-        return allActors[targetIndex];
+        if (possibleTiles.Count <= 0){return null;}
+        int rng = Random.Range(0, possibleTiles.Count);
+        return allActors[possibleTiles[rng]];
     }
 
     public TacticActor FindClosestEnemyInAttackRange(TacticActor currentActor, List<TacticActor> allActors)
     {
-        int targetIndex = -1;
+        possibleTiles.Clear();
         int targetDistance = bigInt;
         int currentDistance = bigInt;
         int location = currentActor.locationIndex;
@@ -514,20 +522,28 @@ public class TerrainPathfinder : MonoBehaviour
                 currentDistance = CalculateDistance(location, allActors[i].locationIndex);
                 if (currentDistance < targetDistance)
                 {
-                    targetIndex = i;
+                    possibleTiles.Clear();
+                    possibleTiles.Add(i);
                     targetDistance = currentDistance;
+                }
+                else if (currentDistance == targetDistance)
+                {
+                    possibleTiles.Add(i);
                 }
             }
         }
-        if (targetIndex >= 0)
+        if (possibleTiles.Count > 0)
         {
-            return allActors[targetIndex];
+            int rng = Random.Range(0, possibleTiles.Count);
+            return allActors[possibleTiles[rng]];
         }
         return null;
     }
 
     public int FindFurthestTileFromTarget(TacticActor currentActor, TacticActor target)
     {
+        // Keep track of options.
+        possibleTiles.Clear();
         // Get the reachable tiles.
         int awayFrom = target.locationIndex;
         int destination = currentActor.locationIndex;
@@ -541,8 +557,18 @@ public class TerrainPathfinder : MonoBehaviour
             if (tempDist > distance)
             {
                 distance = tempDist;
-                destination = reachableTiles[i];
+                possibleTiles.Clear();
+                possibleTiles.Add(reachableTiles[i]);
             }
+            if (tempDist == distance)
+            {
+                possibleTiles.Add(reachableTiles[i]);
+            }
+        }
+        if (possibleTiles.Count > 0)
+        {
+            int rng = Random.Range(0, possibleTiles.Count);
+            return possibleTiles[rng];
         }
         return destination;
     }

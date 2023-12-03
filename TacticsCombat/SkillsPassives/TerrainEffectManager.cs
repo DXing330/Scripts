@@ -16,7 +16,6 @@ public class TerrainEffectManager : MonoBehaviour
 
     private void ChasmTerrain(TacticActor actor)
     {
-        Debug.Log(actor.typeName+" is on a chasm.");
         // Fly or die.
         if (actor.movementType == 1)
         {

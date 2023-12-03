@@ -15,6 +15,7 @@ public class BattleSimulator : MonoBehaviour
     public MoveManager moveManager;
     public SkillEffectManager skillManager;
     public TurnOrderPanel turnOrder;
+    public ActionLog actionLog;
     public ActionManager actionManager;
     public TerrainEffectManager terrainEffectManager;
     public int turnIndex = 0;
@@ -32,6 +33,7 @@ public class BattleSimulator : MonoBehaviour
         moveManager = simulatedBattle.moveManager;
         skillManager = simulatedBattle.skillManager;
         turnOrder = simulatedBattle.turnOrder;
+        actionLog = simulatedBattle.actionLog;
         actionManager = simulatedBattle.actionManager;
         terrainEffectManager = simulatedBattle.terrainEffectManager;
     }
@@ -45,9 +47,8 @@ public class BattleSimulator : MonoBehaviour
         }
     }
 
-    public void RunNSimulations(int n = 10)
+    public void RunNSimulations(int n = 20)
     {
-        Debug.Log("Starting "+n+" simulations.");
         for (int i = 0; i < n; i++)
         {
             ResetSimulation();
@@ -69,13 +70,23 @@ public class BattleSimulator : MonoBehaviour
             }
         }
         Debug.Log(wins*100/plays);
+        for (int i = 0; i < allActors.Count; i++)
+        {
+            Destroy(allActors[i].gameObject);
+        }
+        for (int i = 0; i < actors.Count; i++)
+        {
+            Destroy(actors[i].gameObject);
+        }
     }
 
     private void ResetSimulation()
     {
+        actionLog.ClearActionLog();
+        allActors = turnOrder.InitiativeThreadedByTeam(allActors);
         for (int i = 0; i < actors.Count; i++)
         {
-            Destroy(actors[i]);
+            Destroy(actors[i].gameObject);
         }
         actors.Clear();
         for (int i = 0; i < allActors.Count; i++)
@@ -87,17 +98,23 @@ public class BattleSimulator : MonoBehaviour
     private void StartSimulation()
     {
         started = true;
+        actors = turnOrder.InitiativeThreadedByTeam(actors);
     }
 
     private void CheckWinners(bool write = false)
     {
         int winners = WinningTeam(write);
-        if (winners >= 0)
+        if (winners >= 0 && started)
         {
             started = false;
             if (winners == 0)
             {
                 wins++;
+                Debug.Log("Wins: "+wins);
+                for (int i = actionLog.actionLog.Count-1; i > 0; i--)
+                {
+                    Debug.Log(actionLog.actionLog[i]);
+                }
             }
             plays++;
         }
@@ -109,10 +126,6 @@ public class BattleSimulator : MonoBehaviour
         int teamZeroCount = 0;
         for (int i = 0; i < actors.Count; i++)
         {
-            /*if (write)
-            {
-                Debug.Log(actors[i].typeName+": "+actors[i].health);
-            }*/
             if (actors[i].health <= 0){continue;}
             switch (actors[i].team)
             {
@@ -152,14 +165,24 @@ public class BattleSimulator : MonoBehaviour
             tempActor.UpdateTarget(FindNearestEnemy());
         }
         ActorUpdateDestination();
-        //Debug.Log("Start: "+tempActor.locationIndex);
         tempActor.currentPath = pathFinder.FindPathIndex(tempActor.locationIndex, tempActor.destinationIndex, tempActor.movementType);
         tempActor.turnPath.Clear();
         MoveAction();
         tempActor.MoveAlongPath(false);
-        //Debug.Log("Fin: "+tempActor.locationIndex);
         ActorAttackAction();
+        ActorSupportAction();
         CheckWinners();
+    }
+
+    private void ActorSupportAction()
+    {
+        if (tempActor.actionsLeft <= 0 || tempActor.health <= 0){return;}
+        NPCLoadSkill(2);
+        if (tempActor.CheckSkillActivatable())
+        {
+            NPCActivateSkill(tempActor.locationIndex);
+            tempActor.ActivateSkill();
+        }
     }
 
     private void ActorUpdateDestination()
@@ -361,6 +384,7 @@ public class BattleSimulator : MonoBehaviour
             if (skillTarget == null){return;}
             string targetName = skillTarget.typeName;
             bool specialEffect = false;
+            actionLog.AddSkillAction(actors[turnIndex], skillTarget);
             specialEffect = skillManager.ApplySkillEffect(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);
             if (specialEffect)
             {
