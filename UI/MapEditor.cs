@@ -65,6 +65,11 @@ public class MapEditor : Map
         UpdateMap();
     }
 
+    public void StopEditingMaps()
+    {
+        GameManager.instance.RefreshForestMaps();
+    }
+
     protected override void Start()
     {
         UpdateBaseTerrains();
