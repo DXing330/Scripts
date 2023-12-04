@@ -10,7 +10,7 @@ public class EquipmentSelectGUI : MonoBehaviour
     {
         if (inner)
         {
-            if (selectedActor < 0 || currentActorPage*actors.Count+selectedActor >= playerActors.Count){return;}
+            if (selectedActor < 0 || selectedActor >= playerActors.Count){return;}
             animator.SetTrigger("ChangeEquip");
             UpdateEquippedPanel();
             selectedEquipType = -1;
@@ -19,6 +19,7 @@ public class EquipmentSelectGUI : MonoBehaviour
         else
         {
             animator.SetTrigger("ViewEquip");
+            UpdateStatsPanel();
         }
     }
     public EquipmentData equipData;
@@ -53,8 +54,9 @@ public class EquipmentSelectGUI : MonoBehaviour
 
     public void SelectSpot(int selectedIndex)
     {
-        if (selectedActor == selectedIndex){selectedActor = -1;}
-        else {selectedActor = selectedIndex;}
+        int index = selectedIndex+currentActorPage*actors.Count;
+        if (selectedActor == index){selectedActor = -1;}
+        else {selectedActor = index;}
         UpdateActorPanels();
         UpdateStatsPanel();
     }
@@ -97,8 +99,8 @@ public class EquipmentSelectGUI : MonoBehaviour
     private void UpdateStatsPanel()
     {
         ResetStatsPanel();
-        if (selectedActor < 0 || currentActorPage*actors.Count+selectedActor >= playerActors.Count){return;}
-        PlayerActor currentActor = playerActors[currentActorPage*actors.Count+selectedActor];
+        if (selectedActor < 0 || selectedActor >= playerActors.Count){return;}
+        PlayerActor currentActor = playerActors[selectedActor];
         currentActor.allEquipment.UpdateStats();
         List<int> currentBaseStats = currentActor.ReturnStatList();
         List<int> currentEquipStats = currentActor.allEquipment.ReturnStatList();
@@ -112,8 +114,8 @@ public class EquipmentSelectGUI : MonoBehaviour
     // Images corresponding to the equipment an actor equipped.
     private void UpdateEquippedPanel()
     {
-        if (selectedActor < 0 || currentActorPage*actors.Count+selectedActor >= playerActors.Count){return;}
-        currentActorEquips = playerActors[selectedActor+currentActorPage*actors.Count].ReturnEquippedInList();
+        if (selectedActor < 0 || selectedActor >= playerActors.Count){return;}
+        currentActorEquips = playerActors[selectedActor].ReturnEquippedInList();
         for (int i = 0; i < equippedTiles.Count; i++)
         {
             equippedTiles[i].UpdateActorSprite(equipSprites.SpriteDictionary(currentActorEquips[i]));
@@ -228,9 +230,18 @@ public class EquipmentSelectGUI : MonoBehaviour
         UpdateInventoryStatsPanel();
     }
 
+    private void ResetInventoryStatsPanel()
+    {
+        for (int i = 0; i < inventoryEquipStatTexts.Count; i++)
+        {
+            inventoryEquipStatTexts[i].text = "";
+        }
+    }
+
     private void UpdateInventoryStatsPanel()
     {
-        int index = selectedInventoryIndex + (currentInventoryPage*inventoryTiles.Count);
+        ResetInventoryStatsPanel();
+        int index = selectedInventoryIndex;
         // Ensure that you actually clicked on an equipment.
         if (index < 0 || index >= currentInventory.Count){return;}
         equipData.LoadEquipData(selectedEquipment, currentInventory[index]);
@@ -243,9 +254,33 @@ public class EquipmentSelectGUI : MonoBehaviour
 
     public void SelectInventoryIndex(int index)
     {
-        if (selectedInventoryIndex == index){selectedInventoryIndex = -1;}
-        else {selectedInventoryIndex = index;}
+        int selected = index + (currentInventoryPage*inventoryTiles.Count);
+        if (selectedInventoryIndex == selected){selectedInventoryIndex = -1;}
+        else {selectedInventoryIndex = selected;}
         UpdateInventoryPanelHighlights();
         UpdateInventoryStatsPanel();
+    }
+
+    public void EquipSelectedEquipment()
+    {
+        if (selectedEquipType < 0){return;}
+        if (selectedInventoryIndex < 0 || selectedInventoryIndex >= currentInventory.Count){return;}
+        equipInventory.EquipToActor(selectedActor, selectedEquipType, selectedInventoryIndex);
+        UpdateAfterChangingEquipment();
+    }
+
+    public void UnequipSelectEquipType()
+    {
+        if (selectedEquipType < 0){return;}
+        equipInventory.UnequipFromActor(selectedActor, selectedEquipType);
+        UpdateAfterChangingEquipment();
+    }
+
+    private void UpdateAfterChangingEquipment()
+    {
+        UpdateEquippedPanel();
+        UpdateEquipStatsPanel();
+        GetEquipsOfSelectedType();
+        UpdateInventoryPanel();
     }
 }

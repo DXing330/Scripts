@@ -26,6 +26,7 @@ public class EquipmentInventory : BasicDataManager
         allAccessories.Clear();
         for (int i = 0; i < allEquipment.Count; i++)
         {
+            if (allEquipment[i].Length < 6){continue;}
             GameManager.instance.equipData.LoadEquipData(equipment, allEquipment[i]);
             SortEquip(equipment.equipName, equipment.equipType);
         }
@@ -102,19 +103,42 @@ public class EquipmentInventory : BasicDataManager
     public void GainEquipment(string newEquipment)
     {
         allEquipment.Add(newEquipment);
+        SortEquipmentIntoLists();
     }
 
     public void LoseEquipment(int index)
     {
         allEquipment.RemoveAt(index);
+        SortEquipmentIntoLists();
     }
 
-    public void EquipToActor(int actorIndex, int equipIndex)
+    public void EquipToActor(int actorIndex, int equipType, int equipIndex)
     {
-        // Make sure the equipment exists.
-        if (equipIndex >= allEquipment.Count){return;}
-        GameManager.instance.equipData.LoadEquipData(equipment, allEquipment[equipIndex]);
         PlayerActor actorToEquip = GameManager.instance.playerActors[actorIndex];
+        // Make sure the equipment exists.
+        switch (equipType)
+        {
+            case 0:
+                if (equipIndex >= allWeapons.Count){return;}
+                GameManager.instance.equipData.LoadEquipData(equipment, allWeapons[equipIndex]);
+                break;
+            case 1:
+                if (equipIndex >= allArmors.Count){return;}
+                GameManager.instance.equipData.LoadEquipData(equipment, allArmors[equipIndex]);
+                break;
+            case 2:
+                if (equipIndex >= allHelmets.Count){return;}
+                GameManager.instance.equipData.LoadEquipData(equipment, allHelmets[equipIndex]);
+                break;
+            case 3:
+                if (equipIndex >= allBoots.Count){return;}
+                GameManager.instance.equipData.LoadEquipData(equipment, allBoots[equipIndex]);
+                break;
+            case 4:
+                if (equipIndex >= allAccessories.Count){return;}
+                GameManager.instance.equipData.LoadEquipData(equipment, allAccessories[equipIndex]);
+                break;
+        }
         // Make sure the equipment can be equipped.
         if (equipment.possibleUsers != "All"){return;}
         // Equip it to the appropriate slot.
@@ -136,6 +160,54 @@ public class EquipmentInventory : BasicDataManager
                 actorToEquip.equipAccessory = equipment.equipName;
                 break;
         }
+        // One equipment per character.
+        int index = allEquipment.IndexOf(equipment.equipName);
+        LoseEquipment(index);
         actorToEquip.UpdateEquipment();
+        SaveEquipSets();
+    }
+
+    public void UnequipFromActor(int actorIndex, int equipType)
+    {
+        PlayerActor actorToEquip = GameManager.instance.playerActors[actorIndex];
+        switch (equipType)
+        {
+            case 0:
+                if (actorToEquip.equipWeapon != "none")
+                {
+                    GainEquipment(actorToEquip.equipWeapon);
+                }
+                actorToEquip.equipWeapon = "none";
+                break;
+            case 1:
+                if (actorToEquip.equipArmor != "none")
+                {
+                    GainEquipment(actorToEquip.equipArmor);
+                }
+                actorToEquip.equipArmor = "none";
+                break;
+            case 2:
+                if (actorToEquip.equipHelmet != "none")
+                {
+                    GainEquipment(actorToEquip.equipHelmet);
+                }
+                actorToEquip.equipHelmet = "none";
+                break;
+            case 3:
+                if (actorToEquip.equipBoots != "none")
+                {
+                    GainEquipment(actorToEquip.equipBoots);
+                }
+                actorToEquip.equipBoots = "none";
+                break;
+            case 4:
+                if (actorToEquip.equipAccessory != "none")
+                {
+                    GainEquipment(actorToEquip.equipAccessory);
+                }
+                actorToEquip.equipAccessory = "none";
+                break;
+        }
+        SaveEquipSets();
     }
 }
