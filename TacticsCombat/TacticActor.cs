@@ -15,13 +15,13 @@ public class TacticActor : MonoBehaviour
     // Race/class/etc.
     public string typeName;
     public int size;
+    public int weight;
     public string species;
     public int locationIndex;
     public int level;
     public int movementType = 0;
     public int health;
     public int baseHealth = 20;
-
     public int baseEnergy = 5;
     public int energy;
     public int baseMovement = 3;
@@ -67,6 +67,7 @@ public class TacticActor : MonoBehaviour
     public void QuickStart()
     {
         health = baseHealth;
+        weight = size;
         currentMovespeed = baseMovement;
         energy = baseEnergy;
         attackDamage = baseAttack;
@@ -132,6 +133,7 @@ public class TacticActor : MonoBehaviour
             return;
         }
         delayable = true;
+        weight = size;
         attackDamage = baseAttack;
         actionsLeft = baseActions;
         defense = baseDefense;

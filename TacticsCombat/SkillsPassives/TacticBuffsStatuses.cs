@@ -40,6 +40,10 @@ public class TacticBuffsStatuses : MonoBehaviour
             case "ENGY-":
                 actor.LoseEnergy(1);
                 break;
+            case "DIZZY":
+                actor.weight--;
+                actor.attackDamage -= actor.baseAttack/5;
+                break;
         }
     }
 }

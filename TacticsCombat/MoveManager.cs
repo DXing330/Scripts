@@ -101,7 +101,7 @@ public class MoveManager : MonoBehaviour
             push = 0;
         }
         int line = LineCheck(displacer.locationIndex, displacedActor.locationIndex);
-        int power = displacementPower + (displacer.size) - (displacedActor.size);
+        int power = displacementPower + (displacer.weight) - (displacedActor.weight);
         if (power <= 0){return;}
         if (line < 0){return;}
         else if (line == 0)
