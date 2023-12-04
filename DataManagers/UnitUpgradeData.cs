@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitUpgradeData : MonoBehaviour
+public class UnitUpgradeData : BasicDataManager
 {
     private string saveDataPath;
     private string loadedData;
@@ -16,7 +16,7 @@ public class UnitUpgradeData : MonoBehaviour
     public List<string> bonusPassiveSkills;
     public List<string> bonusActiveSkills;
 
-    public void NewGame()
+    public override void NewGame()
     {
         upgradedUnits.Clear();
         bonusHealth.Clear();
@@ -26,7 +26,7 @@ public class UnitUpgradeData : MonoBehaviour
         Load();
     }
 
-    public void Save()
+    public override void Save()
     {
         saveDataPath = Application.persistentDataPath;
         string upgradeData = "";
@@ -37,7 +37,7 @@ public class UnitUpgradeData : MonoBehaviour
         File.WriteAllText(saveDataPath+"/upgradeData.txt", upgradeData);
     }
 
-    public void Load()
+    public override void Load()
     {
         saveDataPath = Application.persistentDataPath;
         loadedData = File.ReadAllText(saveDataPath+"/upgradeData.txt");

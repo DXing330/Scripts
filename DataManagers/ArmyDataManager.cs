@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArmyDataManager : MonoBehaviour
+public class ArmyDataManager : BasicDataManager
 {
     private string saveDataPath;
     private string loadedData;
@@ -25,7 +25,7 @@ public class ArmyDataManager : MonoBehaviour
         }
     }
 
-    public void NewGame()
+    public override void NewGame()
     {
         armyFormation.Clear();
         for (int i = 0; i < maxArmySize; i++)
@@ -38,7 +38,7 @@ public class ArmyDataManager : MonoBehaviour
         Save();
     }
 
-    public void Save()
+    public override void Save()
     {
         saveDataPath = Application.persistentDataPath;
         string armyData = GameManager.instance.ConvertListToString(armyFormation);
@@ -47,7 +47,7 @@ public class ArmyDataManager : MonoBehaviour
         File.WriteAllText(saveDataPath+"/fighters.txt", fighterData);
     }
 
-    public void Load()
+    public override void Load()
     {
         saveDataPath = Application.persistentDataPath;
         loadedData = File.ReadAllText(saveDataPath+"/armyData.txt");

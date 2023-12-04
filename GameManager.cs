@@ -11,7 +11,9 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     public PlayerActor player;
     public PlayerActor familiar;
+    public List<BasicDataManager> gameData;
     public ArmyDataManager armyData;
+    public EquipmentInventory equipInventory;
     public ActorDataManager actorData;
     public EquipmentData equipData;
     public UnitUpgradeData upgradeData;
@@ -97,8 +99,10 @@ public class GameManager : MonoBehaviour
         activesPassives += ConvertListToString(familiarPassives)+"#";
         activesPassives += ConvertListToString(familiarActives)+"#";
         File.WriteAllText(saveDataPath+"/skillData.txt", activesPassives);
-        armyData.Save();
-        upgradeData.Save();
+        for (int i = 0; i < gameData.Count; i++)
+        {
+            gameData[i].Save();
+        }
     }
 
     private void QuickSave()
@@ -119,8 +123,10 @@ public class GameManager : MonoBehaviour
             goldCoins = int.Parse(dataBlocks[3]);
             time = int.Parse(dataBlocks[4]);
             location = int.Parse(dataBlocks[5]);
-            armyData.Load();
-            upgradeData.Load();
+            for (int i = 0; i < gameData.Count; i++)
+            {
+                gameData[i].Load();
+            }
         }
         player.UpdateStats();
         familiar.UpdateStats();
@@ -152,8 +158,10 @@ public class GameManager : MonoBehaviour
         goldCoins = 0;
         time = 0;
         location = 2203;
-        armyData.NewGame();
-        upgradeData.NewGame();
+        for (int i = 0; i < gameData.Count; i++)
+        {
+            gameData[i].NewGame();
+        }
         SaveData();
     }
 
