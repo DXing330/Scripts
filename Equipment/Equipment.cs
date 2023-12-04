@@ -8,7 +8,7 @@ public class Equipment : AllStats
     public int equipType;
     public int ID;
     public string equipName;
-    public List<string> possibleUsers;
+    public string possibleUsers;
     public string flavorText;
     public string passiveSkills = "";
     public string activeSkills = "";

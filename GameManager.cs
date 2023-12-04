@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public List<PlayerActor> playerActors;
     public PlayerActor player;
     public PlayerActor familiar;
     public List<BasicDataManager> gameData;

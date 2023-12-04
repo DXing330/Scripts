@@ -66,7 +66,7 @@ public class EquipmentData : MonoBehaviour
         loaded.size = int.Parse(equipSizes[index]);
         loaded.baseInitiative = int.Parse(equipInitiatives[index]);
         loaded.equipType = int.Parse(equipTypes[index]);
-        loaded.possibleUsers = possibleUsers[index].Split(",").ToList();
+        loaded.possibleUsers = possibleUsers[index];
         loaded.flavorText = flavorTexts[index];
     }
 }
