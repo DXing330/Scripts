@@ -24,6 +24,11 @@ public class EquipmentInventory : BasicDataManager
         allHelmets.Clear();
         allBoots.Clear();
         allAccessories.Clear();
+        for (int i = 0; i < allEquipment.Count; i++)
+        {
+            GameManager.instance.equipData.LoadEquipData(equipment, allEquipment[i]);
+            SortEquip(equipment.equipName, equipment.equipType);
+        }
     }
 
     private void SortEquip(string equip, int equipType)
@@ -33,16 +38,16 @@ public class EquipmentInventory : BasicDataManager
             case 0:
                 allWeapons.Add(equip);
                 break;
-            case 0:
+            case 1:
                 allArmors.Add(equip);
                 break;
-            case 0:
+            case 2:
                 allHelmets.Add(equip);
                 break;
-            case 0:
+            case 3:
                 allBoots.Add(equip);
                 break;
-            case 0:
+            case 4:
                 allAccessories.Add(equip);
                 break;
         }
@@ -81,6 +86,7 @@ public class EquipmentInventory : BasicDataManager
         loadedData = File.ReadAllText(saveDataPath+"/equipInventoryData.txt");
         string[] blocks = loadedData.Split("#");
         allEquipment = blocks[0].Split("|").ToList();
+        SortEquipmentIntoLists();
         allEquippedEquipment = blocks[1].Split("|").ToList();
         LoadEquipSets();
     }

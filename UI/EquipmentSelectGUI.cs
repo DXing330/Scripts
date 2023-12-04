@@ -22,6 +22,7 @@ public class EquipmentSelectGUI : MonoBehaviour
         }
     }
     public EquipmentData equipData;
+    public EquipmentInventory equipInventory;
     public ActorSprites actorSprites;
     public EquipmentSprites equipSprites;
     public Equipment equippedEquipment;
@@ -46,6 +47,7 @@ public class EquipmentSelectGUI : MonoBehaviour
     {
         playerActors = GameManager.instance.playerActors;
         equipData = GameManager.instance.equipData;
+        equipInventory = GameManager.instance.equipInventory;
         UpdateActorPanels();
     }
 
@@ -144,9 +146,25 @@ public class EquipmentSelectGUI : MonoBehaviour
         }
     }
 
+    private void ResetInventoryPanel()
+    {
+        for (int i = 0; i < inventoryTiles.Count; i++)
+        {
+            inventoryTiles[i].ResetHighlight();
+            inventoryTiles[i].ResetActorSprite();
+        }
+    }
+    
     // Images corresponding to the equipment of some type in the inventory.
     private void UpdateInventoryPanel()
     {
+        ResetInventoryPanel();
+        int startIndex = currentInventoryPage*inventoryTiles.Count;
+        int endIndex = Mathf.Min(startIndex + inventoryTiles.Count, currentInventory.Count);
+        for (int i = startIndex; i < endIndex; i++)
+        {
+            inventoryTiles[i - startIndex].UpdateActorSprite(equipSprites.SpriteDictionary(currentInventory[i]));
+        }
     }
 
     public void SelectEquipType(int type)
@@ -156,6 +174,33 @@ public class EquipmentSelectGUI : MonoBehaviour
         selectedInventoryIndex = -1;
         UpdateEquipPanelHighlights();
         UpdateEquipStatsPanel();
+        if (selectedEquipType >= 0)
+        {
+            GetEquipsOfSelectedType();
+            UpdateInventoryPanel();
+        }
+    }
+
+    private void GetEquipsOfSelectedType()
+    {
+        switch (selectedEquipType)
+        {
+            case 0:
+                currentInventory = equipInventory.allWeapons;
+                break;
+            case 1:
+                currentInventory = equipInventory.allArmors;
+                break;
+            case 2:
+                currentInventory = equipInventory.allHelmets;
+                break;
+            case 3:
+                currentInventory = equipInventory.allBoots;
+                break;
+            case 4:
+                currentInventory = equipInventory.allAccessories;
+                break;
+        }
     }
 
     private void ResetEquipStatsPanel()
@@ -185,6 +230,15 @@ public class EquipmentSelectGUI : MonoBehaviour
 
     private void UpdateInventoryStatsPanel()
     {
+        int index = selectedInventoryIndex + (currentInventoryPage*inventoryTiles.Count);
+        // Ensure that you actually clicked on an equipment.
+        if (index < 0 || index >= currentInventory.Count){return;}
+        equipData.LoadEquipData(selectedEquipment, currentInventory[index]);
+        List<int> currentBaseStats = selectedEquipment.ReturnStatList();
+        for (int i = 0; i < currentBaseStats.Count; i++)
+        {
+            inventoryEquipStatTexts[i].text = currentBaseStats[i].ToString();
+        }
     }
 
     public void SelectInventoryIndex(int index)
