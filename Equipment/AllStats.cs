@@ -14,6 +14,7 @@ public class AllStats : MonoBehaviour
     public int moveType = 0;
     public int size = 1;
     public int baseInitiative = 10;
+    public List<int> allStatList;
 
     public void NullAllStats()
     {
@@ -27,5 +28,21 @@ public class AllStats : MonoBehaviour
         baseActions = 0;
         size = 0;
         baseInitiative = 0;
+    }
+
+    public virtual List<int> ReturnStatList()
+    {
+        allStatList.Clear();
+        allStatList.Add(baseHealth);
+        allStatList.Add(baseAttack);
+        allStatList.Add(baseDefense);
+        allStatList.Add(baseEnergy);
+        allStatList.Add(baseMovement);
+        //allStatList.Add(moveType);
+        allStatList.Add(attackRange);
+        allStatList.Add(baseActions);
+        allStatList.Add(size);
+        allStatList.Add(baseInitiative);
+        return allStatList;
     }
 }

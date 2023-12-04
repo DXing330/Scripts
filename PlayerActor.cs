@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerActor : AllStats
 {
     public TacticActor playerActor;
+    public string typeName;
     public int currentLevel;
     public int healthPerLevel = 3;
     public int energyPerLevel = 1;
@@ -34,6 +35,18 @@ public class PlayerActor : AllStats
     public string ReturnAllEquipped()
     {
         return equipWeapon+"+"+equipArmor+"+"+equipHelmet+"+"+equipBoots+"+"+equipAccessory;
+    }
+
+    public List<string> ReturnEquippedInList()
+    {
+        List<string> allEquips = new List<string>();
+        allEquips.Clear();
+        allEquips.Add(equipWeapon);
+        allEquips.Add(equipArmor);
+        allEquips.Add(equipHelmet);
+        allEquips.Add(equipBoots);
+        allEquips.Add(equipAccessory);
+        return allEquips;
     }
 
     // Load upon startup your previous equipment set.
@@ -65,10 +78,26 @@ public class PlayerActor : AllStats
         UpdateStats();
     }
 
+    public override List<int> ReturnStatList()
+    {
+        allStatList.Clear();
+        allStatList.Add(baseHealth+((currentLevel-1) * healthPerLevel));
+        allStatList.Add(baseAttack);
+        allStatList.Add(baseDefense);
+        allStatList.Add(baseEnergy+((currentLevel-1) * energyPerLevel));
+        allStatList.Add(baseMovement);
+        allStatList.Add(attackRange);
+        allStatList.Add(baseActions);
+        allStatList.Add(size);
+        allStatList.Add(baseInitiative);
+        return allStatList;
+    }
+
     public void UpdateStats()
     {
         allEquipment.UpdateStats();
         currentLevel = GameManager.instance.playerLevel;
+        playerActor.typeName = typeName;
         playerActor.level = currentLevel;
         playerActor.baseHealth = baseHealth+((currentLevel-1) * healthPerLevel)+allEquipment.baseHealth;
         playerActor.baseAttack = baseAttack+allEquipment.baseAttack;

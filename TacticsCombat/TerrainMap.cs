@@ -93,14 +93,15 @@ public class TerrainMap : MonoBehaviour
                 terrainEffectDurations.Add(0);
             }
             actorManager.LoadFixedEnemyTeam();
+            actorManager.LoadPlayerTeam(true);
         }
         else if (GameManager.instance.randomBattle <= 0)
         {
             baseTerrain = GameManager.instance.battleLocationType;
             GenerateMap(baseTerrain, fullSize);
             actorManager.LoadEnemyTeam();
+            actorManager.LoadPlayerTeam();
         }
-        actorManager.LoadPlayerTeam();
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
         UpdateCenterTile(((fullSize) * fullSize)/2);
         UpdateMap();

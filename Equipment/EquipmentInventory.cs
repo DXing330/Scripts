@@ -11,6 +11,42 @@ public class EquipmentInventory : BasicDataManager
     public Equipment equipment;
     public List<string> allEquipment;
     public List<string> allEquippedEquipment;
+    public List<string> allWeapons;
+    public List<string> allArmors;
+    public List<string> allHelmets;
+    public List<string> allBoots;
+    public List<string> allAccessories;
+
+    public void SortEquipmentIntoLists()
+    {
+        allWeapons.Clear();
+        allArmors.Clear();
+        allHelmets.Clear();
+        allBoots.Clear();
+        allAccessories.Clear();
+    }
+
+    private void SortEquip(string equip, int equipType)
+    {
+        switch (equipType)
+        {
+            case 0:
+                allWeapons.Add(equip);
+                break;
+            case 0:
+                allArmors.Add(equip);
+                break;
+            case 0:
+                allHelmets.Add(equip);
+                break;
+            case 0:
+                allBoots.Add(equip);
+                break;
+            case 0:
+                allAccessories.Add(equip);
+                break;
+        }
+    }
 
     public override void NewGame()
     {

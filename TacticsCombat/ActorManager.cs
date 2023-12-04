@@ -57,34 +57,43 @@ public class ActorManager : MonoBehaviour
         }
     }
 
-    public void LoadPlayerTeam()
+    public void LoadPlayerTeam(bool fix = false)
     {
         //int column = 0;
         //int row = 0;
-        tries = 0;
-        int enemyCount = usedTiles.Count;
-        for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
+        if (!fix)
         {
-            if (GameManager.instance.armyData.armyFormation[i] == "none")
+            tries = 0;
+            int enemyCount = usedTiles.Count;
+            for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
             {
-                continue;
+                if (GameManager.instance.armyData.armyFormation[i] == "none")
+                {
+                    continue;
+                }
+                // Randomly spawn in the player team.
+                GenerateRandomLocation();
+                // Spawn the player as soon as you get a location for them.
+                LoadPlayerTeamMember(GameManager.instance.armyData.armyFormation[i], usedTiles[^1]);
             }
-            // Randomly spawn in the player team.
-            GenerateRandomLocation();
-            // Spawn the player as soon as you get a location for them.
-            LoadPlayerTeamMember(GameManager.instance.armyData.armyFormation[i], usedTiles[^1]);
         }
-        /*for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
+        if (fix)
         {
-            string actorType = GameManager.instance.armyData.armyFormation[i];
-            LoadPlayerTeamMember(actorType, row, column);
-            column++;
-            if (column >= 3)
+            int column = 0;
+            int row = 0;
+            for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
             {
-                column = 0;
-                row++;
+                string actorType = GameManager.instance.armyData.armyFormation[i];
+                int rowColLoc = row*terrainMap.fullSize+(column);
+                LoadPlayerTeamMember(actorType, rowColLoc);
+                column++;
+                if (column >= 3)
+                {
+                    column = 0;
+                    row++;
+                }
             }
-        }*/
+        }
     }
 
     private void LoadPlayerTeamMember(string type, int location)
