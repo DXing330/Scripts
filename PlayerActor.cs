@@ -2,23 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerActor : MonoBehaviour
+public class PlayerActor : AllStats
 {
     public TacticActor playerActor;
     public int currentLevel;
-    public int baseHealth = 20;
     public int healthPerLevel = 3;
-    public int baseAttack = 10;
-    public int baseDefense = 3;
-    public int baseEnergy = 3;
     public int energyPerLevel = 1;
-    public int baseMovement = 3;
-    public int attackRange = 1;
-    public int baseActions = 4;
-    public int moveType = 0;
-    public int size = 1;
     public string species = "Undead";
-    public int baseInitiative = 10;
     public List<string> learntPassives;
     public List<string> learntSkills;
     public EquipmentContainer allEquipment;
@@ -33,17 +23,17 @@ public class PlayerActor : MonoBehaviour
         allEquipment.UpdateStats();
         currentLevel = GameManager.instance.playerLevel;
         playerActor.level = currentLevel;
-        playerActor.baseHealth = baseHealth+((currentLevel-1) * healthPerLevel)+allEquipment.totalBonusHealth;
-        playerActor.baseAttack = baseAttack+allEquipment.totalBonusAttack;
-        playerActor.baseDefense = baseDefense+allEquipment.totalBonusDefense;
-        playerActor.baseEnergy = baseEnergy+((currentLevel-1) * energyPerLevel)+allEquipment.totalBonusEnergy;
-        playerActor.baseMovement = baseMovement+allEquipment.totalBonusMovement;
-        playerActor.attackRange = attackRange;
-        playerActor.baseActions = baseActions;
+        playerActor.baseHealth = baseHealth+((currentLevel-1) * healthPerLevel)+allEquipment.baseHealth;
+        playerActor.baseAttack = baseAttack+allEquipment.baseAttack;
+        playerActor.baseDefense = baseDefense+allEquipment.baseDefense;
+        playerActor.baseEnergy = baseEnergy+((currentLevel-1) * energyPerLevel)+allEquipment.baseEnergy;
+        playerActor.baseMovement = baseMovement+allEquipment.baseMovement;
+        playerActor.attackRange = Mathf.Max(attackRange, allEquipment.attackRange);
+        playerActor.baseActions = baseActions+allEquipment.baseActions;
         playerActor.movementType = moveType;
-        playerActor.size = size;
+        playerActor.size = size+allEquipment.size;
         playerActor.species = species;
-        playerActor.baseInitiative = baseInitiative;
+        playerActor.baseInitiative = baseInitiative+allEquipment.baseInitiative;
         if (learntSkills.Count <= 0)
         {
             return;
