@@ -145,18 +145,38 @@ public class EquipmentInventory : BasicDataManager
         switch (equipment.equipType)
         {
             case 0:
+                if (actorToEquip.equipWeapon != "none")
+                {
+                    GainEquipment(actorToEquip.equipWeapon);
+                }
                 actorToEquip.equipWeapon = equipment.equipName;
                 break;
             case 1:
+                if (actorToEquip.equipArmor != "none")
+                {
+                    GainEquipment(actorToEquip.equipArmor);
+                }
                 actorToEquip.equipArmor = equipment.equipName;
                 break;
             case 2:
+                if (actorToEquip.equipHelmet != "none")
+                {
+                    GainEquipment(actorToEquip.equipHelmet);
+                }
                 actorToEquip.equipHelmet = equipment.equipName;
                 break;
             case 3:
+                if (actorToEquip.equipBoots != "none")
+                {
+                    GainEquipment(actorToEquip.equipBoots);
+                }
                 actorToEquip.equipBoots = equipment.equipName;
                 break;
             case 4:
+                if (actorToEquip.equipAccessory != "none")
+                {
+                    GainEquipment(actorToEquip.equipAccessory);
+                }
                 actorToEquip.equipAccessory = equipment.equipName;
                 break;
         }
