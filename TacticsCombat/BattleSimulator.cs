@@ -89,6 +89,7 @@ public class BattleSimulator : MonoBehaviour
 
     private void ResetSimulation()
     {
+        pathFinder.heap.ResetHeap();
         actionLog.ClearActionLog();
         allActors = turnOrder.InitiativeThreadedByTeam(allActors);
         for (int i = 0; i < actors.Count; i++)

@@ -44,7 +44,7 @@ public class TerrainPathfinder : MonoBehaviour
 
     private void ResetHeap()
     {
-        heap.Reset();
+        heap.ResetHeap();
         heap.InitialCapacity(fullSize * fullSize);
     }
 

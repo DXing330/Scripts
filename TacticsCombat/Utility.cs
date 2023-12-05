@@ -11,9 +11,9 @@ public class Utility : MonoBehaviour
     // Move cost of tile.
     public List<int> weights = new List<int>();
     
-    public void Reset()
+    public void ResetHeap()
     {
-        size  = 0;
+        size = 0;
         nodes.Clear();
         weights.Clear();
     }
