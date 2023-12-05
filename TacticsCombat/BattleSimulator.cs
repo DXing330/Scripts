@@ -5,6 +5,7 @@ using TMPro;
 
 public class BattleSimulator : MonoBehaviour
 {
+    public bool active = false;
     public TerrainMap simulatedBattle;
     public TMP_Text winChance;
     public List<int> terrainInfo;
@@ -26,8 +27,18 @@ public class BattleSimulator : MonoBehaviour
     public int plays;
     public bool started = false;
 
+    private void CheckIfActive()
+    {
+        string check = GameManager.instance.ReturnPlayerSetting(0);
+        Debug.Log(check);
+        if (check == "1"){active = true;}
+        else{active = false;}
+    }
+
     public void UpdateSimulation()
     {
+        CheckIfActive();
+        if (!active){return;}
         CreateCopyOfActors();
         terrainInfo = new List<int>(simulatedBattle.terrainInfo);
         allUnoccupied = new List<int>(simulatedBattle.allUnoccupied);
@@ -56,11 +67,12 @@ public class BattleSimulator : MonoBehaviour
 
     public void RunNSimulations(int n = 20)
     {
+        if (!active){return;}
         for (int i = 0; i < n; i++)
         {
             ResetSimulation();
             StartSimulation();
-            for (int j = 0; j < 99; j++)
+            for (int j = 0; j < simulatedBattle.roundLimit; j++)
             {
                 if (!started){continue;}
                 ActorsTurn();

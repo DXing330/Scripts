@@ -12,6 +12,11 @@ public class GameManager : MonoBehaviour
     public List<PlayerActor> playerActors;
     public PlayerActor player;
     public PlayerActor familiar;
+    public PlayerSettings playerSettings;
+    public string ReturnPlayerSetting(int settingIndex)
+    {
+        return playerSettings.ReturnSetting(settingIndex);
+    }
     public List<BasicDataManager> gameData;
     public ArmyDataManager armyData;
     public EquipmentInventory equipInventory;

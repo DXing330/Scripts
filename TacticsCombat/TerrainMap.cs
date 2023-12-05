@@ -15,6 +15,7 @@ public class TerrainMap : MonoBehaviour
     protected int cornerRow;
     private int turnIndex = 0;
     public int roundIndex = 0;
+    public int roundLimit = 30;
     private int fixedCenter;
     private bool lockedView = false;
     public int gridSize = 9;
@@ -115,7 +116,7 @@ public class TerrainMap : MonoBehaviour
     private void CheckWinners()
     {
         // Some kind of turn limit.
-        if (roundIndex > 99)
+        if (roundIndex > roundLimit)
         {
             actorManager.ReturnToHub(false);
             return;
