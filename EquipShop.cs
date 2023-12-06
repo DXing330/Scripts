@@ -91,6 +91,7 @@ public class EquipShop : MonoBehaviour
         {
             GameManager.instance.goldCoins -= prices[currentlySelectedEquip];
         }
+        else{return;}
         // Obtain equipment.
         GameManager.instance.equipInventory.GainEquipment(equips[currentlySelectedEquip]);
     }

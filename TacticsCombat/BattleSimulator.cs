@@ -30,7 +30,6 @@ public class BattleSimulator : MonoBehaviour
     private void CheckIfActive()
     {
         string check = GameManager.instance.ReturnPlayerSetting(0);
-        Debug.Log(check);
         if (check == "1"){active = true;}
         else{active = false;}
     }

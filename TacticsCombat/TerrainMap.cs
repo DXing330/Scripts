@@ -169,6 +169,11 @@ public class TerrainMap : MonoBehaviour
             //RemoveActors();
             turnIndex = 0;
             roundIndex++;
+            if (roundIndex > roundLimit)
+            {
+                actorManager.ReturnToHub(false);
+                return;
+            }
             SortByInitiative();
         }
         ClearHighlightedTiles();
@@ -197,6 +202,7 @@ public class TerrainMap : MonoBehaviour
         if (actors[turnIndex].team > 0 || (auto))
         {
             NPCActorsTurn();
+            return;
         }
         // If the NPC die on their turn you don't need to do anything else.
         if (battleStarted)
@@ -764,6 +770,7 @@ public class TerrainMap : MonoBehaviour
         if (auto){npc = false;}
         actors[turnIndex].NPCStartTurn(npc);
         NextTurn();
+        return;
     }
 
     private void UpdateAfterMovingActor()
@@ -1000,6 +1007,7 @@ public class TerrainMap : MonoBehaviour
     {
         UpdateOccupiedTiles();
         pathFinder.UpdateOccupiedTiles(occupiedTiles);
+        if (auto){return;}
         // O(n)
         for (int i = 0; i < terrainTiles.Count; i++)
         {
@@ -1104,6 +1112,7 @@ public class TerrainMap : MonoBehaviour
 
     private void HighlightTiles(bool cyan = true)
     {
+        if (auto){return;}
         int index = -1;
         for (int i = 0; i < terrainTiles.Count; i++)
         {
