@@ -30,7 +30,21 @@ public class AllStats : MonoBehaviour
         baseInitiative = 0;
     }
 
-    public virtual List<int> ReturnStatList()
+    public void CopyAllStats(AllStats statsToCopy)
+    {
+        baseHealth = statsToCopy.baseHealth;
+        baseAttack = statsToCopy.baseAttack;
+        baseDefense = statsToCopy.baseDefense;
+        baseEnergy = statsToCopy.baseEnergy;
+        baseMovement = statsToCopy.baseMovement;
+        moveType = statsToCopy.moveType;
+        attackRange = statsToCopy.attackRange;
+        baseActions = statsToCopy.baseActions;
+        size = statsToCopy.size;
+        baseInitiative = statsToCopy.baseInitiative;
+    }
+
+    public virtual List<int> ReturnStatList(bool main = true)
     {
         allStatList.Clear();
         allStatList.Add(baseHealth);

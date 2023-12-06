@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TacticActor : MonoBehaviour
+public class TacticActor : AllStats
 {
     // 0 is player's team, other teams are NPCs.
     public int team = 0;
@@ -14,29 +14,20 @@ public class TacticActor : MonoBehaviour
     public bool delayable = true;
     // Race/class/etc.
     public string typeName;
-    public int size;
     public int weight;
     public string species;
     public int locationIndex;
     public int level;
     public int movementType = 0;
     public int health;
-    public int baseHealth = 20;
-    public int baseEnergy = 5;
     public int energy;
-    public int baseMovement = 3;
     public int currentMovespeed;
-    public int baseActions = 2;
     public int actionsLeft;
-    public int attackRange = 1;
     public int actionsToAttack = 1;
     public int currentAttackRange;
-    public int baseAttack = 10;
     public int attackDamage;
-    public int baseDefense = 5;
     public int defense;
     public int movement;
-    public int baseInitiative = 10;
     public int initiative;
     // 0 is offensive, 1 is passive, 2 is fleeing
     public int AIType = 0;

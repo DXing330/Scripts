@@ -9,6 +9,7 @@ public class ArmyDataManager : BasicDataManager
 {
     private string saveDataPath;
     private string loadedData;
+    public List<PlayerActor> partyMembers;
     public int maxArmySize = 9;
     public List<string> armyFormation = new List<string>(9);
     public List<string> availableFighters = new List<string>(0);
@@ -22,6 +23,19 @@ public class ArmyDataManager : BasicDataManager
             {
                 armyFormation[i] = "none";
             }
+        }
+    }
+
+    private void LoadPartyMembersByName()
+    {
+        GameManager.instance.ResetParty();
+        int partyMemberIndex = 0;
+        for (int i = 0; i < armyFormation.Count; i++)
+        {
+            if (armyFormation[i] == "none" || armyFormation[i] == "Player" || armyFormation[i] == "Familiar"){continue;}
+            partyMembers[partyMemberIndex].SetName(armyFormation[i]);
+            GameManager.instance.playerActors.Add(partyMembers[partyMemberIndex]);
+            partyMemberIndex++;
         }
     }
 
@@ -59,6 +73,7 @@ public class ArmyDataManager : BasicDataManager
             NewGame();
         }
         AdjustLists();
+        LoadPartyMembersByName();
     }
 
     public void GainFighter(string fighterName)

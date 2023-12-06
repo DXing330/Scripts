@@ -92,6 +92,7 @@ public class EquipmentInventory : BasicDataManager
         LoadEquipSets();
     }
 
+    // Need to make sure that the party loads first for this to work.
     private void LoadEquipSets()
     {
         for (int i = 0; i < allEquippedEquipment.Count; i++)

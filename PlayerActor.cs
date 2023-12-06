@@ -78,13 +78,27 @@ public class PlayerActor : AllStats
         UpdateStats();
     }
 
-    public override List<int> ReturnStatList()
+    public override List<int> ReturnStatList(bool main = true)
     {
         allStatList.Clear();
-        allStatList.Add(baseHealth+((currentLevel-1) * healthPerLevel));
+        if (main)
+        {
+            allStatList.Add(baseHealth+((currentLevel-1) * healthPerLevel));
+        }
+        else
+        {
+            allStatList.Add(baseHealth);
+        }
         allStatList.Add(baseAttack);
         allStatList.Add(baseDefense);
-        allStatList.Add(baseEnergy+((currentLevel-1) * energyPerLevel));
+        if (main)
+        {
+            allStatList.Add(baseEnergy+((currentLevel-1) * energyPerLevel));
+        }
+        else
+        {
+            allStatList.Add(baseEnergy);
+        }
         allStatList.Add(baseMovement);
         allStatList.Add(attackRange);
         allStatList.Add(baseActions);
@@ -119,5 +133,29 @@ public class PlayerActor : AllStats
         {
             playerActor.activeSkillNames.Add(learntSkills[i]);
         }
+    }
+
+    // Mob characters don't get any level bonuses, just equipment bonuses.
+    public void SideCharacterUpdateStats()
+    {
+        allEquipment.UpdateStats();
+        GameManager.instance.actorData.LoadActorData(playerActor, typeName);
+        CopyAllStats(playerActor);
+        playerActor.baseHealth += allEquipment.baseHealth;
+        playerActor.baseAttack += allEquipment.baseAttack;
+        playerActor.baseDefense += allEquipment.baseDefense;
+        playerActor.baseEnergy += allEquipment.baseEnergy;
+        playerActor.baseMovement += allEquipment.baseMovement;
+        playerActor.attackRange += Mathf.Max(attackRange, allEquipment.attackRange);
+        playerActor.baseActions += allEquipment.baseActions;
+        playerActor.size += allEquipment.size;
+        playerActor.baseInitiative += allEquipment.baseInitiative;
+    }
+
+    public void SetName(string newName)
+    {
+        if (newName == "none" || newName.Length < 3){return;}
+        typeName = newName;
+        SideCharacterUpdateStats();
     }
 }

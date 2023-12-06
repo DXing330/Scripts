@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public int basePartySize = 2;
     public List<PlayerActor> playerActors;
     public PlayerActor player;
     public PlayerActor familiar;
@@ -224,6 +225,15 @@ public class GameManager : MonoBehaviour
             player.UpdateStats();
             familiar.UpdateStats();
             SaveData();
+        }
+    }
+
+    public void ResetParty()
+    {
+        if (playerActors.Count <= basePartySize){return;}
+        for (int i = basePartySize; i < playerActors.Count; i++)
+        {
+            playerActors.RemoveAt(i);
         }
     }
 

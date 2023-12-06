@@ -90,6 +90,7 @@ public class EquipShop : MonoBehaviour
         if (GameManager.instance.goldCoins >= prices[currentlySelectedEquip])
         {
             GameManager.instance.goldCoins -= prices[currentlySelectedEquip];
+            UpdateInfo();
         }
         else{return;}
         // Obtain equipment.
