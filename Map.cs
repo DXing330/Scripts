@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class Map : MonoBehaviour
 {
+    public bool square = true;
     protected int startIndex;
     public int gridSize = 7;
+    // Used for square maps.
     protected int fullSize;
+    // Used for rectangular maps.
+    protected int totalRows;
+    protected int totalColumns;
     protected int cornerColumn;
     protected int cornerRow;
     public List<Sprite> tileSprites;
@@ -17,6 +22,15 @@ public class Map : MonoBehaviour
     protected virtual void Start()
     {
         //InitializeTiles();
+        SetTotalRowsColumns(fullSize, fullSize);
+    }
+
+    public void SetTotalRowsColumns(int rows, int columns)
+    {
+        if (rows == columns){square = true;}
+        totalRows = rows;
+        totalColumns = columns;
+        fullSize  = rows;
     }
 
     protected virtual void InitializeTiles()
@@ -45,6 +59,7 @@ public class Map : MonoBehaviour
         currentTiles.Clear();
         int cColumn = 0;
         int cRow = 0;
+        // This doesn't depend on fullSize.
         for (int i = 0; i < gridSize * gridSize; i++)
         {
             AddCurrentTile(cRow + cornerRow, cColumn + cornerColumn);
@@ -59,12 +74,12 @@ public class Map : MonoBehaviour
 
     protected virtual void AddCurrentTile(int row, int column)
     {
-        if (row < 0 || column < 0 || column >= fullSize || row >= fullSize)
+        if (row < 0 || column < 0 || column >= totalColumns || row >= totalRows)
         {
             currentTiles.Add(-1);
             return;
         }
-        currentTiles.Add((row*fullSize)+column);
+        currentTiles.Add((row*totalColumns)+column);
     }
 
     protected virtual void DetermineCornerRowColumn()
@@ -72,9 +87,9 @@ public class Map : MonoBehaviour
         int start = startIndex;
         cornerRow = -(gridSize/2);
         cornerColumn = -(gridSize/2);
-        while (start >= fullSize)
+        while (start >= totalColumns)
         {
-            start -= fullSize;
+            start -= totalColumns;
             cornerRow++;
         }
         cornerColumn += start;
@@ -83,7 +98,7 @@ public class Map : MonoBehaviour
     protected virtual void UpdateTile(int imageIndex, int tileIndex)
     {
         // Undefined tiles are black.
-        if (tileIndex < 0 || tileIndex >= (fullSize * fullSize))
+        if (tileIndex < 0 || tileIndex >= (totalRows * totalColumns))
         {
             terrainTiles[imageIndex].UpdateColor(-1);
         }
@@ -103,9 +118,9 @@ public class Map : MonoBehaviour
     protected int GetRow(int location)
     {
         int row = 0;
-        while (location >= fullSize)
+        while (location >= totalColumns)
         {
-            location -= fullSize;
+            location -= totalColumns;
             row++;
         }
         return row;
@@ -113,6 +128,6 @@ public class Map : MonoBehaviour
 
     protected int GetColumn(int location)
     {
-        return location%fullSize;
+        return location%totalColumns;
     }
 }

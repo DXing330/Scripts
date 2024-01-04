@@ -7,6 +7,7 @@ using UnityEngine;
 public class TerrainPathfinder : MonoBehaviour
 {
     public bool hex = false;
+    public bool square = true;
     public Utility heap;
     public TerrainTile terrainTile;
     // Raw terrain types.
@@ -44,19 +45,24 @@ public class TerrainPathfinder : MonoBehaviour
         UpdateOccupiedTiles(newOccupied);
         terrainInfo = newTerrain;
         fullSize = size;
+        if (square)
+        {
+            totalRows = fullSize;
+            totalColumns = fullSize;
+        }
     }
 
     private void ResetHeap()
     {
         heap.ResetHeap();
-        heap.InitialCapacity(fullSize * fullSize);
+        heap.InitialCapacity(totalRows * totalColumns);
     }
 
     private void ResetDistances(int startIndex)
     {
         ResetHeap();
         distances.Clear();
-        for (int i = 0; i < fullSize * fullSize; i++)
+        for (int i = 0; i < totalRows * totalColumns; i++)
         {
             // At the start no idea what tile leads to what.
             savedPathList.Add(-1);
@@ -81,7 +87,7 @@ public class TerrainPathfinder : MonoBehaviour
         ridingMoveCosts.Clear();
         swimmingMoveCosts.Clear();
         scoutingMoveCosts.Clear();
-        for (int i = 0; i < fullSize * fullSize; i++)
+        for (int i = 0; i < totalRows * totalColumns; i++)
         {
             moveCostList.Add(terrainTile.ReturnMoveCost(terrainInfo[i], newOccupied[i]));
             flyingMoveCosts.Add(terrainTile.ReturnFlyingMoveCost(terrainInfo[i], newOccupied[i]));
@@ -196,21 +202,21 @@ public class TerrainPathfinder : MonoBehaviour
         tempAdjTiles.Clear();
         if (!hex)
         {
-            if (location%fullSize > 0)
+            if (location%totalColumns > 0)
             {
                 tempAdjTiles.Add(location-1);
             }
-            if (location%fullSize < fullSize - 1)
+            if (location%totalColumns < totalColumns - 1)
             {
                 tempAdjTiles.Add(location+1);
             }
-            if (location < (fullSize - 1) * fullSize)
+            if (location < (totalRows - 1) * totalColumns)
             {
-                tempAdjTiles.Add(location+fullSize);
+                tempAdjTiles.Add(location+totalColumns);
             }
-            if (location > fullSize - 1)
+            if (location > totalColumns - 1)
             {
-                tempAdjTiles.Add(location-fullSize);
+                tempAdjTiles.Add(location-totalColumns);
             }
         }
         if (hex)
@@ -218,45 +224,45 @@ public class TerrainPathfinder : MonoBehaviour
             int currentRow = GetRow(location);
             int currentColumn = GetColumn(location);
             // The top and bottom row have some special cases.
-            if (currentRow < fullSize - 1 && currentRow > 0)
+            if (currentRow < totalRows - 1 && currentRow > 0)
             {
-                tempAdjTiles.Add(location+fullSize);
-                tempAdjTiles.Add(location-fullSize);
-                if (currentColumn < fullSize - 1 && currentColumn > 0)
+                tempAdjTiles.Add(location+totalColumns);
+                tempAdjTiles.Add(location-totalColumns);
+                if (currentColumn < totalColumns - 1 && currentColumn > 0)
                 {
                     tempAdjTiles.Add(location+1);
                     tempAdjTiles.Add(location-1);
                     if (currentColumn%2 == 1)
                     {
-                        tempAdjTiles.Add(location+fullSize+1);
-                        tempAdjTiles.Add(location+fullSize-1);
+                        tempAdjTiles.Add(location+totalColumns+1);
+                        tempAdjTiles.Add(location+totalColumns-1);
                     }
                     else if (currentColumn%2 == 0)
                     {
-                        tempAdjTiles.Add(location-fullSize+1);
-                        tempAdjTiles.Add(location-fullSize-1);
+                        tempAdjTiles.Add(location-totalColumns+1);
+                        tempAdjTiles.Add(location-totalColumns-1);
                     }
                 }
                 else if (currentColumn == 0)
                 {
                     tempAdjTiles.Add(location+1);
-                    tempAdjTiles.Add(location-fullSize+1);
+                    tempAdjTiles.Add(location-totalColumns+1);
                 }
-                else if (currentColumn == fullSize - 1)
+                else if (currentColumn == totalColumns - 1)
                 {
                     tempAdjTiles.Add(location-1);
-                    tempAdjTiles.Add(location-fullSize-1);
+                    tempAdjTiles.Add(location-totalColumns-1);
                 }
             }
             if (currentRow == 0)
             {
-                tempAdjTiles.Add(location+fullSize);
+                tempAdjTiles.Add(location+totalColumns);
                 // Corner cases.
                 if (currentColumn == 0)
                 {
                     tempAdjTiles.Add(location + 1);
                 }
-                else if (currentColumn == fullSize - 1)
+                else if (currentColumn == totalColumns - 1)
                 {
                     tempAdjTiles.Add(location - 1);
                 }
@@ -266,24 +272,24 @@ public class TerrainPathfinder : MonoBehaviour
                     tempAdjTiles.Add(location - 1);
                     if (currentColumn%2 == 1)
                     {
-                        tempAdjTiles.Add(location + fullSize + 1);
-                        tempAdjTiles.Add(location + fullSize - 1);
+                        tempAdjTiles.Add(location + totalColumns + 1);
+                        tempAdjTiles.Add(location + totalColumns - 1);
                     }
                 }
             }
-            if (currentRow == fullSize - 1)
+            if (currentRow == totalRows - 1)
             {
-                tempAdjTiles.Add(location-fullSize);
+                tempAdjTiles.Add(location-totalColumns);
                 // Corner cases.
                 if (currentColumn == 0)
                 {
                     tempAdjTiles.Add(location + 1);
-                    tempAdjTiles.Add(location - fullSize + 1);
+                    tempAdjTiles.Add(location - totalColumns + 1);
                 }
-                else if (currentColumn == fullSize - 1)
+                else if (currentColumn == totalColumns - 1)
                 {
                     tempAdjTiles.Add(location - 1);
-                    tempAdjTiles.Add(location - fullSize - 1);
+                    tempAdjTiles.Add(location - totalColumns - 1);
                 }
                 else
                 {
@@ -291,8 +297,8 @@ public class TerrainPathfinder : MonoBehaviour
                     tempAdjTiles.Add(location - 1);
                     if (currentColumn%2 == 0)
                     {
-                        tempAdjTiles.Add(location - fullSize + 1);
-                        tempAdjTiles.Add(location - fullSize - 1);
+                        tempAdjTiles.Add(location - totalColumns + 1);
+                        tempAdjTiles.Add(location - totalColumns - 1);
                     }
                 }
             }
@@ -339,21 +345,21 @@ public class TerrainPathfinder : MonoBehaviour
                     return (GetRow(location) > 0);
                 // UpRight.
                 case 1:
-                    if (GetColumn(location) == fullSize - 1){return false;}
+                    if (GetColumn(location) == totalColumns - 1){return false;}
                     if (GetRow(location) ==  0 && GetColumn(location)%2 == 0){return false;}
                     return true;
                 // DownRight.
                 case 2:
-                    if (GetColumn(location) == fullSize - 1){return false;}
-                    if (GetRow(location) ==  fullSize - 1 && GetColumn(location)%2 == 1){return false;}
+                    if (GetColumn(location) == totalColumns - 1){return false;}
+                    if (GetRow(location) ==  totalRows - 1 && GetColumn(location)%2 == 1){return false;}
                     return true;
                 // Down.
                 case 3:
-                    return (GetRow(location) < fullSize - 1);
+                    return (GetRow(location) < totalRows - 1);
                 // DownLeft.
                 case 4:
                     if (GetColumn(location) == 0){return false;}
-                    if (GetRow(location) ==  fullSize - 1 && GetColumn(location)%2 == 1){return false;}
+                    if (GetRow(location) ==  totalRows - 1 && GetColumn(location)%2 == 1){return false;}
                     return true;
                 // UpLeft.
                 case 5:
@@ -368,16 +374,16 @@ public class TerrainPathfinder : MonoBehaviour
             {
                 // Up.
                 case 0:
-                    return (location > fullSize - 1);
+                    return (location > totalColumns - 1);
                 // Right.
                 case 1:
-                    return (location%fullSize < fullSize - 1);
+                    return (location%totalColumns < totalColumns - 1);
                 // Down.
                 case 2:
-                    return (location < (fullSize - 1) * fullSize);
+                    return (location < (totalRows - 1) * totalColumns);
                 // Left.
                 case 3:
-                    return (location%fullSize > 0);
+                    return (location%totalColumns > 0);
             }
         }
         return false;   
@@ -447,13 +453,13 @@ public class TerrainPathfinder : MonoBehaviour
             {
                 // Up.
                 case 0:
-                    return (location-fullSize);
+                    return (location-totalColumns);
                 // Right.
                 case 1:
                     return (location+1);
                 // Down.
                 case 2:
-                    return (location+fullSize);
+                    return (location+totalColumns);
                 // Left.
                 case 3:
                     return (location-1);
@@ -465,38 +471,38 @@ public class TerrainPathfinder : MonoBehaviour
             {
                 // Up.
                 case 0:
-                    return location - fullSize;
+                    return location - totalColumns;
                 // UpRight.
                 case 1:
                     if (GetColumn(location)%2 == 1)
                     {
                         return location + 1;
                     }
-                    return (location - fullSize + 1);
+                    return (location - totalColumns + 1);
                 // DownRight.
                 case 2:
                     if (GetColumn(location)%2 == 0)
                     {
                         return location + 1;
                     }
-                    return (location + fullSize + 1);
+                    return (location + totalColumns + 1);
                 // Down.
                 case 3:
-                    return location + fullSize;
+                    return location + totalColumns;
                 // DownLeft.
                 case 4:
                     if (GetColumn(location)%2 == 0)
                     {
                         return location - 1;
                     }
-                    return (location + fullSize - 1);
+                    return (location + totalColumns - 1);
                 // UpLeft.
                 case 5:
                     if (GetColumn(location)%2 == 1)
                     {
                         return location - 1;
                     }
-                    return (location - fullSize - 1);
+                    return (location - totalColumns - 1);
             }
         }
         return location;
@@ -507,7 +513,7 @@ public class TerrainPathfinder : MonoBehaviour
         reachableTiles.Clear();
         ResetDistances(start);
         int distance = 0;
-        while (distance <= range && reachableTiles.Count < fullSize * fullSize)
+        while (distance <= range && reachableTiles.Count < totalColumns * totalRows)
         {
             distance = heap.PeekWeight();
             if (distance > range)
@@ -549,7 +555,7 @@ public class TerrainPathfinder : MonoBehaviour
         ResetDistances(startIndex);
         // Check what tiles you can move to.
         int distance = 0;
-        while (distance <= moveRange && reachableTiles.Count < fullSize * fullSize)
+        while (distance <= moveRange && reachableTiles.Count < totalColumns * totalRows)
         {
             distance = heap.PeekWeight();
             if (distance > moveRange)
@@ -638,9 +644,9 @@ public class TerrainPathfinder : MonoBehaviour
     private int GetRow(int location)
     {
         int row = 0;
-        while (location >= fullSize)
+        while (location >= totalColumns)
         {
-            location -= fullSize;
+            location -= totalColumns;
             row++;
         }
         return row;
@@ -648,7 +654,7 @@ public class TerrainPathfinder : MonoBehaviour
 
     private int GetColumn(int location)
     {
-        return location%fullSize;
+        return location%totalColumns;
     }
 
     private int GetHexQ(int location)

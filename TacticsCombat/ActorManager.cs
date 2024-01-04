@@ -187,7 +187,7 @@ public class ActorManager : MonoBehaviour
         for (int i = 0; i < terrainMap.terrainInfo.Count; i++)
         {
             int tileType = terrainMap.terrainInfo[i];
-            if (tileType == 6 || tileType == 7)
+            if (tileType == 7)
             {
                 unusableTiles.Add(i);
             }
