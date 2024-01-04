@@ -34,7 +34,7 @@ public class HexMapAdjustor : MonoBehaviour
                     yPivot = yCenter - 1f/(4*gridSize);
                 }
                 tiles[tileIndex].UpdatePivot(xPivot, yPivot);
-                tiles[tileIndex].SetTileText("("+i+","+j+")");
+                tiles[tileIndex].SetTileText("("+GetHexQ(tileIndex)+","+GetHexR(tileIndex)+","+GetHexS(tileIndex)+")");
                 tileIndex++;
                 xPivot += 1f/(gridSize - 1);
             }
@@ -42,5 +42,35 @@ public class HexMapAdjustor : MonoBehaviour
         }
     }
 
+    private int GetRow(int location)
+    {
+        int row = 0;
+        while (location >= gridSize)
+        {
+            location -= gridSize;
+            row++;
+        }
+        return row;
+    }
+
+    private int GetColumn(int location)
+    {
+        return location%gridSize;
+    }
+
+    private int GetHexQ(int location)
+    {
+        return GetColumn(location);
+    }
+
+    private int GetHexR(int location)
+    {
+        return GetRow(location) - (GetColumn(location) - (GetColumn(location)%2)) / 2;
+    }
+
+    private int GetHexS(int location)
+    {
+        return -GetHexQ(location)-GetHexR(location);
+    }
 
 }

@@ -9,6 +9,7 @@ public class HexTerrainTile : TerrainTile
     public TerrainMap terrainMap;
     public Map otherMap;
     public TMP_Text tileNumberText;
+    public bool text = false;
 
     public override void UpdateColor(int type)
     {
@@ -27,13 +28,13 @@ public class HexTerrainTile : TerrainTile
     public override void SetTileNumber(int newNumber)
     {
         tileNumber = newNumber;
-        if (tileNumberText == null){return;}
+        if (!text){return;}
         tileNumberText.text = newNumber.ToString();
     }
 
     public void SetTileText(string newText)
     {
-        if (tileNumberText == null){return;}
+        if (!text){return;}
         tileNumberText.text = newText;
     }
 
@@ -44,6 +45,7 @@ public class HexTerrainTile : TerrainTile
 
     public void ClickOnTile()
     {
+        Debug.Log(tileNumber);
         // Send the tileNumber to the terrain map.
         if (tileNumber < 0){return;}
         if (terrainMap == null)

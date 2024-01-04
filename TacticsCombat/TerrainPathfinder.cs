@@ -330,38 +330,89 @@ public class TerrainPathfinder : MonoBehaviour
 
     public bool DirectionCheck(int location, int direction)
     {
-        switch (direction)
+        if (hex)
         {
-            // Up.
-            case 0:
-                return (location > fullSize - 1);
-            // Right.
-            case 1:
-                return (location%fullSize < fullSize - 1);
-            // Down.
-            case 2:
-                return (location < (fullSize - 1) * fullSize);
-            // Left.
-            case 3:
-                return (location%fullSize > 0);
+            switch (direction)
+            {
+                // Up.
+                case 0:
+                    return (GetRow(location) > 0);
+                // UpRight.
+                case 1:
+                    if (GetColumn(location) == fullSize - 1){return false;}
+                    if (GetRow(location) ==  0 && GetColumn(location)%2 == 0){return false;}
+                    return true;
+                // DownRight.
+                case 2:
+                    if (GetColumn(location) == fullSize - 1){return false;}
+                    if (GetRow(location) ==  fullSize - 1 && GetColumn(location)%2 == 1){return false;}
+                    return true;
+                // Down.
+                case 3:
+                    return (GetRow(location) < fullSize - 1);
+                // DownLeft.
+                case 4:
+                    if (GetColumn(location) == 0){return false;}
+                    if (GetRow(location) ==  fullSize - 1 && GetColumn(location)%2 == 1){return false;}
+                    return true;
+                // UpLeft.
+                case 5:
+                    if (GetColumn(location) == 0){return false;}
+                    if (GetRow(location) ==  0 && GetColumn(location)%2 == 0){return false;}
+                    return true;
+            }
+        }
+        else
+        {
+            switch (direction)
+            {
+                // Up.
+                case 0:
+                    return (location > fullSize - 1);
+                // Right.
+                case 1:
+                    return (location%fullSize < fullSize - 1);
+                // Down.
+                case 2:
+                    return (location < (fullSize - 1) * fullSize);
+                // Left.
+                case 3:
+                    return (location%fullSize > 0);
+            }
         }
         return false;   
     }
 
     public int SameLine(int locOne, int locTwo)
     {
-        // 0 = same row, 1 = same column, -1 = neither
-        int rowOne = GetRow(locOne);
-        int rowTwo = GetRow(locTwo);
-        if (rowOne == rowTwo)
+        if (!hex)
         {
-            return 0;
+            // 0 = same row, 1 = same column, -1 = neither
+            int rowOne = GetRow(locOne);
+            int rowTwo = GetRow(locTwo);
+            if (rowOne == rowTwo)
+            {
+                return 0;
+            }
+            int colOne = GetColumn(locOne);
+            int colTwo = GetColumn(locTwo);
+            if (colOne == colTwo)
+            {
+                return 1;
+            }
         }
-        int colOne = GetColumn(locOne);
-        int colTwo = GetColumn(locTwo);
-        if (colOne == colTwo)
+        if (hex)
         {
-            return 1;
+            // 1 = same column, 2 = same diagonal, -1 = neither
+            int QOne = GetHexQ(locOne);
+            int QTwo = GetHexQ(locTwo);
+            if (QOne == QTwo){return 1;}
+            int ROne = GetHexR(locOne);
+            int RTwo = GetHexR(locTwo);
+            if (ROne == RTwo){return 2;}
+            int SOne = GetHexS(locOne);
+            int STwo = GetHexS(locTwo);
+            if (SOne == STwo){return 3;}
         }
         return -1;
     }
@@ -376,22 +427,77 @@ public class TerrainPathfinder : MonoBehaviour
         return (GetRow(locOne) < GetRow(locTwo));
     }
 
+    // Same R axis, check if one is higher than the other.
+    public bool UpR(int locOne, int locTwo)
+    {
+        return (GetHexQ(locOne) < GetHexQ(locTwo));
+    }
+
+    // Same S acis, check is one is higher than the other.
+    public bool UpS(int locOne, int locTwo)
+    {
+        return (GetHexQ(locOne) > GetHexQ(locTwo));
+    }
+
     public int GetDestination(int location, int direction)
     {
-        switch (direction)
+        if (!hex)
         {
-            // Up.
-            case 0:
-                return (location-fullSize);
-            // Right.
-            case 1:
-                return (location+1);
-            // Down.
-            case 2:
-                return (location+fullSize);
-            // Left.
-            case 3:
-                return (location-1);
+            switch (direction)
+            {
+                // Up.
+                case 0:
+                    return (location-fullSize);
+                // Right.
+                case 1:
+                    return (location+1);
+                // Down.
+                case 2:
+                    return (location+fullSize);
+                // Left.
+                case 3:
+                    return (location-1);
+            }
+        }
+        if (hex)
+        {
+            switch (direction)
+            {
+                // Up.
+                case 0:
+                    return location - fullSize;
+                // UpRight.
+                case 1:
+                    if (GetColumn(location)%2 == 1)
+                    {
+                        return location + 1;
+                    }
+                    return (location - fullSize + 1);
+                // DownRight.
+                case 2:
+                    if (GetColumn(location)%2 == 0)
+                    {
+                        return location + 1;
+                    }
+                    return (location + fullSize + 1);
+                // Down.
+                case 3:
+                    return location + fullSize;
+                // DownLeft.
+                case 4:
+                    if (GetColumn(location)%2 == 0)
+                    {
+                        return location - 1;
+                    }
+                    return (location + fullSize - 1);
+                // UpLeft.
+                case 5:
+                    if (GetColumn(location)%2 == 1)
+                    {
+                        return location - 1;
+                    }
+                    return (location - fullSize - 1);
+            }
         }
         return location;
     }
@@ -543,6 +649,21 @@ public class TerrainPathfinder : MonoBehaviour
     private int GetColumn(int location)
     {
         return location%fullSize;
+    }
+
+    private int GetHexQ(int location)
+    {
+        return GetColumn(location);
+    }
+
+    private int GetHexR(int location)
+    {
+        return GetRow(location) - (GetColumn(location) - (GetColumn(location)%2)) / 2;
+    }
+
+    private int GetHexS(int location)
+    {
+        return -GetHexQ(location)-GetHexR(location);
     }
 
     public TacticActor FindNearestEnemy(TacticActor currentActor, List<TacticActor> allActors)

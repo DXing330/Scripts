@@ -112,6 +112,14 @@ public class MoveManager : MonoBehaviour
         {
             DisplaceVertically(displacedActor, displacer.locationIndex, power, push);
         }
+        else if (line == 2)
+        {
+            DisplaceAlongR(displacedActor, displacer.locationIndex, power, push);
+        }
+        else if (line == 3)
+        {
+            DisplaceAlongS(displacedActor, displacer.locationIndex, power, push);
+        }
     }
 
     private void DisplaceHorizontally(TacticActor displaced, int displacerLocation, int power, int direction)
@@ -168,7 +176,7 @@ public class MoveManager : MonoBehaviour
             {
                 for (int i = 0; i < power; i++)
                 {
-                    ForceMovement(displaced, 2);
+                    ForceMovement(displaced, 3);
                 }
             }
             // Pull them up.
@@ -196,7 +204,95 @@ public class MoveManager : MonoBehaviour
             {
                 for (int i = 0; i < power; i++)
                 {
+                    ForceMovement(displaced, 3);
+                }
+            }
+        }
+    }
+
+    private void DisplaceAlongR(TacticActor displaced, int displacerLocation, int power, int direction)
+    {
+        // Check if the displacer is above of the target.
+        if (pathfinder.UpR(displacerLocation, displaced.locationIndex))
+        {
+            // Push them down right.
+            if (direction == 1)
+            {
+                for (int i = 0; i < power; i++)
+                {
                     ForceMovement(displaced, 2);
+                }
+            }
+            // Pull them up left.
+            else
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 5);
+                }
+            }
+        }
+        // Otherwise the displacer started below the target.
+        else
+        {
+            // Push them up left.
+            if (direction == 1)
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 5);
+                }
+            }
+            // Pull them down right.
+            else
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 2);
+                }
+            }
+        }
+    }
+
+    private void DisplaceAlongS(TacticActor displaced, int displacerLocation, int power, int direction)
+    {
+        // Check if the displacer is above of the target.
+        if (pathfinder.UpS(displacerLocation, displaced.locationIndex))
+        {
+            // Push them down left.
+            if (direction == 1)
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 4);
+                }
+            }
+            // Pull them up right.
+            else
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 1);
+                }
+            }
+        }
+        // Otherwise the displacer started below the target.
+        else
+        {
+            // Push them up left.
+            if (direction == 1)
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 1);
+                }
+            }
+            // Pull them down right.
+            else
+            {
+                for (int i = 0; i < power; i++)
+                {
+                    ForceMovement(displaced, 4);
                 }
             }
         }
