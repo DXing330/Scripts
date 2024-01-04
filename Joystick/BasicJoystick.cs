@@ -6,7 +6,7 @@ public class BasicJoystick : MonoBehaviour
 {
     public Joystick joystick;
     public float moveCooldown = 0.2f;
-    private float lastMove = 0f;
+    protected float lastMove = 0f;
 
 
     // Update is called once per frame

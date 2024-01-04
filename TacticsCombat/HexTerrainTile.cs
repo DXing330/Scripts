@@ -12,7 +12,16 @@ public class HexTerrainTile : TerrainTile
 
     public override void UpdateColor(int type)
     {
-        return;
+        Color tempColor = Color.white;
+        tempColor.a = 1f;
+        tileImage.color = tempColor;
+        if (type < 0)
+        {
+            tempColor = Color.black;
+            tempColor.a = 1f;
+            tileImage.color = tempColor;
+            return;
+        }
     }
 
     public override void SetTileNumber(int newNumber)
@@ -24,6 +33,7 @@ public class HexTerrainTile : TerrainTile
 
     public void SetTileText(string newText)
     {
+        if (tileNumberText == null){return;}
         tileNumberText.text = newText;
     }
 
