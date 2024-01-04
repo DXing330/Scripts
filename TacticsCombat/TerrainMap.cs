@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class TerrainMap : MonoBehaviour
 {
+    public bool hex = true;
     public BattleSimulator simulator;
     public bool battleStarted = false;
     public bool auto = false;
@@ -41,6 +42,7 @@ public class TerrainMap : MonoBehaviour
     public TerrainMaker terrainMaker;
     public TerrainPathfinder pathFinder;
     public List<Sprite> tileSprites;
+    public List<Sprite> hexTileSprites;
     public List<TacticActor> actors;
     public List<TacticActor> allActors;
     public List<TacticActor> aliveActors;
@@ -82,6 +84,13 @@ public class TerrainMap : MonoBehaviour
     {
         actorManager.GetActorData();
         actorManager.skillData.LoadAllData();
+        for (int i = 0; i < terrainTiles.Count; i++)
+        {
+            if (hex)
+            {
+                terrainTiles[i].SetTileNumber(i);
+            }
+        }
         if (GameManager.instance.randomBattle > 0)
         {
             terrainInfo = GameManager.instance.fixedBattleTerrain;
@@ -954,7 +963,14 @@ public class TerrainMap : MonoBehaviour
         {
             int tileType = terrainInfo[tileIndex];
             terrainTiles[imageIndex].UpdateColor(tileType);
-            terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
+            if (hex)
+            {
+                terrainTiles[imageIndex].UpdateTileImage(hexTileSprites[tileType]);
+            }
+            else
+            {
+                terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
+            }
         }
     }
 

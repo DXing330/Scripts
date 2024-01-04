@@ -94,4 +94,25 @@ public class Map : MonoBehaviour
             terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
         }
     }
+
+    public virtual void ClickOnTile(int tileNumber)
+    {
+        Debug.Log(tileNumber);
+    }
+
+    protected int GetRow(int location)
+    {
+        int row = 0;
+        while (location >= fullSize)
+        {
+            location -= fullSize;
+            row++;
+        }
+        return row;
+    }
+
+    protected int GetColumn(int location)
+    {
+        return location%fullSize;
+    }
 }

@@ -95,7 +95,8 @@ public class EquipmentInventory : BasicDataManager
     // Need to make sure that the party loads first for this to work.
     private void LoadEquipSets()
     {
-        for (int i = 0; i < allEquippedEquipment.Count; i++)
+        int max = Mathf.Min(allEquippedEquipment.Count, GameManager.instance.playerActors.Count);
+        for (int i = 0; i < max; i++)
         {
             GameManager.instance.playerActors[i].LoadAllEquipped(allEquippedEquipment[i]);
         }

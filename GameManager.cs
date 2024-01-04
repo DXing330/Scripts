@@ -231,10 +231,9 @@ public class GameManager : MonoBehaviour
     public void ResetParty()
     {
         if (playerActors.Count <= basePartySize){return;}
-        for (int i = basePartySize; i < playerActors.Count; i++)
-        {
-            playerActors.RemoveAt(i);
-        }
+        playerActors.Clear();
+        playerActors.Add(player);
+        playerActors.Add(familiar);
     }
 
     public void UpdateLocation(int newLocation)

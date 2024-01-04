@@ -6,27 +6,19 @@ public class MapEditorJoystick : BasicJoystick
 {
     public MapEditor map;
 
-    protected override void MoveHorizontally(int x)
+    protected override void Update()
     {
-        if (x > 0)
-        {
-            map.MoveMap(1);
-        }
-        else if (x < 0)
-        {
-            map.MoveMap(3);
-        }
+        if (Time.time < lastMove + moveCooldown){return;}
+        int joy_x = (int) joystick.Horizontal;
+        int joy_y = (int) joystick.Vertical;
+        if (joy_x == 0 && joy_y == 0){return;}
+        MoveHorizontally(joy_x);
+        MoveVertically(joy_y);
+        lastMove = Time.time;
     }
 
-    protected override void MoveVertically(int y)
+    protected void MoveMap(float x, float y)
     {
-        if (y > 0)
-        {
-            map.MoveMap(0);
-        }
-        else if (y < 0)
-        {
-            map.MoveMap(2);
-        }
+
     }
 }

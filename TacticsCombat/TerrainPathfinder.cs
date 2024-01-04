@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class TerrainPathfinder : MonoBehaviour
 {
+    public bool hex = false;
     public Utility heap;
     public TerrainTile terrainTile;
     // Raw terrain types.
@@ -22,7 +23,10 @@ public class TerrainPathfinder : MonoBehaviour
     public List<int> scoutingMoveCosts;
     // Occupied tiles adjust move cost.
     public List<int> occupiedTiles;
+    // Fullsize is used for square maps where #rows = #columns
     private int fullSize;
+    private int totalRows;
+    private int totalColumns;
     private int bigInt = 999999;
     public List<int> adjacentTiles;
     public List<int> tempAdjTiles;
@@ -190,44 +194,108 @@ public class TerrainPathfinder : MonoBehaviour
     private List<int> AdjacentFromIndex(int location)
     {
         tempAdjTiles.Clear();
-        if (location%fullSize > 0)
+        if (!hex)
         {
-            tempAdjTiles.Add(location-1);
+            if (location%fullSize > 0)
+            {
+                tempAdjTiles.Add(location-1);
+            }
+            if (location%fullSize < fullSize - 1)
+            {
+                tempAdjTiles.Add(location+1);
+            }
+            if (location < (fullSize - 1) * fullSize)
+            {
+                tempAdjTiles.Add(location+fullSize);
+            }
+            if (location > fullSize - 1)
+            {
+                tempAdjTiles.Add(location-fullSize);
+            }
         }
-        if (location%fullSize < fullSize - 1)
+        if (hex)
         {
-            tempAdjTiles.Add(location+1);
-        }
-        if (location < (fullSize - 1) * fullSize)
-        {
-            tempAdjTiles.Add(location+fullSize);
-        }
-        if (location > fullSize - 1)
-        {
-            tempAdjTiles.Add(location-fullSize);
-        }
-        return tempAdjTiles;
-    }
-
-    // Hard code test, come back to this later.
-    private List<int> AdjacentWithinRange(int location, int range)
-    {
-        tempAdjTiles.Clear();
-        if (location%fullSize > range - 1)
-        {
-            tempAdjTiles.Add(location-range);
-        }
-        if (location%fullSize < fullSize - range - 1)
-        {
-            tempAdjTiles.Add(location+range);
-        }
-        if (location < (fullSize - range - 1) * fullSize)
-        {
-            tempAdjTiles.Add(location+(fullSize*range));
-        }
-        if (location > fullSize - range - 1)
-        {
-            tempAdjTiles.Add(location-(fullSize*range));
+            int currentRow = GetRow(location);
+            int currentColumn = GetColumn(location);
+            // The top and bottom row have some special cases.
+            if (currentRow < fullSize - 1 && currentRow > 0)
+            {
+                tempAdjTiles.Add(location+fullSize);
+                tempAdjTiles.Add(location-fullSize);
+                if (currentColumn < fullSize - 1 && currentColumn > 0)
+                {
+                    tempAdjTiles.Add(location+1);
+                    tempAdjTiles.Add(location-1);
+                    if (currentColumn%2 == 1)
+                    {
+                        tempAdjTiles.Add(location+fullSize+1);
+                        tempAdjTiles.Add(location+fullSize-1);
+                    }
+                    else if (currentColumn%2 == 0)
+                    {
+                        tempAdjTiles.Add(location-fullSize+1);
+                        tempAdjTiles.Add(location-fullSize-1);
+                    }
+                }
+                else if (currentColumn == 0)
+                {
+                    tempAdjTiles.Add(location+1);
+                    tempAdjTiles.Add(location-fullSize+1);
+                }
+                else if (currentColumn == fullSize - 1)
+                {
+                    tempAdjTiles.Add(location-1);
+                    tempAdjTiles.Add(location-fullSize-1);
+                }
+            }
+            if (currentRow == 0)
+            {
+                tempAdjTiles.Add(location+fullSize);
+                // Corner cases.
+                if (currentColumn == 0)
+                {
+                    tempAdjTiles.Add(location + 1);
+                }
+                else if (currentColumn == fullSize - 1)
+                {
+                    tempAdjTiles.Add(location - 1);
+                }
+                else
+                {
+                    tempAdjTiles.Add(location + 1);
+                    tempAdjTiles.Add(location - 1);
+                    if (currentColumn%2 == 1)
+                    {
+                        tempAdjTiles.Add(location + fullSize + 1);
+                        tempAdjTiles.Add(location + fullSize - 1);
+                    }
+                }
+            }
+            if (currentRow == fullSize - 1)
+            {
+                tempAdjTiles.Add(location-fullSize);
+                // Corner cases.
+                if (currentColumn == 0)
+                {
+                    tempAdjTiles.Add(location + 1);
+                    tempAdjTiles.Add(location - fullSize + 1);
+                }
+                else if (currentColumn == fullSize - 1)
+                {
+                    tempAdjTiles.Add(location - 1);
+                    tempAdjTiles.Add(location - fullSize - 1);
+                }
+                else
+                {
+                    tempAdjTiles.Add(location + 1);
+                    tempAdjTiles.Add(location - 1);
+                    if (currentColumn%2 == 0)
+                    {
+                        tempAdjTiles.Add(location - fullSize + 1);
+                        tempAdjTiles.Add(location - fullSize - 1);
+                    }
+                }
+            }
         }
         return tempAdjTiles;
     }

@@ -299,7 +299,7 @@ public class OverworldMap : Map
         GameManager.instance.SetRandomBattleLocationDifficulty(int.Parse(locDiff[0]), int.Parse(locDiff[1]));
     }
 
-    public void ClickOnTile(int tileNumber)
+    public override void ClickOnTile(int tileNumber)
     {
         MovePlayerOntoTile(tileNumber);
     }

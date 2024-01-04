@@ -78,6 +78,10 @@ public class MapEditor : Map
         allMaps = File.ReadAllText(saveDataPath+"/Maps_"+baseTerrain+".txt");
         UpdateAllMapsList();
         ChangeIndex();
+        for (int i = 0; i < terrainTiles.Count; i++)
+        {
+            terrainTiles[i].SetTileNumber(i);
+        }
     }
 
     private void UpdateAllMapsList()
@@ -236,54 +240,72 @@ public class MapEditor : Map
     public void MoveMap(int direction)
     {
         int previousIndex = startIndex;
+        int previousColumn = GetColumn(previousIndex);
+        int previousRow = GetRow(previousIndex);
         switch (direction)
         {
             case -1:
                 UpdateCenterTile();
                 break;
             case 0:
-                if (previousIndex < fullSize)
-                {
-                    break;
-                }
+                if (previousIndex < fullSize){break;}
                 startIndex-=fullSize;
                 break;
             case 1:
-                if (previousIndex%fullSize==fullSize-1)
+                // Depends on column.
+                if (previousColumn == fullSize - 1){break;}
+                if (previousColumn%2 == 0)
                 {
-                    break;
+                    if (previousRow == 0){break;}
+                    startIndex = startIndex - fullSize + 1;
                 }
-                startIndex++;
+                else
+                {
+                    startIndex++;
+                }
                 break;
             case 2:
+                if (previousColumn == fullSize - 1){break;}
+                if (previousColumn%2 == 1)
+                {
+                    if (previousRow == fullSize - 1){break;}
+                    startIndex = startIndex + fullSize + 1;
+                }
+                else
+                {
+                    startIndex++;
+                }
+                break;
+            case 3:
                 if (previousIndex>(fullSize*(fullSize-1))-1)
                 {
                     break;
                 }
                 startIndex+=fullSize;
                 break;
-            case 3:
-                if (previousIndex%fullSize==0)
-                {
-                    break;
-                }
-                startIndex--;
-                break;
             case 4:
-                MoveMap(0);
-                MoveMap(1);
+                if (previousColumn == 0){break;}
+                if (previousColumn%2 == 1)
+                {
+                    if (previousRow == fullSize - 1){break;}
+                    startIndex = startIndex - fullSize - 1;
+                }
+                else
+                {
+                    startIndex--;
+                }
                 break;
             case 5:
-                MoveMap(2);
-                MoveMap(1);
-                break;
-            case 6:
-                MoveMap(2);
-                MoveMap(3);
-                break;
-            case 7:
-                MoveMap(0);
-                MoveMap(3);
+                if (previousColumn == 0){break;}
+                if (previousColumn%2 == 0)
+                {
+                    if (previousRow == 0){break;}
+                    startIndex = startIndex - fullSize - 1;
+                }
+                else
+                {
+                    startIndex--;
+                }
                 break;
         }
         DetermineCornerRowColumn();
@@ -291,7 +313,7 @@ public class MapEditor : Map
         UpdateMap();
     }
 
-    public void ClickOnTile(int tileNumber)
+    public override void ClickOnTile(int tileNumber)
     {
         if (currentlySelectedTerrain < 0){return;}
         allTiles[currentTiles[tileNumber]] = baseTerrains[currentlySelectedTerrain];

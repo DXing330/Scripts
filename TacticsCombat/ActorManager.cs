@@ -59,8 +59,17 @@ public class ActorManager : MonoBehaviour
 
     public void LoadPlayerTeam(bool fix = false)
     {
-        //int column = 0;
-        //int row = 0;
+        // Can load this based on the party list now.
+        /*if (!fix)
+        {
+            tries = 0;
+            int enemyCount = usedTiles.Count;
+            for (int i = 0; i < GameManager.instance.playerActors.Count; i++)
+            {
+                GenerateRandomLocation();
+                LoadPlayerTeamMemberFromActor(GameManager.instance.playerActors[i].playerActor, usedTiles[^1]);
+            }
+        }*/
         if (!fix)
         {
             tries = 0;
@@ -94,6 +103,11 @@ public class ActorManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void LoadPlayerTeamMemberFromActor(TacticActor actor, int location)
+    {
+        LoadActor(actor, location);
     }
 
     private void LoadPlayerTeamMember(string type, int location)
@@ -190,6 +204,7 @@ public class ActorManager : MonoBehaviour
         TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
         newActor.CopyStats(actorToCopy);
         newActor.InitialLocation(location);
+        UpdateActorSprite(newActor, actorToCopy.typeName);
         newActor.team = team;
         newActor.SetMap(terrainMap);
         terrainMap.AddActor(newActor);

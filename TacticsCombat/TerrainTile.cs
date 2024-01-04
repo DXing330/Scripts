@@ -5,6 +5,11 @@ using UnityEngine.UI;
 
 public class TerrainTile : MonoBehaviour
 {
+    public int tileNumber = -1;
+    public virtual void SetTileNumber(int newNumber)
+    {
+        tileNumber = newNumber;
+    }
     public int cType;
     //plains=0,forest=1,mountain=2,water=3,deepWater=4,desert=5
     public RectTransform rectTransform;
@@ -24,7 +29,7 @@ public class TerrainTile : MonoBehaviour
         cType = newType;
     }
 
-    public void UpdateSize(float newSize)
+    public virtual void UpdateSize(float newSize)
     {
         rectTransform.localScale = new Vector3(newSize, newSize, 0);
     }
@@ -113,7 +118,7 @@ public class TerrainTile : MonoBehaviour
         AOEHighlight.color = tempColor;
     }
 
-    public void UpdateColor(int type)
+    public virtual void UpdateColor(int type)
     {
         Color tempColor = Color.white;
         tempColor.a = 0.3f;
