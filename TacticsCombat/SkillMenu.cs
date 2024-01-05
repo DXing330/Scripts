@@ -9,6 +9,7 @@ public class SkillMenu : MonoBehaviour
     public Text skillEnergyCost;
     public Text skillDetails;
     public TacticActiveSkill activeSkill;
+    public SkillSelectList skillList;
     public AttackMenu lockOnMenu;
     public TerrainMap terrainMap;
     private Animator animator;
@@ -28,6 +29,7 @@ public class SkillMenu : MonoBehaviour
 
     public void UpdateSkill(TacticActiveSkill newSkill)
     {
+        skillList.UpdateSkills();
         activeSkill = newSkill;
         if (newSkill == null)
         {
@@ -52,6 +54,13 @@ public class SkillMenu : MonoBehaviour
     {
         terrainMap.SwitchSkill(right);
         UpdateSkill(terrainMap.ReturnCurrentSkill());
+    }
+
+    public void SelectSkill(int skillIndex)
+    {
+        skillList.SelectSkill(skillIndex);
+        UpdateSkill(terrainMap.ReturnCurrentSkill());
+        animator.SetTrigger("Select");
     }
 
     public void UseSkill()

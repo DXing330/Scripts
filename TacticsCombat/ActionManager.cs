@@ -113,6 +113,8 @@ public class ActionManager : MonoBehaviour
                 break;
             case 3:
                 terrainMap.ActorStartUsingSkills();
+                skillMenu.skillList.SetActor(currentActor);
+                // Use the current actor to get a list of skill names.
                 skillMenu.UpdateSkill(terrainMap.ReturnCurrentSkill());
                 DisableMovement();
                 DisableAttack();

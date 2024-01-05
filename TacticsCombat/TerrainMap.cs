@@ -302,7 +302,6 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorStartUsingSkills()
     {
-        // Reuse it for skills.
         currentSkill = 0;
     }
 
@@ -475,6 +474,14 @@ public class TerrainMap : MonoBehaviour
             {
                 currentSkill = skillsAmount - 1;
             }
+        }
+    }
+
+    public void SelectSkill(int skillIndex)
+    {
+        if (skillIndex < actors[turnIndex].activeSkillNames.Count)
+        {
+            currentSkill = skillIndex;
         }
     }
 
