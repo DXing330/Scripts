@@ -72,7 +72,7 @@ public class ActionLog : MonoBehaviour
         switch (terrainType)
         {
             case 7:
-                actor.typeName+" is on top of a chasm.";
+                newAction = actor.typeName+" is on top of a chasm.";
                 break;
         }
         AddActionLog(newAction);
