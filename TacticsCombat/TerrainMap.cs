@@ -198,6 +198,7 @@ public class TerrainMap : MonoBehaviour
     public void ActorsTurn()
     {
         // Check on terrain effects.
+        actionLog.AddTerrainEffect(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
         terrainEffectManager.AffectActorOnTerrain(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
         if (!actors[turnIndex].Actable())
         {
