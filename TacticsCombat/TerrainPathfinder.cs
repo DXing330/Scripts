@@ -346,12 +346,12 @@ public class TerrainPathfinder : MonoBehaviour
                 // UpRight.
                 case 1:
                     if (GetColumn(location) == totalColumns - 1){return false;}
-                    if (GetRow(location) ==  0 && GetColumn(location)%2 == 0){return false;}
+                    if (GetRow(location) == 0 && GetColumn(location)%2 == 0){return false;}
                     return true;
                 // DownRight.
                 case 2:
                     if (GetColumn(location) == totalColumns - 1){return false;}
-                    if (GetRow(location) ==  totalRows - 1 && GetColumn(location)%2 == 1){return false;}
+                    if (GetRow(location) == totalRows - 1 && GetColumn(location)%2 == 1){return false;}
                     return true;
                 // Down.
                 case 3:
@@ -359,12 +359,12 @@ public class TerrainPathfinder : MonoBehaviour
                 // DownLeft.
                 case 4:
                     if (GetColumn(location) == 0){return false;}
-                    if (GetRow(location) ==  totalRows - 1 && GetColumn(location)%2 == 1){return false;}
+                    if (GetRow(location) == totalRows - 1 && GetColumn(location)%2 == 1){return false;}
                     return true;
                 // UpLeft.
                 case 5:
                     if (GetColumn(location) == 0){return false;}
-                    if (GetRow(location) ==  0 && GetColumn(location)%2 == 0){return false;}
+                    if (GetRow(location) == 0 && GetColumn(location)%2 == 0){return false;}
                     return true;
             }
         }
@@ -654,6 +654,7 @@ public class TerrainPathfinder : MonoBehaviour
 
     private int GetColumn(int location)
     {
+        if (totalColumns == 0){return location%fullSize;}
         return location%totalColumns;
     }
 

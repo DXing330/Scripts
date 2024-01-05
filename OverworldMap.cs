@@ -37,10 +37,12 @@ public class OverworldMap : Map
         allLocations = allLocationsString.Split("|").ToList();
         locationSpecifics = allLocationSpecifics.Split("|").ToList();
         fullSize = (int) Mathf.Sqrt(allTiles.Count);
+        SetTotalRowsColumns(fullSize, fullSize);
         playerLocation = GameManager.instance.location;
         UpdateCenterTile();
         UpdateMap();
         pathfinder.SetTerrainInfo(allLocations, fullSize);
+
     }
 
     protected override void AddCurrentTile(int row, int column)

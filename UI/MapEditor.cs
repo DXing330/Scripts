@@ -139,7 +139,11 @@ public class MapEditor : Map
     {
         mapIndex = -1;
         UpdateIndexText();
-        if (fullSize < gridSize){fullSize = gridSize;}
+        if (fullSize < gridSize)
+        {
+            fullSize = gridSize;
+            SetTotalRowsColumns();
+        }
         allTiles.Clear();
         for (int i = 0; i < fullSize * fullSize; i++)
         {
@@ -158,6 +162,7 @@ public class MapEditor : Map
     {
         allTiles = new List<string>(mapToEdit);
         fullSize = (int) Mathf.Sqrt(allTiles.Count);
+        SetTotalRowsColumns();
         UpdateCenterTile();
         UpdateMap();
     }
@@ -194,6 +199,7 @@ public class MapEditor : Map
         baseTerrain = terrain;
         allTiles = loadedMap;
         fullSize = (int) Mathf.Sqrt(allTiles.Count);
+        SetTotalRowsColumns();
     }
 
     private void UpdateHighlights()
@@ -252,29 +258,12 @@ public class MapEditor : Map
                 startIndex-=fullSize;
                 break;
             case 1:
-                // Depends on column.
-                if (previousColumn == fullSize - 1){break;}
-                if (previousColumn%2 == 0)
-                {
-                    if (previousRow == 0){break;}
-                    startIndex = startIndex - fullSize + 1;
-                }
-                else
-                {
-                    startIndex++;
-                }
+                if (previousColumn >= fullSize - 2){break;}
+                startIndex += 2;
                 break;
             case 2:
-                if (previousColumn == fullSize - 1){break;}
-                if (previousColumn%2 == 1)
-                {
-                    if (previousRow == fullSize - 1){break;}
-                    startIndex = startIndex + fullSize + 1;
-                }
-                else
-                {
-                    startIndex++;
-                }
+                if (previousColumn >= fullSize - 2){break;}
+                startIndex += 2;
                 break;
             case 3:
                 if (previousIndex>(fullSize*(fullSize-1))-1)
@@ -284,28 +273,12 @@ public class MapEditor : Map
                 startIndex+=fullSize;
                 break;
             case 4:
-                if (previousColumn == 0){break;}
-                if (previousColumn%2 == 1)
-                {
-                    if (previousRow == fullSize - 1){break;}
-                    startIndex = startIndex - fullSize - 1;
-                }
-                else
-                {
-                    startIndex--;
-                }
+                if (previousColumn <= 1){break;}
+                startIndex -= 2;
                 break;
             case 5:
-                if (previousColumn == 0){break;}
-                if (previousColumn%2 == 0)
-                {
-                    if (previousRow == 0){break;}
-                    startIndex = startIndex - fullSize - 1;
-                }
-                else
-                {
-                    startIndex--;
-                }
+                if (previousColumn <= 1){break;}
+                startIndex -= 2;
                 break;
         }
         DetermineCornerRowColumn();

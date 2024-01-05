@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Map : MonoBehaviour
 {
+    public bool hex = true;
     public bool square = true;
     protected int startIndex;
     public int gridSize = 7;
@@ -12,8 +13,8 @@ public class Map : MonoBehaviour
     // Used for rectangular maps.
     protected int totalRows;
     protected int totalColumns;
-    protected int cornerColumn;
-    protected int cornerRow;
+    public int cornerColumn;
+    public int cornerRow;
     public List<Sprite> tileSprites;
     public List<string> allTiles;
     public List<int> currentTiles;
@@ -25,12 +26,16 @@ public class Map : MonoBehaviour
         SetTotalRowsColumns(fullSize, fullSize);
     }
 
-    public void SetTotalRowsColumns(int rows, int columns)
+    public void SetTotalRowsColumns(int rows = -1, int columns = -1)
     {
-        if (rows == columns){square = true;}
+        if (rows < 0 || columns < 0)
+        {
+            totalRows = fullSize;
+            totalColumns = fullSize;
+            return;
+        }
         totalRows = rows;
         totalColumns = columns;
-        fullSize  = rows;
     }
 
     protected virtual void InitializeTiles()
@@ -59,7 +64,6 @@ public class Map : MonoBehaviour
         currentTiles.Clear();
         int cColumn = 0;
         int cRow = 0;
-        // This doesn't depend on fullSize.
         for (int i = 0; i < gridSize * gridSize; i++)
         {
             AddCurrentTile(cRow + cornerRow, cColumn + cornerColumn);
@@ -85,14 +89,24 @@ public class Map : MonoBehaviour
     protected virtual void DetermineCornerRowColumn()
     {
         int start = startIndex;
-        cornerRow = -(gridSize/2);
-        cornerColumn = -(gridSize/2);
-        while (start >= totalColumns)
+        if (hex)
         {
-            start -= totalColumns;
-            cornerRow++;
+            int startRow = GetRow(start);
+            int startColumn = GetColumn(start);
+            cornerRow = startRow - (gridSize/2);
+            cornerColumn = startColumn - (gridSize/2);
         }
-        cornerColumn += start;
+        if (!hex)
+        {
+            cornerRow = -(gridSize/2);
+            cornerColumn = -(gridSize/2);
+            while (start >= totalColumns)
+            {
+                start -= totalColumns;
+                cornerRow++;
+            }
+            cornerColumn += start;
+        }
     }
 
     protected virtual void UpdateTile(int imageIndex, int tileIndex)

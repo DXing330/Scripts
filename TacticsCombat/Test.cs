@@ -59,4 +59,61 @@ public class Test : MonoBehaviour
             }
         }
     }
+/*
+    case 1:
+        // Depends on column.
+        if (previousColumn == fullSize - 1){break;}
+        if (previousColumn%2 == 0)
+        {
+            if (previousRow == 0){break;}
+            startIndex = startIndex - fullSize + 1;
+        }
+        else
+        {
+            startIndex++;
+        }
+        break;
+    case 2:
+        if (previousColumn == fullSize - 1){break;}
+        if (previousColumn%2 == 1)
+        {
+            if (previousRow == fullSize - 1){break;}
+            startIndex = startIndex + fullSize + 1;
+        }
+        else
+        {
+            startIndex++;
+        }
+        break;
+    case 3:
+        if (previousIndex>(fullSize*(fullSize-1))-1)
+        {
+            break;
+        }
+        startIndex+=fullSize;
+        break;
+    case 4:
+        if (previousColumn == 0){break;}
+        if (previousColumn%2 == 1)
+        {
+            if (previousRow == fullSize - 1){break;}
+            startIndex = startIndex - fullSize - 1;
+        }
+        else
+        {
+            startIndex--;
+        }
+        break;
+    case 5:
+        if (previousColumn == 0){break;}
+        if (previousColumn%2 == 0)
+        {
+            if (previousRow == 0){break;}
+            startIndex = startIndex - fullSize - 1;
+        }
+        else
+        {
+            startIndex--;
+        }
+        break;*/
 }

@@ -20,7 +20,10 @@ public class TerrainMap : MonoBehaviour
     private int fixedCenter;
     private bool lockedView = false;
     public int gridSize = 9;
+    public bool square = true;
     public int fullSize = 13;
+    public int totalRows;
+    public int totalColumns;
     public int baseTerrain = 0;
     public List<TerrainTile> terrainTiles;
     public List<int> currentTiles;
@@ -112,11 +115,18 @@ public class TerrainMap : MonoBehaviour
             actorManager.LoadEnemyTeam();
             actorManager.LoadPlayerTeam();
         }
+        // Need someway to set the total rows and columns based on something.
+        // For now just set them equal to the fullSize.
+        if (square)
+        {
+            totalRows = fullSize;
+            totalColumns = fullSize;
+        }
         pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
-        UpdateCenterTile(((fullSize) * fullSize)/2);
+        UpdateCenterTile(((totalRows * totalColumns))/2);
         UpdateMap();
-        if (fullSize <= gridSize){lockedView = true;}
-        fixedCenter=fullSize*fullSize/2;
+        if (totalRows <= gridSize || totalColumns <= gridSize){lockedView = true;}
+        fixedCenter=((totalRows * totalColumns))/2;
         simulator.UpdateSimulation();
         simulator.RunNSimulations();
         actionLog.ClearActionLog();
@@ -905,8 +915,13 @@ public class TerrainMap : MonoBehaviour
                 }
             }
         }
+        if (square)
+        {
+            totalRows = fullSize;
+            totalColumns = fullSize;
+        }
         allUnoccupied.Clear();
-        for (int i = 0; i < fullSize * fullSize; i++)
+        for (int i = 0; i < totalRows * totalColumns; i++)
         {
             allUnoccupied.Add(0);
         }
@@ -931,12 +946,12 @@ public class TerrainMap : MonoBehaviour
 
     protected void AddCurrentTile(int row, int column)
     {
-        if (row < 0 || column < 0 || column >= fullSize || row >= fullSize)
+        if (row < 0 || column < 0 || column >= totalColumns || row >= totalRows)
         {
             currentTiles.Add(-1);
             return;
         }
-        currentTiles.Add((row*fullSize)+column);
+        currentTiles.Add((row*totalColumns)+column);
     }
 
     protected void DetermineCornerRowColumn()
@@ -944,9 +959,9 @@ public class TerrainMap : MonoBehaviour
         int start = startIndex;
         cornerRow = -(gridSize/2);
         cornerColumn = -(gridSize/2);
-        while (start >= fullSize)
+        while (start >= totalColumns)
         {
-            start -= fullSize;
+            start -= totalColumns;
             cornerRow++;
         }
         cornerColumn += start;
@@ -955,7 +970,7 @@ public class TerrainMap : MonoBehaviour
     protected void UpdateTile(int imageIndex, int tileIndex)
     {
         // Undefined tiles are black.
-        if (tileIndex < 0 || tileIndex >= (fullSize * fullSize))
+        if (tileIndex < 0 || tileIndex >= (totalColumns * totalRows))
         {
             terrainTiles[imageIndex].UpdateColor(-1);
         }
@@ -1320,13 +1335,13 @@ public class TerrainMap : MonoBehaviour
         switch (direction)
         {
             case 0:
-                nextTile -= fullSize;
+                nextTile -= totalColumns;
                 break;
             case 1:
                 nextTile++;
                 break;
             case 2:
-                nextTile += fullSize;
+                nextTile += totalColumns;
                 break;
             case 3:
                 nextTile--;
@@ -1356,55 +1371,88 @@ public class TerrainMap : MonoBehaviour
     {
         lockedView = true;
         int previousFixedCenter = fixedCenter;
-        switch (direction)
+        if (!hex)
         {
-            case -1:
-                fixedCenter=fullSize*fullSize/2;
-                break;
-            case 0:
-                if (previousFixedCenter < fullSize)
-                {
+            switch (direction)
+            {
+                case -1:
+                    fixedCenter=((totalRows * totalColumns) + totalColumns)/2;
                     break;
-                }
-                fixedCenter-=fullSize;
-                break;
-            case 1:
-                if (previousFixedCenter%fullSize==fullSize-1)
-                {
+                case 0:
+                    if (previousFixedCenter < totalColumns)
+                    {
+                        break;
+                    }
+                    fixedCenter-=totalColumns;
                     break;
-                }
-                fixedCenter++;
-                break;
-            case 2:
-                if (previousFixedCenter>(fullSize*(fullSize-1))-1)
-                {
+                case 1:
+                    if (previousFixedCenter%totalColumns==totalColumns-1)
+                    {
+                        break;
+                    }
+                    fixedCenter++;
                     break;
-                }
-                fixedCenter+=fullSize;
-                break;
-            case 3:
-                if (previousFixedCenter%fullSize==0)
-                {
+                case 2:
+                    if (previousFixedCenter>(totalColumns*(totalRows-1))-1)
+                    {
+                        break;
+                    }
+                    fixedCenter+=totalColumns;
                     break;
-                }
-                fixedCenter--;
+                case 3:
+                    if (previousFixedCenter%totalColumns==0)
+                    {
+                        break;
+                    }
+                    fixedCenter--;
+                    break;
+                case 4:
+                    MoveMap(0);
+                    MoveMap(1);
+                    break;
+                case 5:
+                    MoveMap(2);
+                    MoveMap(1);
+                    break;
+                case 6:
+                    MoveMap(2);
+                    MoveMap(3);
+                    break;
+                case 7:
+                    MoveMap(0);
+                    MoveMap(3);
+                    break;
+            }
+        }
+        if (hex)
+        {
+            switch (direction)
+            {
+                case 0:
+                if (previousFixedCenter < totalColumns){break;}
+                fixedCenter-=totalColumns;
                 break;
-            case 4:
-                MoveMap(0);
-                MoveMap(1);
-                break;
-            case 5:
-                MoveMap(2);
-                MoveMap(1);
-                break;
-            case 6:
-                MoveMap(2);
-                MoveMap(3);
-                break;
-            case 7:
-                MoveMap(0);
-                MoveMap(3);
-                break;
+                case 1:
+                    if (previousFixedCenter%totalColumns >= totalColumns - 2){break;}
+                    fixedCenter += 2;
+                    break;
+                case 2:
+                    if (previousFixedCenter%totalColumns >= totalColumns - 2){break;}
+                    fixedCenter += 2;
+                    break;
+                case 3:
+                    if (previousFixedCenter > (totalColumns*(totalRows-1))-1){break;}
+                    fixedCenter+=totalColumns;
+                    break;
+                case 4:
+                    if (previousFixedCenter%totalColumns <= 1){break;}
+                    fixedCenter -= 2;
+                    break;
+                case 5:
+                    if (previousFixedCenter%totalColumns <= 1){break;}
+                    fixedCenter -= 2;
+                    break;
+            }
         }
         UpdateCenterTile(fixedCenter);
         UpdateMap();
