@@ -211,8 +211,8 @@ public class MapEditor : Map
         allTiles = loadedMap;
         totalRows = rows;
         totalColumns = columns;
-        if (totalRows < 9){totalRows = 9;}
-        if (totalColumns < 9){totalColumns = 9;}
+        if (totalRows < gridSize){totalRows = gridSize;}
+        if (totalColumns < gridSize){totalColumns = gridSize;}
         fullSize = (int) Mathf.Sqrt(allTiles.Count);
     }
 
