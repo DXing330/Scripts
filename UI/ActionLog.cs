@@ -75,6 +75,7 @@ public class ActionLog : MonoBehaviour
                 newAction = actor.typeName+" is on top of a chasm.";
                 break;
         }
+        if (newAction.Length < 6){return;}
         AddActionLog(newAction);
     }
 }
