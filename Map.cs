@@ -119,6 +119,12 @@ public class Map : MonoBehaviour
         else
         {
             int tileType = int.Parse(allTiles[tileIndex]);
+            if (tileType == 7)
+            {
+                terrainTiles[imageIndex].UpdateTileImage(tileSprites[0]);
+                terrainTiles[imageIndex].UpdateLocationImage(tileSprites[tileType]);
+                return;
+            }
             terrainTiles[imageIndex].UpdateColor(tileType);
             terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
         }

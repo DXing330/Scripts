@@ -18,7 +18,7 @@ public class TerrainMap : MonoBehaviour
     public int roundIndex = 0;
     public int roundLimit = 30;
     private int fixedCenter;
-    private bool lockedView = false;
+    private bool lockedView = true;
     public int gridSize = 9;
     public bool square = true;
     public int fullSize = 13;
@@ -122,7 +122,7 @@ public class TerrainMap : MonoBehaviour
             totalRows = fullSize;
             totalColumns = fullSize;
         }
-        pathFinder.SetTerrainInfo(terrainInfo, fullSize, occupiedTiles);
+        pathFinder.SetTerrainInfo(terrainInfo, totalRows, totalColumns, occupiedTiles);
         UpdateCenterTile(((totalRows * totalColumns))/2);
         UpdateMap();
         if (totalRows <= gridSize || totalColumns <= gridSize){lockedView = true;}
@@ -715,7 +715,6 @@ public class TerrainMap : MonoBehaviour
 
     public void ViewActorByIndex(int index)
     {
-        lockedView = false;
         currentViewed = turnOrder.ReturnActorIndex(index);
         if (currentViewed < 0)
         {

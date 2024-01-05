@@ -160,6 +160,7 @@ public class MapEditor : Map
 
     public void UndoEdits()
     {
+        if (mapToEdit.Count < terrainTiles.Count){return;}
         allTiles = new List<string>(mapToEdit);
         fullSize = (int) Mathf.Sqrt(allTiles.Count);
         SetTotalRowsColumns();

@@ -40,15 +40,16 @@ public class TerrainPathfinder : MonoBehaviour
     public List<int> attackableTiles;
     public List<int> possibleTiles;
 
-    public void SetTerrainInfo(List<int> newTerrain, int size, List<int> newOccupied)
+    public void SetTerrainInfo(List<int> newTerrain, int rows, int columns, List<int> newOccupied)
     {
         UpdateOccupiedTiles(newOccupied);
         terrainInfo = newTerrain;
-        fullSize = size;
-        if (square)
+        totalRows = rows;
+        totalColumns = columns;
+        if (totalRows == totalColumns)
         {
-            totalRows = fullSize;
-            totalColumns = fullSize;
+            square = true;
+            fullSize = totalRows;
         }
     }
 
