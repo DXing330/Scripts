@@ -115,18 +115,9 @@ public class TerrainMap : MonoBehaviour
             actorManager.LoadEnemyTeam();
             actorManager.LoadPlayerTeam();
         }
-        // Need someway to set the total rows and columns based on something.
-        // For now just set them equal to the fullSize.
-        if (square)
-        {
-            totalRows = fullSize;
-            totalColumns = fullSize;
-        }
         pathFinder.SetTerrainInfo(terrainInfo, totalRows, totalColumns, occupiedTiles);
-        UpdateCenterTile(((totalRows * totalColumns))/2);
+        UpdateCenterTile(1);
         UpdateMap();
-        if (totalRows <= gridSize || totalColumns <= gridSize){lockedView = true;}
-        fixedCenter=((totalRows * totalColumns))/2;
         simulator.UpdateSimulation();
         simulator.RunNSimulations();
         actionLog.ClearActionLog();
@@ -215,7 +206,7 @@ public class TerrainMap : MonoBehaviour
         }
         moveManager.UpdateMoveMenu();
         pathFinder.UpdateOccupiedTiles(occupiedTiles);
-        UpdateCenterTile(actors[turnIndex].locationIndex);
+        UpdateCenterTile();
         UpdateMap();
         actors[turnIndex].StartTurn();
         if (actors[turnIndex].team > 0 || (auto))
@@ -293,7 +284,6 @@ public class TerrainMap : MonoBehaviour
         {
             return;
         }
-        UpdateCenterTile(actors[turnIndex].locationIndex);
         UpdateMap();
         actorInfo.UpdateInfo(actors[turnIndex]);
     }
@@ -605,7 +595,7 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorStopAttacking()
     {
-        UpdateCenterTile(actors[turnIndex].locationIndex);
+        UpdateCenterTile();
         UpdateMap();
     }
 
@@ -708,7 +698,7 @@ public class TerrainMap : MonoBehaviour
             return;
         }
         actorInfo.UpdateInfo(actors[currentViewed]);
-        UpdateCenterTile(actors[currentViewed].locationIndex);
+        UpdateCenterTile();
         UpdateMap();
         ViewAttackableTiles();
     }
@@ -803,7 +793,7 @@ public class TerrainMap : MonoBehaviour
     {
         UpdateOccupiedTiles();
         pathFinder.UpdateOccupiedTiles(occupiedTiles);
-        UpdateCenterTile(actors[turnIndex].locationIndex);
+        UpdateCenterTile();
         UpdateMap();
     }
 
@@ -905,8 +895,19 @@ public class TerrainMap : MonoBehaviour
             if (GameManager.instance.forestFixedTerrains[terrainIndex].Length > size)
             {
                 // Get the terrain from the GameManager.
-                string[] fixedTerrain = GameManager.instance.forestFixedTerrains[terrainIndex].Split("|");
-                fullSize = (int) Mathf.Sqrt(fixedTerrain.Length);
+                string[] fixedTerrainInfo = GameManager.instance.forestFixedTerrains[terrainIndex].Split(",");
+                string[] fixedTerrain = fixedTerrainInfo[0].Split("|");
+                // Enable backwards compatability for now.
+                if (fixedTerrainInfo.Length > 2)
+                {
+                    square = false;
+                    totalRows = int.Parse(fixedTerrainInfo[1]);
+                    totalColumns = int.Parse(fixedTerrainInfo[2]);
+                }
+                else
+                {
+                    fullSize = (int) Mathf.Sqrt(fixedTerrain.Length);
+                }
                 terrainInfo.Clear();
                 for (int j = 0; j < fixedTerrain.Length; j++)
                 {
@@ -979,6 +980,12 @@ public class TerrainMap : MonoBehaviour
             terrainTiles[imageIndex].UpdateColor(tileType);
             if (hex)
             {
+                if (tileType == 7)
+                {
+                    terrainTiles[imageIndex].UpdateLocationImage(hexTileSprites[tileType]);
+                    terrainTiles[imageIndex].UpdateTileImage(hexTileSprites[0]);
+                    return;
+                }
                 terrainTiles[imageIndex].UpdateTileImage(hexTileSprites[tileType]);
             }
             else
@@ -988,22 +995,27 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
-    private void UpdateCenterTile(int index)
+    private void UpdateCenterTile(int center = -1)
     {
-        if (lockedView)
+        if (center > 0)
         {
-            startIndex = fixedCenter;
+            DetermineCentermostTile();
+        }
+        startIndex = fixedCenter;
+        DetermineCornerRowColumn();
+        DetermineCurrentTiles();
+    }
+
+    private void DetermineCentermostTile()
+    {
+        if (totalRows%2 == 1)
+        {
+            fixedCenter = (totalRows * totalColumns)/2;
         }
         else
         {
-            startIndex = index;
-            if (startIndex < 0)
-            {
-                startIndex = actors[turnIndex].locationIndex;   
-            }
+            fixedCenter = ((totalRows - 1) * totalColumns)/2;
         }
-        DetermineCornerRowColumn();
-        DetermineCurrentTiles();
     }
 
     private void UpdateOccupiedTiles()
@@ -1293,7 +1305,7 @@ public class TerrainMap : MonoBehaviour
     private void SeeTarget()
     {
         currentHighlighting = 3;
-        UpdateCenterTile(targetableTiles[currentTarget]);
+        UpdateCenterTile();
         UpdateMap();
         HighlightTiles(false);
         // Update some info about the target.
@@ -1356,7 +1368,7 @@ public class TerrainMap : MonoBehaviour
     private void SeeSkillSpan()
     {
         currentHighlighting = 4;
-        UpdateCenterTile(skillCenter);
+        //UpdateCenterTile(skillCenter);
         UpdateMap();
         HighlightTiles();
         // Need to keep track of the skill's center location.
@@ -1453,7 +1465,7 @@ public class TerrainMap : MonoBehaviour
                     break;
             }
         }
-        UpdateCenterTile(fixedCenter);
+        UpdateCenterTile();
         UpdateMap();
         // Need to maintain the highlights according to what the player was doing.
         // Moving -> move highlights, skill -> skill highlights, etc.

@@ -165,11 +165,12 @@ public class ActorManager : MonoBehaviour
 
     private bool GenerateRandomLocation()
     {
-        int fullSize = terrainMap.fullSize;
-        if (tries > fullSize * fullSize){return false;}
-        int row = Random.Range(0,fullSize);
-        int column = Random.Range(0,fullSize);
-        int index = column + (row*fullSize);
+        int rows = terrainMap.totalRows;
+        int columns = terrainMap.totalColumns;
+        if (tries > rows * columns){return false;}
+        int row = Random.Range(0,rows);
+        int column = Random.Range(0,columns);
+        int index = column + (row*columns);
         if (!usedTiles.Contains(index) && !unusableTiles.Contains(index))
         {
             usedTiles.Add(index);

@@ -6,54 +6,39 @@ public class MapEditorJoystick : BasicJoystick
 {
     public MapEditor map;
 
+    // Update is called once per frame
     protected override void Update()
     {
         if (Time.time < lastMove + moveCooldown){return;}
-        float joy_x = joystick.Horizontal;
-        float joy_y = joystick.Vertical;
+        int joy_x = (int) joystick.Horizontal;
+        int joy_y = (int) joystick.Vertical;
         if (joy_x == 0 && joy_y == 0){return;}
-        MoveMap(joy_x, joy_y);
+        MoveHorizontally(joy_x);
+        MoveVertically(joy_y);
         lastMove = Time.time;
     }
 
-    protected void MoveMap(float x, float y)
+    protected override void MoveHorizontally(int x)
     {
-        if (y == 0){return;}
+        if (x > 0)
+        {
+            map.MoveMap(1);
+        }
+        else if (x < 0)
+        {
+            map.MoveMap(4);
+        }
+    }
+
+    protected override void MoveVertically(int y)
+    {
         if (y > 0)
         {
-            if (Mathf.Abs(x) < Mathf.Abs(y))
-            {
-                map.MoveMap(0);
-            }
-            else
-            {
-                if (x > 0)
-                {
-                    map.MoveMap(1);
-                }
-                else
-                {
-                    map.MoveMap(5);
-                }
-            }
+            map.MoveMap(0);
         }
-        else
+        else if (y < 0)
         {
-            if (Mathf.Abs(x) < Mathf.Abs(y))
-            {
-                map.MoveMap(3);
-            }
-            else
-            {
-                if (x > 0)
-                {
-                    map.MoveMap(2);
-                }
-                else
-                {
-                    map.MoveMap(4);
-                }
-            }
+            map.MoveMap(3);
         }
     }
 }

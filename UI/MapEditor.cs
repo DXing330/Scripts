@@ -60,7 +60,15 @@ public class MapEditor : Map
             }
         }
         UpdateIndexText();
-        LoadMap(allMapsList[mapIndex].Split("|").ToList());
+        string[] loadedMapData = allMapsList[mapIndex].Split(",");
+        if (loadedMapData.Length > 2)
+        {
+            LoadMap(loadedMapData[0].Split("|").ToList(), int.Parse(loadedMapData[1]), int.Parse(loadedMapData[2]));
+        }
+        else
+        {
+            LoadMap(loadedMapData[0].Split("|").ToList());
+        }
         UpdateCenterTile();
         UpdateMap();
     }
@@ -107,10 +115,12 @@ public class MapEditor : Map
             allMaps = "";
         }
         SaveMap();
+        string savedMapText = GameManager.instance.ConvertListToString(mapToEdit)+","+totalRows+","+totalColumns;
         // If its a new map then add it to the rest.
         if (mapIndex < 0)
         {
-            allMaps += "#"+GameManager.instance.ConvertListToString(mapToEdit);
+            allMaps += "#"+savedMapText;
+            // add some text about the amount of rows and columns in the map.
             UpdateAllMapsList();
             mapIndex = allMapsList.Count-1;
             UpdateIndexText();
@@ -118,7 +128,7 @@ public class MapEditor : Map
         // Otherwise just edit it.
         else
         {
-            allMapsList[mapIndex] = GameManager.instance.ConvertListToString(mapToEdit);
+            allMapsList[mapIndex] = savedMapText;
             allMaps = GameManager.instance.ConvertListToString(allMapsList, "#");
         }
         File.WriteAllText(saveDataPath+"/Maps_"+baseTerrain+".txt", allMaps);
@@ -195,12 +205,15 @@ public class MapEditor : Map
         }
     }
 
-    public void LoadMap(List<string> loadedMap, string terrain = "1")
+    public void LoadMap(List<string> loadedMap, int rows = -1, int columns = -1, string terrain = "1")
     {
         baseTerrain = terrain;
         allTiles = loadedMap;
+        totalRows = rows;
+        totalColumns = columns;
+        if (totalRows < 9){totalRows = 9;}
+        if (totalColumns < 9){totalColumns = 9;}
         fullSize = (int) Mathf.Sqrt(allTiles.Count);
-        SetTotalRowsColumns();
     }
 
     private void UpdateHighlights()
@@ -230,14 +243,24 @@ public class MapEditor : Map
     {
         if (tileNumber < 0)
         {
-            if (fullSize%2 == 1)
+            /*if ((totalRows*totalColumns)%2 == 1)
             {
-                startIndex = (fullSize*fullSize/2);
+                startIndex = (totalRows*totalColumns/2);
             }
             else
             {
-                startIndex = (fullSize/2)+(fullSize*fullSize/2);
+                startIndex = (totalColumns/2)+(totalRows*totalColumns/2);
+            }*/
+            // Main idea, go to the middle row, middle column.
+            if (totalRows%2 == 1)
+            {
+                startIndex = (totalRows*totalColumns/2);
             }
+            else
+            {
+                startIndex = (totalColumns/2)+(totalRows*totalColumns/2);
+            }
+            // Main idea, go to the middle row, middle column.
         }
         else{startIndex = tileNumber;}
         DetermineCornerRowColumn();
@@ -255,23 +278,23 @@ public class MapEditor : Map
                 UpdateCenterTile();
                 break;
             case 0:
-                if (previousIndex < fullSize){break;}
-                startIndex-=fullSize;
+                if (previousRow <= 0){break;}
+                startIndex-=totalColumns;
                 break;
             case 1:
-                if (previousColumn >= fullSize - 2){break;}
+                if (previousColumn >= totalColumns - 2){break;}
                 startIndex += 2;
                 break;
             case 2:
-                if (previousColumn >= fullSize - 2){break;}
+                if (previousColumn >= totalColumns - 2){break;}
                 startIndex += 2;
                 break;
             case 3:
-                if (previousIndex>(fullSize*(fullSize-1))-1)
+                if (previousRow>=totalRows-1)
                 {
                     break;
                 }
-                startIndex+=fullSize;
+                startIndex+=totalColumns;
                 break;
             case 4:
                 if (previousColumn <= 1){break;}
@@ -314,6 +337,9 @@ public class MapEditor : Map
         {
             DecreaseMapSize();
         }
+        allTiles = new List<string>(tempTiles);
+        UpdateCenterTile();
+        UpdateMap();
     }
 
     private void IncreaseMapSize()
@@ -335,9 +361,6 @@ public class MapEditor : Map
             }
         }
         fullSize++;
-        allTiles = new List<string>(tempTiles);
-        UpdateCenterTile();
-        UpdateMap();
     }
 
     private void DecreaseMapSize()
@@ -359,9 +382,102 @@ public class MapEditor : Map
             }
         }
         fullSize--;
-        allTiles = new List<string>(tempTiles);
+    }
+
+    public void AdjustRows(bool increase = true)
+    {
+        tempTiles.Clear();
+        if (increase)
+        {
+            AddRow();
+        }
+        else
+        {
+            RemoveRow();
+        }
         UpdateCenterTile();
         UpdateMap();
+    }
+
+    public void AdjustColumns(bool increase = true)
+    {
+        tempTiles.Clear();
+        if (increase)
+        {
+            AddColumns();
+        }
+        else
+        {
+            RemoveColumns();
+        }
+        UpdateCenterTile();
+        UpdateMap();
+    }
+
+    private void AddRow()
+    {
+        if (totalRows >= gridSize * 2){return;}
+        // Just add a new row at the bottom.
+        for (int i = 0; i < totalColumns; i++)
+        {
+            allTiles.Add(baseTerrain);
+        }
+        totalRows++;
+    }
+
+    private void RemoveRow()
+    {
+        if (totalRows <= gridSize){return;}
+        // Remove the last row.
+        for (int i = 0; i < totalColumns; i++)
+        {
+            allTiles.RemoveAt(allTiles.Count - 1);
+        }
+        totalRows--;
+    }
+
+    private void AddColumns()
+    {
+        if (totalColumns >= gridSize * 2){return;}
+        // Add two columns at once to ensure balance.
+        // Adding two doesn't make it balanced, try adding four at a time.
+        int index = 0;
+        for (int i = 0; i < totalRows; i++)
+        {
+            for (int j = 0; j < totalColumns+4; j++)
+            {
+                if (j >= totalColumns)
+                {
+                    tempTiles.Add(baseTerrain);
+                    continue;
+                }
+                tempTiles.Add(allTiles[index]);
+                index++;
+            }
+        }
+        totalColumns += 4;
+        allTiles = new List<string>(tempTiles);
+    }
+
+    private void RemoveColumns()
+    {
+        if (totalColumns <= gridSize){return;}
+        int index = 0;
+        for (int i = 0; i < totalRows; i++)
+        {
+            for (int j = 0; j < totalColumns; j++)
+            {
+                if (j >= totalColumns - 4)
+                {
+                    index++;
+                    continue;
+                }
+                tempTiles.Add(allTiles[index]);
+                index++;
+            }
+        }
+        totalColumns -= 4;
+        allTiles = new List<string>(tempTiles);
     }
 
     public void ChangePage(bool right = true)

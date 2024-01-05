@@ -11,8 +11,8 @@ public class Map : MonoBehaviour
     // Used for square maps.
     protected int fullSize;
     // Used for rectangular maps.
-    protected int totalRows;
-    protected int totalColumns;
+    public int totalRows;
+    public int totalColumns;
     public int cornerColumn;
     public int cornerRow;
     public List<Sprite> tileSprites;
