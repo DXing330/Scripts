@@ -591,7 +591,7 @@ public class TerrainPathfinder : MonoBehaviour
     public List<int> FindTilesInLineRange(TacticActor actor, int range)
     {
         reachableTiles.Clear();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 6; i++)
         {
             // Start wherever the actor is.
             int start = actor.locationIndex;
