@@ -1,14 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class ActionLog : MonoBehaviour
 {
+    public static ActionLog instance;
+    void Awake()
+    {
+        instance = this;
+    }
     public List<string> actionLog;
     public List<TMP_Text> actionTexts;
     // Later allow for scrolling up or down.
     public int currentPage = 0;
+    public Scrollbar scrollbar;
 
     private void ResetTexts()
     {

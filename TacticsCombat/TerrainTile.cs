@@ -10,6 +10,11 @@ public class TerrainTile : MonoBehaviour
     {
         tileNumber = newNumber;
     }
+    public Color transColor;
+    void Start()
+    {
+        transColor.a = 0f;
+    }
     public int cType;
     //plains=0,forest=1,mountain=2,water=3,deepWater=4,desert=5
     public RectTransform rectTransform;
@@ -23,6 +28,7 @@ public class TerrainTile : MonoBehaviour
     public Image highlight;
     // Show the border when you're trying to select a tile.
     public Image AOEHighlight;
+    public List<Image> directionalArrows;
 
     public void SetType(int newType)
     {
@@ -52,9 +58,7 @@ public class TerrainTile : MonoBehaviour
     public void ResetLocationImage()
     {
         locationImage.sprite = null;
-        Color tempColor = Color.white;
-        tempColor.a = 0f;
-        locationImage.color = tempColor;
+        locationImage.color = transColor;
     }
 
     public void UpdateLocationImage(Sprite newTile)
@@ -67,10 +71,8 @@ public class TerrainTile : MonoBehaviour
 
     public void ResetImage()
     {
-        Color tempColor = Color.white;
-        tempColor.a = 0f;
         actorImage.sprite = null;
-        actorImage.color = tempColor;
+        actorImage.color = transColor;
     }
 
     public void UpdateImage(Sprite newActor)
@@ -83,9 +85,7 @@ public class TerrainTile : MonoBehaviour
 
     public void ResetHighlight()
     {
-        Color tempColor = Color.white;
-        tempColor.a = 0f;
-        highlight.color = tempColor;
+        highlight.color = transColor;
     }
 
     public void Highlight(bool cyan = true)
@@ -102,9 +102,7 @@ public class TerrainTile : MonoBehaviour
 
     public void ResetAOEHighlight()
     {
-        Color tempColor = Color.white;
-        tempColor.a = 0f;
-        AOEHighlight.color = tempColor;
+        AOEHighlight.color = transColor;
     }
 
     public void AoeHighlight(bool red = true)
@@ -166,6 +164,24 @@ public class TerrainTile : MonoBehaviour
                 break;
         }
         backgroundColor.color = tempColor;
+    }
+
+    public void ResetDirectionalArrows()
+    {
+        for (int i = 0; i < directionalArrows.Count; i++)
+        {
+            directionalArrows[i].color = transColor;
+        }
+    }
+    
+    public void UpdateDirectionalArrow(int direction = -1)
+    {
+        if (direction >= 0 && direction < directionalArrows.Count)
+        {
+            Color visibleColor = Color.white;
+            visibleColor.a = 1f;
+            directionalArrows[direction].color = visibleColor;
+        }
     }
 
     public int ReturnMoveCost(int type, int occupied = 0)

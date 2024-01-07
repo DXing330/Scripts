@@ -29,6 +29,8 @@ public class TacticActor : AllStats
     public int defense;
     public int movement;
     public int initiative;
+    public int counterAttacksLeft = 1;
+    public int currentDirection;
     // 0 is offensive, 1 is passive, 2 is fleeing
     public int AIType = 0;
     public int destinationIndex;
@@ -131,6 +133,7 @@ public class TacticActor : AllStats
         currentMovespeed = baseMovement;
         currentAttackRange = attackRange;
         energy = Mathf.Min(energy+1, baseEnergy);
+        counterAttacksLeft = Mathf.Min(counterAttacksLeft+1, 1);
         ApplyBuffDebuffEffects();
         movement = 0;
     }
