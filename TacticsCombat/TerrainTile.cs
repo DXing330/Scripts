@@ -29,6 +29,7 @@ public class TerrainTile : MonoBehaviour
     // Show the border when you're trying to select a tile.
     public Image AOEHighlight;
     public List<Image> directionalArrows;
+    public int currentDirectionArrow = -1;
 
     public void SetType(int newType)
     {
@@ -168,16 +169,16 @@ public class TerrainTile : MonoBehaviour
 
     public void ResetDirectionalArrows()
     {
-        for (int i = 0; i < directionalArrows.Count; i++)
-        {
-            directionalArrows[i].color = transColor;
-        }
+        if (currentDirectionArrow < 0){return;}
+        directionalArrows[currentDirectionArrow].color = transColor;
+        currentDirectionArrow = -1;
     }
     
     public void UpdateDirectionalArrow(int direction = -1)
     {
         if (direction >= 0 && direction < directionalArrows.Count)
         {
+            currentDirectionArrow = direction;
             Color visibleColor = Color.white;
             visibleColor.a = 1f;
             directionalArrows[direction].color = visibleColor;

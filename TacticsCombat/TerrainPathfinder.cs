@@ -112,6 +112,11 @@ public class TerrainPathfinder : MonoBehaviour
         }
         return true;
     }
+
+    public int CheckCurrentLocationType(TacticActor actor)
+    {
+        return (terrainInfo[actor.locationIndex]);
+    }
     
     // Returns a list of tiles to pass through, not including the start or end points, so you will end up adjacent to the destination.
     public List<int> FindPathIndex(int startIndex, int destIndex, int moveType)
@@ -333,6 +338,18 @@ public class TerrainPathfinder : MonoBehaviour
                 adjacentTiles.AddRange(tempAdjTiles.Except(adjacentTiles));
             }
         }
+    }
+
+    public int DirectionBetweenLocations(int startLocation, int nextLocation)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (GetDestination(startLocation, i) == nextLocation)
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public bool DirectionCheck(int location, int direction)

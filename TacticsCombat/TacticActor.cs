@@ -504,6 +504,14 @@ public class TacticActor : AllStats
         {
             if (!real)
             {
+                if (turnPath.Count == 1)
+                {
+                    currentDirection = terrainMap.pathFinder.DirectionBetweenLocations(locationIndex, turnPath[0]);
+                }
+                else
+                {
+                    currentDirection = terrainMap.pathFinder.DirectionBetweenLocations(turnPath[turnPath.Count - 2], turnPath[^1]);
+                }
                 locationIndex = turnPath[^1];
                 return;
             }

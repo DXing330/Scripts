@@ -1065,6 +1065,7 @@ public class TerrainMap : MonoBehaviour
             terrainTiles[i].ResetLocationImage();
             terrainTiles[i].ResetHighlight();
             terrainTiles[i].ResetAOEHighlight();
+            terrainTiles[i].ResetDirectionalArrows();
             UpdateTile(i, currentTiles[i]);
         }
         // O(n^2)
@@ -1085,6 +1086,7 @@ public class TerrainMap : MonoBehaviour
     private void UpdateActorImage(int imageIndex, int actorIndex)
     {
         terrainTiles[imageIndex].UpdateImage(allActors[actorIndex].spriteRenderer.sprite);
+        terrainTiles[imageIndex].UpdateDirectionalArrow(allActors[actorIndex].currentDirection);
     }
 
     private void GetReachableTiles()
@@ -1331,7 +1333,11 @@ public class TerrainMap : MonoBehaviour
     // Just do this once at the beginning of skill movement to get the highlighted range of the skill.
     private int SeeSkillRange()
     {
-        int skillRange = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
+        int skillRange = actors[turnIndex].activeSkill.range;
+        if (actors[turnIndex].activeSkill.effect == "Battle")
+        {
+            skillRange = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
+        }
         highlightedTiles = new List<int>(pathFinder.FindTilesInSkillRange(actors[turnIndex], skillRange));
         highlightedTiles.Add(actors[turnIndex].locationIndex);
         return skillRange;
@@ -1339,7 +1345,11 @@ public class TerrainMap : MonoBehaviour
 
     private int LineSkillRange()
     {
-        int skillRange = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
+        int skillRange = actors[turnIndex].activeSkill.range;
+        if (actors[turnIndex].activeSkill.effect == "Battle")
+        {
+            skillRange = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
+        }
         highlightedTiles = new List<int>(pathFinder.FindTilesInLineRange(actors[turnIndex], skillRange));
         highlightedTiles.Add(actors[turnIndex].locationIndex);
         return skillRange;
@@ -1448,9 +1458,9 @@ public class TerrainMap : MonoBehaviour
             switch (direction)
             {
                 case 0:
-                if (previousFixedCenter < totalColumns){break;}
-                fixedCenter-=totalColumns;
-                break;
+                    if (previousFixedCenter < totalColumns){break;}
+                    fixedCenter-=totalColumns;
+                    break;
                 case 1:
                     if (previousFixedCenter%totalColumns >= totalColumns - 2){break;}
                     fixedCenter += 2;
