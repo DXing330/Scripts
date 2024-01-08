@@ -640,8 +640,13 @@ public class TerrainMap : MonoBehaviour
             return;
         }
         actors[turnIndex].actionsLeft--;
-        // Find if they can counter attack.
         TacticActor target = ReturnCurrentTarget();
+        int newDirection = pathFinder.DirectionBetweenLocations(actors[turnIndex].locationIndex, target.locationIndex);
+        if (newDirection >= 0)
+        {
+            actors[turnIndex].currentDirection = newDirection;
+        }
+        // Find if they can counter attack.
         bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex], target), DetermineFlanking(target));
         // If they die while attacking, automatically end their turn.
         if (attackerDied || actors[turnIndex].actionsLeft <= 0)
