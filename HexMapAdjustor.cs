@@ -34,7 +34,8 @@ public class HexMapAdjustor : MonoBehaviour
                     yPivot = yCenter - 1f/(4*gridSize);
                 }
                 tiles[tileIndex].UpdatePivot(xPivot, yPivot);
-                tiles[tileIndex].SetTileText("("+GetHexQ(tileIndex)+","+GetHexR(tileIndex)+","+GetHexS(tileIndex)+")");
+                tiles[tileIndex].SetTileNumber(tileIndex);
+                //tiles[tileIndex].SetTileText("("+GetHexQ(tileIndex)+","+GetHexR(tileIndex)+","+GetHexS(tileIndex)+")");
                 tileIndex++;
                 xPivot += 1f/(gridSize - 1);
             }

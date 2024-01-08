@@ -26,8 +26,8 @@ public class TerrainPathfinder : MonoBehaviour
     public List<int> occupiedTiles;
     // Fullsize is used for square maps where #rows = #columns
     private int fullSize;
-    private int totalRows;
-    private int totalColumns;
+    public int totalRows;
+    public int totalColumns;
     private int bigInt = 999999;
     public List<int> adjacentTiles;
     public List<int> tempAdjTiles;
@@ -411,6 +411,8 @@ public class TerrainPathfinder : MonoBehaviour
     {
         if (hex)
         {
+            Debug.Log(directionOne);
+            Debug.Log(directionTwo);
             if ((directionOne+3)%6 == directionTwo){return true;}
             else if ((directionOne+2)%6 == directionTwo){return true;}
             else if ((directionOne+4)%6 == directionTwo){return true;}

@@ -19,6 +19,7 @@ public class Map : MonoBehaviour
     public List<string> allTiles;
     public List<int> currentTiles;
     public List<TerrainTile> terrainTiles;
+    public TerrainPathfinder pathfinder;
 
     protected virtual void Start()
     {
@@ -133,6 +134,10 @@ public class Map : MonoBehaviour
     public virtual void ClickOnTile(int tileNumber)
     {
         Debug.Log(tileNumber);
+        for (int i = 0; i < terrainTiles.Count; i++)
+        {
+            terrainTiles[i].SetTileText(pathfinder.CalculateDistance(tileNumber, i).ToString());
+        }
     }
 
     protected int GetRow(int location)

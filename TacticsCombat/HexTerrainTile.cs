@@ -33,7 +33,7 @@ public class HexTerrainTile : TerrainTile
         tileNumberText.text = newNumber.ToString();
     }
 
-    public void SetTileText(string newText)
+    public override void SetTileText(string newText)
     {
         if (!text){return;}
         tileNumberText.text = newText;

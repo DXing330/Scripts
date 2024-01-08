@@ -10,6 +10,10 @@ public class TerrainTile : MonoBehaviour
     {
         tileNumber = newNumber;
     }
+    public virtual void SetTileText(string newText)
+    {
+        return;
+    }
     public Color transColor;
     void Start()
     {

@@ -21,7 +21,7 @@ public class OverworldMap : Map
     public List<string> allLocations;
     public List<string> locationSpecifics;
     public List<string> exploredTiles;
-    public OverworldPathfinder pathfinder;
+    public new OverworldPathfinder pathfinder;
 
     protected void Save()
     {}
