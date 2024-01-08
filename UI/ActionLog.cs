@@ -6,6 +6,17 @@ using TMPro;
 
 public class ActionLog : MonoBehaviour
 {
+    public bool testing = false;
+    void Start()
+    {
+        if (testing)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                AddActionLog(i.ToString());
+            }
+        }
+    }
     public static ActionLog instance;
     void Awake()
     {
@@ -32,7 +43,7 @@ public class ActionLog : MonoBehaviour
     }
 
     // Update with the newest actions.
-    public void UpdateActionTexts()
+    private void UpdateActionTexts()
     {
         ResetTexts();
         // Update the text in reverse so the bottom is the newest.
@@ -40,7 +51,7 @@ public class ActionLog : MonoBehaviour
         {
             for (int i = 0; i < actionTexts.Count; i++)
             {
-                actionTexts[actionTexts.Count - i - 1].text = actionLog[i];
+                actionTexts[actionTexts.Count - i - 1].text = actionLog[i+currentPage];
             }
         }
         // Ensure that the bottom text is the newest.
@@ -53,10 +64,29 @@ public class ActionLog : MonoBehaviour
         }
     }
 
+    // Scrollbar resets whenever new actions are added.
+    private void UpdateScrollBar()
+    {
+        scrollbar.value = 0;
+        scrollbar.size = Mathf.Min(1, actionTexts.Count/actionLog.Count);
+    }
+
+    public void ChangePage()
+    {
+        if (actionTexts.Count >= actionLog.Count){return;}
+        float scrollValue = scrollbar.value;
+        //Debug.Log("Scroll Value: "+scrollValue);
+        // currentPage ranges in value from 0 to actionLog.Count - 10.
+        currentPage = (int) (scrollValue * (actionLog.Count - 10));
+        UpdateActionTexts();
+    }
+
     public void AddActionLog(string newAction)
     {
         actionLog.Insert(0, newAction);
+        currentPage = 0;
         UpdateActionTexts();
+        UpdateScrollBar();
     }
 
     public void AddSkillAction(TacticActor skillUser, TacticActor skillTarget)
