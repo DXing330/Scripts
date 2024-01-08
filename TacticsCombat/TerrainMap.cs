@@ -613,6 +613,12 @@ public class TerrainMap : MonoBehaviour
         {
             actionLog.AddActionLog(attacker.typeName+" attacks "+defender.typeName+".");
         }
+        // Rotate the attacker to face the defender if possible.
+        int newDirection = pathFinder.DirectionBetweenLocations(attacker.locationIndex, defender.locationIndex);
+        if (newDirection >= 0)
+        {
+            attacker.currentDirection = newDirection;
+        }
         // If you don't use the action text them it must be a skill that triggered the battle.
         bool attackerDied = actorManager.BattleBetweenActors(attacker, defender, Counterable(attacker, defender, !actionText), DetermineFlanking(defender), skillMultiplier);
         if (attackerDied && attacker.team == 0)
@@ -760,22 +766,28 @@ public class TerrainMap : MonoBehaviour
 
     private bool Counterable(TacticActor attacker, TacticActor defender, bool skill = false)
     {
-        // If they have the same attack range just counter.
-        if (!skill && attacker.currentAttackRange <= defender.currentAttackRange)
-        {
-            return true;
-        }
+        // Check if the defender has counter attacks left.
+        if (defender.counterAttacksLeft <= 0){return false;}
+        // Check if the defender is facing the right way.
+        if (!pathFinder.FaceOffCheck(attacker.currentDirection, defender.currentDirection)){return false;}
+        // Finally check if the attacker is in range.
         int attackerLocation = attacker.locationIndex;
         int defenderLocation = defender.locationIndex;
         int range = defender.currentAttackRange;
         int distance = pathFinder.CalculateDistance(defenderLocation, attackerLocation);
-        return (distance <= range);
+        if (distance <= range)
+        {
+            defender.counterAttacksLeft--;
+            return true;
+        }
+        return false;
     }
 
     public void MoveActor(int direction)
     {
         if (actors[turnIndex].team == 0)
         {
+            actors[turnIndex].currentDirection = direction;
             moveManager.MoveInDirection(actors[turnIndex], direction);
             UpdateAfterMovingActor();
         }

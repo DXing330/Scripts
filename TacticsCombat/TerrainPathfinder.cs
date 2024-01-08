@@ -407,6 +407,25 @@ public class TerrainPathfinder : MonoBehaviour
         return false;   
     }
 
+    public bool FaceOffCheck(int directionOne, int directionTwo)
+    {
+        if (hex)
+        {
+            if ((directionOne+3)%6 == directionTwo){return true;}
+            else if ((directionOne+2)%6 == directionTwo){return true;}
+            else if ((directionOne+4)%6 == directionTwo){return true;}
+            return false;
+        }
+        if (!hex)
+        {
+            if ((directionOne+2)%4 == directionTwo){return true;}
+            return false;
+        }
+        // For ranged attacks direction facing doesn't matter.
+        // Since ranged doesn't have enough nerfs yet lel.
+        return true;
+    }
+
     public int SameLine(int locOne, int locTwo)
     {
         if (!hex)
@@ -640,11 +659,18 @@ public class TerrainPathfinder : MonoBehaviour
 
     public int CalculateDistance(int pointOne, int pointTwo)
     {
-        int rowOne = GetRow(pointOne);
-        int columnOne = GetColumn(pointOne);
-        int rowTwo = GetRow(pointTwo);
-        int columnTwo = GetColumn(pointTwo);
-        return Mathf.Abs(rowOne-rowTwo)+Mathf.Abs(columnOne-columnTwo);
+        if (!hex)
+        {
+            int rowOne = GetRow(pointOne);
+            int columnOne = GetColumn(pointOne);
+            int rowTwo = GetRow(pointTwo);
+            int columnTwo = GetColumn(pointTwo);
+            return Mathf.Abs(rowOne-rowTwo)+Mathf.Abs(columnOne-columnTwo);
+        }
+        else
+        {
+            return (Mathf.Abs(GetHexQ(pointOne)-GetHexQ(pointTwo))+Mathf.Abs(GetHexR(pointOne)-GetHexR(pointTwo))+Mathf.Abs(GetHexS(pointOne)-GetHexS(pointTwo)))/2;
+        }
     }
 
     public int CalculateDistanceToLocation(TacticActor actor, int destination)
@@ -657,6 +683,21 @@ public class TerrainPathfinder : MonoBehaviour
             distance += addedDist;
         }
         return distance;
+    }
+
+    public int CalculateDirectionToLocation(TacticActor actor, int destination)
+    {
+        FindPathIndex(actor.locationIndex, destination, actor.movementType);
+        if (actualPath.Count == 1)
+        {
+            return DirectionBetweenLocations(actor.locationIndex, destination);
+        }
+        else
+        {
+            // Actual path starts at the destination and ends at the start.
+            // So to find the direction to get to the final destination you consider the tile you were at before the final destination, in this case the second tile.
+            return DirectionBetweenLocations(actualPath[1], actualPath[0]);
+        }
     }
 
     private int GetRow(int location)
