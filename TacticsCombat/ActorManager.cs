@@ -312,6 +312,7 @@ public class ActorManager : MonoBehaviour
         {
             return 0;
         }
+        // If the player is defeated its an autoloss?
         // There may be other special win/loss conditions though.
         switch (winCondition)
         {

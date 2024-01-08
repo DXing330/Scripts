@@ -40,6 +40,7 @@ public class SkillEffectManager : MonoBehaviour
                 skill.AddBuffDebuff(target, skill.effectSpecifics, power);
                 return true;
         }
+        if (skill.effect.StartsWith("Battle")){return true;}
         power /= powerDenominator;
         skill.AffectActor(target, power);
         return false;

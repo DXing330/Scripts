@@ -390,6 +390,11 @@ public class TerrainMap : MonoBehaviour
             case "Battle+Status":
                 BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower, false);
                 break;
+            case "Battle+Displace":
+                BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower, false);
+                // If battling and displacing then the power of the displacement is always 1.
+                moveManager.Displace(actors[turnIndex], target, 1, actors[turnIndex].activeSkill.effectSpecifics);
+                break;
             case "Summon":
                 SummonSkillActivate(targetableTiles[currentTarget]);
                 break;

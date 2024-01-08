@@ -411,8 +411,6 @@ public class TerrainPathfinder : MonoBehaviour
     {
         if (hex)
         {
-            Debug.Log(directionOne);
-            Debug.Log(directionTwo);
             if ((directionOne+3)%6 == directionTwo){return true;}
             else if ((directionOne+2)%6 == directionTwo){return true;}
             else if ((directionOne+4)%6 == directionTwo){return true;}

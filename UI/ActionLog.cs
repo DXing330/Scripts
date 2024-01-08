@@ -24,7 +24,6 @@ public class ActionLog : MonoBehaviour
     }
     public List<string> actionLog;
     public List<TMP_Text> actionTexts;
-    // Later allow for scrolling up or down.
     public int currentPage = 0;
     public Scrollbar scrollbar;
 
