@@ -89,6 +89,7 @@ public class GameManager : MonoBehaviour
     public int randomBattle = 0;
     public string battleName = "";
     public List<string> forestFixedTerrains;
+    public List<string> forestFixedBattles;
     public List<int> fixedBattleTerrain;
     public List<string> fixedBattleActors;
     public int battleLocationType;

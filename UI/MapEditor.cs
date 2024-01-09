@@ -10,7 +10,7 @@ public class MapEditor : Map
 {
     public string allMaps;
     public List<string> allMapsList;
-    private string saveDataPath;
+    protected string saveDataPath;
     public TMP_Text indexText;
     public int mapIndex = -1;
     public int currentPage = 0;
@@ -23,7 +23,7 @@ public class MapEditor : Map
     public string baseTerrain = "1";
     public string[] baseTerrains;
 
-    private void UpdateIndexText()
+    protected virtual void UpdateIndexText()
     {
         if (mapIndex < 0)
         {
@@ -83,7 +83,10 @@ public class MapEditor : Map
         UpdateBaseTerrains();
         DeterminePossibleTerrains();
         saveDataPath = Application.persistentDataPath;
-        allMaps = File.ReadAllText(saveDataPath+"/Maps_"+baseTerrain+".txt");
+        if (File.Exists(saveDataPath+"/Maps_"+baseTerrain+".txt"))
+        {
+            allMaps = File.ReadAllText(saveDataPath+"/Maps_"+baseTerrain+".txt");
+        }
         UpdateAllMapsList();
         ChangeIndex();
         for (int i = 0; i < terrainTiles.Count; i++)
@@ -92,7 +95,7 @@ public class MapEditor : Map
         }
     }
 
-    private void UpdateAllMapsList()
+    protected void UpdateAllMapsList()
     {
         allMapsList = allMaps.Split("#").ToList();
         for (int i = 0; i < allMapsList.Count; i++)
@@ -120,7 +123,6 @@ public class MapEditor : Map
         if (mapIndex < 0)
         {
             allMaps += "#"+savedMapText;
-            // add some text about the amount of rows and columns in the map.
             UpdateAllMapsList();
             mapIndex = allMapsList.Count-1;
             UpdateIndexText();
@@ -178,12 +180,12 @@ public class MapEditor : Map
         UpdateMap();
     }
 
-    private void UpdateBaseTerrains()
+    protected void UpdateBaseTerrains()
     {
         baseTerrains = possibleTerrains[int.Parse(baseTerrain)].Split("|");
     }
 
-    private void DeterminePossibleTerrains()
+    protected void DeterminePossibleTerrains()
     {
         int pageShift = (currentPage * possibleTerrainButtons.Count);
         for (int i = 0; i < possibleTerrainButtons.Count; i++)
@@ -205,7 +207,7 @@ public class MapEditor : Map
         }
     }
 
-    public void LoadMap(List<string> loadedMap, int rows = -1, int columns = -1, string terrain = "1")
+    public virtual void LoadMap(List<string> loadedMap, int rows = -1, int columns = -1, string terrain = "1")
     {
         baseTerrain = terrain;
         allTiles = loadedMap;
@@ -216,7 +218,7 @@ public class MapEditor : Map
         fullSize = (int) Mathf.Sqrt(allTiles.Count);
     }
 
-    private void UpdateHighlights()
+    protected void UpdateHighlights()
     {
         for (int i = 0; i < Mathf.Min(possibleTerrainTiles.Count, baseTerrains.Length - (currentPage * possibleTerrainButtons.Count)); i++)
         {
@@ -228,7 +230,7 @@ public class MapEditor : Map
         }
     }
 
-    private void UpdateMap()
+    protected void UpdateMap()
     {
         for (int i = 0; i < terrainTiles.Count; i++)
         {
@@ -239,74 +241,9 @@ public class MapEditor : Map
         }
     }
 
-    private void UpdateCenterTile(int tileNumber = -1)
+    public override void MoveMap(int direction)
     {
-        if (tileNumber < 0)
-        {
-            /*if ((totalRows*totalColumns)%2 == 1)
-            {
-                startIndex = (totalRows*totalColumns/2);
-            }
-            else
-            {
-                startIndex = (totalColumns/2)+(totalRows*totalColumns/2);
-            }*/
-            // Main idea, go to the middle row, middle column.
-            if (totalRows%2 == 1)
-            {
-                startIndex = (totalRows*totalColumns/2);
-            }
-            else
-            {
-                startIndex = (totalColumns/2)+(totalRows*totalColumns/2);
-            }
-            // Main idea, go to the middle row, middle column.
-        }
-        else{startIndex = tileNumber;}
-        DetermineCornerRowColumn();
-        DetermineCurrentTiles();
-    }
-
-    public void MoveMap(int direction)
-    {
-        int previousIndex = startIndex;
-        int previousColumn = GetColumn(previousIndex);
-        int previousRow = GetRow(previousIndex);
-        switch (direction)
-        {
-            case -1:
-                UpdateCenterTile();
-                break;
-            case 0:
-                if (previousRow <= 0){break;}
-                startIndex-=totalColumns;
-                break;
-            case 1:
-                if (previousColumn >= totalColumns - 2){break;}
-                startIndex += 2;
-                break;
-            case 2:
-                if (previousColumn >= totalColumns - 2){break;}
-                startIndex += 2;
-                break;
-            case 3:
-                if (previousRow>=totalRows-1)
-                {
-                    break;
-                }
-                startIndex+=totalColumns;
-                break;
-            case 4:
-                if (previousColumn <= 1){break;}
-                startIndex -= 2;
-                break;
-            case 5:
-                if (previousColumn <= 1){break;}
-                startIndex -= 2;
-                break;
-        }
-        DetermineCornerRowColumn();
-        DetermineCurrentTiles();
+        base.MoveMap(direction);
         UpdateMap();
     }
 
@@ -342,7 +279,7 @@ public class MapEditor : Map
         UpdateMap();
     }
 
-    private void IncreaseMapSize()
+    protected void IncreaseMapSize()
     {
         if (fullSize + 1 >= gridSize*2){return;}
         // Copy the list and add a row and column.
@@ -363,7 +300,7 @@ public class MapEditor : Map
         fullSize++;
     }
 
-    private void DecreaseMapSize()
+    protected void DecreaseMapSize()
     {
         if (fullSize <= gridSize){return;}
         // Copy the list and remove a row and column;
@@ -414,7 +351,7 @@ public class MapEditor : Map
         UpdateMap();
     }
 
-    private void AddRow()
+    protected void AddRow()
     {
         if (totalRows >= gridSize * 2){return;}
         // Just add a new row at the bottom.
@@ -425,7 +362,7 @@ public class MapEditor : Map
         totalRows++;
     }
 
-    private void RemoveRow()
+    protected void RemoveRow()
     {
         if (totalRows <= gridSize){return;}
         // Remove the last row.
@@ -436,7 +373,7 @@ public class MapEditor : Map
         totalRows--;
     }
 
-    private void AddColumns()
+    protected void AddColumns()
     {
         if (totalColumns >= gridSize * 2){return;}
         // Add two columns at once to ensure balance.
@@ -459,7 +396,7 @@ public class MapEditor : Map
         allTiles = new List<string>(tempTiles);
     }
 
-    private void RemoveColumns()
+    protected void RemoveColumns()
     {
         if (totalColumns <= gridSize){return;}
         int index = 0;

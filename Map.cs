@@ -155,4 +155,65 @@ public class Map : MonoBehaviour
     {
         return location%totalColumns;
     }
+
+    public virtual void MoveMap(int direction)
+    {
+        int previousIndex = startIndex;
+        int previousColumn = GetColumn(previousIndex);
+        int previousRow = GetRow(previousIndex);
+        switch (direction)
+        {
+            case -1:
+                UpdateCenterTile();
+                break;
+            case 0:
+                if (previousRow <= 0){break;}
+                startIndex-=totalColumns;
+                break;
+            case 1:
+                if (previousColumn >= totalColumns - 2){break;}
+                startIndex += 2;
+                break;
+            case 2:
+                if (previousColumn >= totalColumns - 2){break;}
+                startIndex += 2;
+                break;
+            case 3:
+                if (previousRow>=totalRows-1)
+                {
+                    break;
+                }
+                startIndex+=totalColumns;
+                break;
+            case 4:
+                if (previousColumn <= 1){break;}
+                startIndex -= 2;
+                break;
+            case 5:
+                if (previousColumn <= 1){break;}
+                startIndex -= 2;
+                break;
+        }
+        DetermineCornerRowColumn();
+        DetermineCurrentTiles();
+    }
+
+    protected virtual void UpdateCenterTile(int tileNumber = -1)
+    {
+        if (tileNumber < 0)
+        {
+            if (totalRows%2 == 1)
+            {
+                startIndex = (totalRows*totalColumns/2);
+            }
+            else
+            {
+                startIndex = (totalColumns/2)+(totalRows*totalColumns/2);
+            }
+            // Main idea, go to the middle row, middle column.
+        }
+        else{startIndex = tileNumber;}
+        DetermineCornerRowColumn();
+        DetermineCurrentTiles();
+    }
 }
