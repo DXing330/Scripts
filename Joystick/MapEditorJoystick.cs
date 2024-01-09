@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MapEditorJoystick : BasicJoystick
 {
-    public MapEditor map;
+    public Map map;
 
     // Update is called once per frame
     protected override void Update()

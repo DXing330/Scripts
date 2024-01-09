@@ -8,6 +8,8 @@ using TMPro;
 
 public class BattleMapEditor : Map
 {
+    public Color transColor;
+    public Color highlightColor;
     public string allBattles;
     public string baseTerrain = "1";
     protected string saveDataPath;
@@ -63,15 +65,65 @@ public class BattleMapEditor : Map
             indexText.text = "Battle "+(currentBattleIndex+1).ToString();
         }
     }
-    // 0 changes map, 1 changes difficulty, 2 changes enemy and locations, 3 changes spawn points.
-    public int currentlyEditing = 1;
+    // -1 changes what to edit, 0 changes map, 1 changes difficulty, 2 changes enemy and locations, 3 changes spawn points.
+    public int currentlyEditing = -1;
     public string currentBattleData;
     public string currentMap;
+    protected void SetCurrentMap(int newMap)
+    {
+        currentMap = newMap.ToString();
+        UpdateCurrentMapText();
+    }
+    public TMP_Text currentMapText;
+    protected void UpdateCurrentMapText()
+    {
+        currentMapText.text = (int.Parse(currentMap)+1).ToString();
+    }
     public string currentDifficulty;
+    public Image editEnemiesBG;
+    public void StartChangingEnemies()
+    {
+        if (currentlyEditing != 2)
+        {
+            currentlyEditing = 2;
+            editEnemiesBG.color = highlightColor;
+        }
+        else
+        {
+            currentlyEditing = -1;
+            editEnemiesBG.color = transColor;
+        }
+        currentlySelectedEnemyType = -1;
+        currentlySelectedEnemyLocation = -1;
+    }
+    public int currentlySelectedEnemyType = -1;
+    public int currentlySelectedEnemyLocation = -1;
     public List<string> currentEnemies;
     public List<string> currentEnemyLocations;
+    public int totalSpawnPoints = 9;
+    public Image editSpawnBG;
+    public TMP_Text unusedSpawnPointsText;
+    protected void UpdateUnusedSpawnPointsText()
+    {
+        int remainder = totalSpawnPoints - currentSpawnPoints.Count;
+        unusedSpawnPointsText.text = remainder.ToString();
+    }
     public List<string> currentSpawnPoints;
-
+    public void StartChangingSpawnPoints()
+    {
+        if (currentlyEditing != 3)
+        {
+            currentlyEditing = 3;
+            editSpawnBG.color = highlightColor;
+        }
+        else
+        {
+            currentlyEditing = -1;
+            editSpawnBG.color = transColor;
+        }
+        currentlySelectedSpawnPoint = -1;
+    }
+    public int currentlySelectedSpawnPoint = -1;
 
     // Loading is done once at the start so a specific load function isn't needed.
     protected void Load()
@@ -116,25 +168,32 @@ public class BattleMapEditor : Map
 
     public void NewBattle()
     {
-        
+        currentBattleIndex = -1;
+        UpdateIndexText();
+        currentlyEditing = -1;
+        SetCurrentMap(0);
+        currentDifficulty = "0";
+        LoadBaseMap();
     }
 
     protected override void Start()
     {
+        for (int i = 0; i < terrainTiles.Count; i++)
+        {
+            terrainTiles[i].SetTileNumber(i);
+        }
         // Load once at the start.
         saveDataPath = Application.persistentDataPath;
         if (File.Exists(saveDataPath+"/BattleMaps_"+baseTerrain+".txt"))
         {
             allBattles = File.ReadAllText(saveDataPath+"/BattleMaps_"+baseTerrain+".txt");
+            UpdateAllBattlesList();
+            ChangeIndex();
         }
         else
         {
             allBattles = "";
-        }
-        UpdateAllBattlesList();
-        for (int i = 0; i < terrainTiles.Count; i++)
-        {
-            terrainTiles[i].SetTileNumber(i);
+            NewBattle();
         }
     }
 
@@ -163,6 +222,29 @@ public class BattleMapEditor : Map
             }
         }
         // Update player spawn points.
+        for (int i = 0; i < currentSpawnPoints.Count; i++)
+        {
+            // See if they should appear.
+            int spawnPoint = int.Parse(currentSpawnPoints[i]);
+            int indexOfSpawn = currentTiles.IndexOf(spawnPoint);
+            if (indexOfSpawn >= 0)
+            {
+                if (spawnPoint == currentlySelectedSpawnPoint)
+                {
+                    terrainTiles[indexOfSpawn].Highlight(false);
+                }
+                else
+                {
+                    terrainTiles[indexOfSpawn].Highlight();
+                }
+            }
+        }
+    }
+
+    public override void MoveMap(int direction)
+    {
+        base.MoveMap(direction);
+        UpdateMap();
     }
 
     public bool SaveCurrentBattle()
@@ -172,7 +254,7 @@ public class BattleMapEditor : Map
         // Battle needs enemies.
         if (currentEnemies.Count <= 0){return false;}
         // Battle needs spawn points.
-        if (currentSpawnPoints.Count < 9){return false;}
+        if (currentSpawnPoints.Count < totalSpawnPoints){return false;}
         return true;
     }
 
@@ -234,7 +316,7 @@ public class BattleMapEditor : Map
         UpdateMap();
     }
 
-    private void ChangeBaseMap(int newMapIndex)
+    protected void ChangeBaseMap(int newMapIndex)
     {
         switch (baseTerrain)
         {
@@ -244,7 +326,7 @@ public class BattleMapEditor : Map
                 if (newMapIndex >= GameManager.instance.forestFixedTerrains.Count){newMapIndex -= totalMaps;}
                 break;
         }
-        currentMap = newMapIndex.ToString();
+        SetCurrentMap(newMapIndex);
         LoadBaseMap();
     }
 
@@ -258,6 +340,126 @@ public class BattleMapEditor : Map
         else
         {
             ChangeBaseMap(currentMapIndex-1);
+        }
+    }
+
+    public override void ClickOnTile(int tileNumber)
+    {
+        switch (currentlyEditing)
+        {
+            case 3:
+                SetSpawnPoint(tileNumber);
+                UpdateUnusedSpawnPointsText();
+                UpdateMap();
+                break;
+        }
+    }
+
+    protected void SetSpawnPoint(int tileNumber)
+    {
+        string spawnLocation = currentTiles[tileNumber].ToString();
+        // Can't spawn on enemies.
+        if (currentEnemyLocations.Contains(spawnLocation)){return;}
+        // Check if this overlaps with a tile already in the spawn zone.
+        int overlap = 0;
+        if (currentSpawnPoints.Contains(spawnLocation)){overlap = 1;}
+        // If you're selecting a new tile.
+        if (currentlySelectedSpawnPoint < 0)
+        {
+            // If not enough spawn points then make a new one.
+            if (overlap == 0 && currentSpawnPoints.Count < totalSpawnPoints)
+            {
+                currentSpawnPoints.Add(spawnLocation);
+                return;
+            }
+            // Can pick a current spawn point.
+            else if (overlap == 1)
+            {
+                currentlySelectedSpawnPoint = int.Parse(spawnLocation);
+                return;
+            }
+        }
+        // Can move spawn points around.
+        else if (currentlySelectedSpawnPoint > 0)
+        {
+            // Don't move it to an overlapping region.
+            // Replace it with the newly selected or drop it.
+            if (overlap == 1)
+            {
+                if (currentlySelectedSpawnPoint == currentTiles[tileNumber])
+                {
+                    currentlySelectedSpawnPoint = -1;
+                }
+                else
+                {
+                    currentlySelectedSpawnPoint = currentTiles[tileNumber];
+                }
+                return;
+            }
+            // If possible then switch the spawn point to the new location.
+            else if (overlap == 0)
+            {
+                int indexOf = currentSpawnPoints.IndexOf(currentlySelectedSpawnPoint.ToString());
+                currentSpawnPoints[indexOf] = spawnLocation;
+                currentlySelectedSpawnPoint = -1;
+            }
+        }
+    }
+
+    public void SelectEnemyType(int typeIndex)
+    {
+        if (currentlySelectedEnemyType == typeIndex)
+        {
+            currentlySelectedEnemyType = -1;
+            return;
+        }
+        currentlySelectedEnemyType = typeIndex;
+    }
+
+    protected void SetEnemy(int tileNumber)
+    {
+        // Either place a new enemy or move an enemy around.
+        if (currentlySelectedEnemyType < 0 && currentlySelectedEnemyLocation < 0){return;}
+        string spawnLocation = currentTiles[tileNumber].ToString();
+        // Can't place an enemy on a spawn point.
+        if (currentSpawnPoints.Contains(spawnLocation)){return;}
+        // Can't place an enemy on another enemy.
+        int overlap = 0;
+        if (currentEnemyLocations.Contains(spawnLocation)){overlap = 1;}
+        // If you click on an empty tile.
+        if (overlap == 0)
+        {
+            if (currentlySelectedEnemyType >= 0)
+            {
+                // Place them down at the location.
+                currentEnemies.Add(possibleForestEnemies[currentlySelectedEnemyType]);
+                currentEnemyLocations.Add(spawnLocation);
+                currentlySelectedEnemyLocation = -1;
+                return;
+            }
+            else if (currentlySelectedEnemyLocation >= 0)
+            {
+                // Move the enemy to the new location.
+                int indexOf = currentEnemyLocations.IndexOf(currentlySelectedEnemyLocation.ToString());
+                currentEnemyLocations[indexOf] = spawnLocation;
+                currentlySelectedEnemyLocation = -1;
+
+            }
+        }
+        // If you click on an enemy already on the map.
+        else if (overlap == 1)
+        {
+            // We can do double clicks to delete enemies.
+            if (currentlySelectedEnemyLocation == currentTiles[tileNumber])
+            {
+                // Delete the enemy.
+                currentlySelectedEnemyLocation = -1;
+            }
+            else
+            {
+                currentlySelectedEnemyLocation = currentTiles[tileNumber];
+            }
+            currentlySelectedEnemyType = -1;
         }
     }
 }
