@@ -48,6 +48,7 @@ public class BattleMapEditor : Map
                 currentBattleIndex = allBattlesList.Count - 1;
             }
         }
+        currentBattleData = allBattlesList[currentBattleIndex];
         UpdateIndexText();
         LoadCurrentBattleData();
         UpdateCenterTile();
@@ -67,6 +68,16 @@ public class BattleMapEditor : Map
     }
     // -1 changes what to edit, 0 changes map, 1 changes difficulty, 2 changes enemy and locations, 3 changes spawn points.
     public int currentlyEditing = -1;
+    protected void SetCurrentlyEditing(int newEditing)
+    {
+        currentlyEditing = newEditing;
+        if (currentlyEditing == 2)
+        {
+            editEnemyTab.SetActive(true);
+            UpdatePageOfEnemies();
+        }
+        else{editEnemyTab.SetActive(false);}
+    }
     public string currentBattleData;
     public string currentMap;
     protected void SetCurrentMap(int newMap)
@@ -85,18 +96,71 @@ public class BattleMapEditor : Map
     {
         if (currentlyEditing != 2)
         {
-            currentlyEditing = 2;
+            SetCurrentlyEditing(2);
             editEnemiesBG.color = highlightColor;
         }
         else
         {
-            currentlyEditing = -1;
+            SetCurrentlyEditing(-1);
             editEnemiesBG.color = transColor;
         }
         currentlySelectedEnemyType = -1;
         currentlySelectedEnemyLocation = -1;
     }
+    public List<TerrainTile> possibleEnemyButtons;
+    public List<GameObject> possibleEnemyObjects;
+    public GameObject editEnemyTab;
+    public int currentPageOfEnemies = 0;
+    protected void UpdatePageOfEnemies()
+    {
+        int pageShift = (currentPageOfEnemies * possibleEnemyObjects.Count);
+        for (int i = 0; i < possibleEnemyObjects.Count; i++)
+        {
+            // We can do the switch for different enemy types later for now just hardcode forest enemies.
+            // Probably we'll just make this a base class and make a different scene for every different terrain type.
+            if (i < possibleForestEnemies.Count - pageShift)
+            {
+                possibleEnemyObjects[i].SetActive(true);
+            }
+            else
+            {
+                possibleEnemyObjects[i].SetActive(false);
+            }
+        }
+        for (int j = 0; j < Mathf.Min(possibleEnemyButtons.Count, possibleForestEnemies.Count - pageShift); j++)
+        {
+            string enemyType = possibleForestEnemies[j + pageShift];
+            possibleEnemyButtons[j].UpdateImage(actorSprites.SpriteDictionary(enemyType));
+        }
+        HighlightSelectedEnemyType();
+    }
+    protected void HighlightSelectedEnemyType()
+    {
+        for (int i = 0; i < possibleEnemyButtons.Count; i++)
+        {
+            possibleEnemyButtons[i].ResetHighlight();
+        }
+        if (currentlySelectedEnemyType >= 0)
+        {
+            // Highlight the appropiate spot on the page.
+            int newIndex = currentlySelectedEnemyType%possibleEnemyObjects.Count;
+            possibleEnemyButtons[newIndex].Highlight(false);
+        }
+    }
     public int currentlySelectedEnemyType = -1;
+    public void SelectEnemyType(int newType)
+    {
+        int selectedType = newType + (currentPageOfEnemies * possibleEnemyObjects.Count);
+        if (currentlySelectedEnemyType != selectedType)
+        {
+            currentlySelectedEnemyType = selectedType;
+        }
+        else
+        {
+            currentlySelectedEnemyType = -1;
+        }
+        HighlightSelectedEnemyType();
+    }
     public int currentlySelectedEnemyLocation = -1;
     public List<string> currentEnemies;
     public List<string> currentEnemyLocations;
@@ -113,12 +177,12 @@ public class BattleMapEditor : Map
     {
         if (currentlyEditing != 3)
         {
-            currentlyEditing = 3;
+            SetCurrentlyEditing(3);
             editSpawnBG.color = highlightColor;
         }
         else
         {
-            currentlyEditing = -1;
+            SetCurrentlyEditing(-1);
             editSpawnBG.color = transColor;
         }
         currentlySelectedSpawnPoint = -1;
@@ -215,10 +279,18 @@ public class BattleMapEditor : Map
         for (int i = 0; i < currentEnemies.Count; i++)
         {
             // See if (and where) they should appear.
-            int indexOfActor = currentTiles.IndexOf(int.Parse(currentEnemyLocations[i]));
+            int enemyLocation = int.Parse(currentEnemyLocations[i]);
+            int indexOfActor = currentTiles.IndexOf(enemyLocation);
             if (indexOfActor >= 0)
             {
                 UpdateActorImage(indexOfActor, currentEnemies[i]);
+                if (currentlyEditing == 2)
+                {
+                    if (currentlySelectedEnemyLocation == enemyLocation)
+                    {
+                        terrainTiles[indexOfActor].Highlight(false);
+                    }
+                }
             }
         }
         // Update player spawn points.
@@ -229,13 +301,13 @@ public class BattleMapEditor : Map
             int indexOfSpawn = currentTiles.IndexOf(spawnPoint);
             if (indexOfSpawn >= 0)
             {
-                if (spawnPoint == currentlySelectedSpawnPoint)
+                terrainTiles[indexOfSpawn].Highlight();
+                if (currentlyEditing == 3)
                 {
-                    terrainTiles[indexOfSpawn].Highlight(false);
-                }
-                else
-                {
-                    terrainTiles[indexOfSpawn].Highlight();
+                    if (spawnPoint == currentlySelectedSpawnPoint)
+                    {
+                        terrainTiles[indexOfSpawn].Highlight(false);
+                    }
                 }
             }
         }
@@ -347,6 +419,11 @@ public class BattleMapEditor : Map
     {
         switch (currentlyEditing)
         {
+            case 2:
+                SetEnemy(tileNumber);
+                HighlightSelectedEnemyType();
+                UpdateMap();
+                break;
             case 3:
                 SetSpawnPoint(tileNumber);
                 UpdateUnusedSpawnPointsText();
@@ -406,20 +483,10 @@ public class BattleMapEditor : Map
         }
     }
 
-    public void SelectEnemyType(int typeIndex)
-    {
-        if (currentlySelectedEnemyType == typeIndex)
-        {
-            currentlySelectedEnemyType = -1;
-            return;
-        }
-        currentlySelectedEnemyType = typeIndex;
-    }
-
     protected void SetEnemy(int tileNumber)
     {
         // Either place a new enemy or move an enemy around.
-        if (currentlySelectedEnemyType < 0 && currentlySelectedEnemyLocation < 0){return;}
+        //if (currentlySelectedEnemyType < 0 && currentlySelectedEnemyLocation < 0){return;}
         string spawnLocation = currentTiles[tileNumber].ToString();
         // Can't place an enemy on a spawn point.
         if (currentSpawnPoints.Contains(spawnLocation)){return;}
@@ -452,7 +519,9 @@ public class BattleMapEditor : Map
             // We can do double clicks to delete enemies.
             if (currentlySelectedEnemyLocation == currentTiles[tileNumber])
             {
-                // Delete the enemy.
+                int indexOf = currentEnemyLocations.IndexOf(currentlySelectedEnemyLocation.ToString());
+                currentEnemyLocations.RemoveAt(indexOf);
+                currentEnemies.RemoveAt(indexOf);
                 currentlySelectedEnemyLocation = -1;
             }
             else
