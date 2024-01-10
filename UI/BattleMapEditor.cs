@@ -246,6 +246,9 @@ public class BattleMapEditor : Map
         UpdateIndexText();
         SetCurrentlyEditing(-1);
         SetCurrentMap(0);
+        currentEnemies.Clear();
+        currentEnemyLocations.Clear();
+        currentSpawnPoints.Clear();
         currentDifficulty = "0";
         LoadBaseMap();
     }
