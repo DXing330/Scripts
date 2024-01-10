@@ -139,6 +139,7 @@ public class GameManager : MonoBehaviour
         player.UpdateStats();
         familiar.UpdateStats();
         RefreshForestMaps();
+        RefreshForestBattles();
     }
 
     public void RefreshForestMaps()
@@ -151,6 +152,21 @@ public class GameManager : MonoBehaviour
                 if (forestFixedTerrains[i].Length < 9)
                 {
                     forestFixedTerrains.RemoveAt(i);
+                }
+            }
+        }
+    }
+
+    public void RefreshForestBattles()
+    {
+        if (File.Exists(saveDataPath+"/BattleMaps_1.txt"))
+        {
+            forestFixedBattles = File.ReadAllText(saveDataPath+"/BattleMaps_1.txt").Split("#").ToList();
+            for (int i = 0; i < forestFixedBattles.Count; i++)
+            {
+                if (forestFixedBattles[i].Length < 9)
+                {
+                    forestFixedBattles.RemoveAt(i);
                 }
             }
         }

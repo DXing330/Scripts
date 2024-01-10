@@ -163,6 +163,37 @@ public class ActorManager : MonoBehaviour
         }
     }
 
+    public void LoadFixedBattleEnemyTeam(string[] enemies, string[] locations)
+    {
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            Debug.Log(locations[i]);
+            GenerateActor(int.Parse(locations[i]), enemies[i], 1);
+        }
+    }
+
+    public void SpawnPlayerTeamInFixedSpots(string[] spawnPoints)
+    {
+        usedTiles.Clear();
+        for (int i = 0; i < spawnPoints.Length; i++)
+        {
+            usedTiles.Add(int.Parse(spawnPoints[i]));
+        }
+        for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
+        {
+            if (GameManager.instance.armyData.armyFormation[i] == "none")
+            {
+                continue;
+            }
+            // Randomly spawn in the player team.
+            int spawnIndex = Random.Range(0, usedTiles.Count);
+            int spawnPoint = usedTiles[spawnIndex];
+            usedTiles.RemoveAt(spawnIndex);
+            // Spawn the player as soon as you get a location for them.
+            LoadPlayerTeamMember(GameManager.instance.armyData.armyFormation[i], spawnPoint);
+        }
+    }
+
     private bool GenerateRandomLocation()
     {
         int rows = terrainMap.totalRows;

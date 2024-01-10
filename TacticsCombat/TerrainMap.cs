@@ -110,10 +110,19 @@ public class TerrainMap : MonoBehaviour
         }
         else if (GameManager.instance.randomBattle <= 0)
         {
-            baseTerrain = GameManager.instance.battleLocationType;
-            GenerateMap(baseTerrain, fullSize);
-            actorManager.LoadEnemyTeam();
-            actorManager.LoadPlayerTeam();
+            // If you have a battle map ready then use it.
+            if (GameManager.instance.forestFixedBattles.Count > 0)
+            {
+                int battleIndex = Random.Range(0, GameManager.instance.forestFixedBattles.Count);
+                LoadBattle(battleIndex);
+            }
+            else
+            {
+                baseTerrain = GameManager.instance.battleLocationType;
+                GenerateMap(baseTerrain, fullSize);
+                actorManager.LoadEnemyTeam();
+                actorManager.LoadPlayerTeam();
+            }
         }
         pathFinder.SetTerrainInfo(terrainInfo, totalRows, totalColumns, occupiedTiles);
         UpdateCenterTile(1);
@@ -949,6 +958,35 @@ public class TerrainMap : MonoBehaviour
         {
             totalRows = fullSize;
             totalColumns = fullSize;
+        }
+        allUnoccupied.Clear();
+        for (int i = 0; i < totalRows * totalColumns; i++)
+        {
+            allUnoccupied.Add(0);
+        }
+    }
+
+    protected void LoadBattle(int battleIndex)
+    {
+        string battleData = GameManager.instance.forestFixedBattles[battleIndex];
+        string[] dataBlocks = battleData.Split(",");
+        LoadMap(int.Parse(dataBlocks[0]));
+        actorManager.LoadFixedBattleEnemyTeam(dataBlocks[2].Split("|"), dataBlocks[3].Split("|"));
+        actorManager.SpawnPlayerTeamInFixedSpots(dataBlocks[4].Split("|"));
+    }
+
+    protected void LoadMap(int mapIndex)
+    {
+        string mapInfo = GameManager.instance.forestFixedTerrains[mapIndex];
+        string[] mapInfoBlocks = mapInfo.Split(",");
+        string[] fixedTerrain = mapInfoBlocks[0].Split("|");
+        // Enable backwards compatability for now.
+        totalRows = int.Parse(mapInfoBlocks[1]);
+        totalColumns = int.Parse(mapInfoBlocks[2]);
+        terrainInfo.Clear();
+        for (int j = 0; j < fixedTerrain.Length; j++)
+        {
+            terrainInfo.Add(int.Parse(fixedTerrain[j]));
         }
         allUnoccupied.Clear();
         for (int i = 0; i < totalRows * totalColumns; i++)

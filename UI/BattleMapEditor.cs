@@ -70,13 +70,21 @@ public class BattleMapEditor : Map
     public int currentlyEditing = -1;
     protected void SetCurrentlyEditing(int newEditing)
     {
+        // Reset to defaults then change as needed.
+        editSpawnBG.color = transColor;
+        editEnemiesBG.color = transColor;
+        editEnemyTab.SetActive(false);
         currentlyEditing = newEditing;
         if (currentlyEditing == 2)
         {
+            editEnemiesBG.color = highlightColor;
             editEnemyTab.SetActive(true);
             UpdatePageOfEnemies();
         }
-        else{editEnemyTab.SetActive(false);}
+        else if (currentlyEditing == 3)
+        {
+            editSpawnBG.color = highlightColor;
+        } 
     }
     public string currentBattleData;
     public string currentMap;
@@ -97,12 +105,10 @@ public class BattleMapEditor : Map
         if (currentlyEditing != 2)
         {
             SetCurrentlyEditing(2);
-            editEnemiesBG.color = highlightColor;
         }
         else
         {
             SetCurrentlyEditing(-1);
-            editEnemiesBG.color = transColor;
         }
         currentlySelectedEnemyType = -1;
         currentlySelectedEnemyLocation = -1;
@@ -183,7 +189,6 @@ public class BattleMapEditor : Map
         else
         {
             SetCurrentlyEditing(-1);
-            editSpawnBG.color = transColor;
         }
         currentlySelectedSpawnPoint = -1;
     }
@@ -193,6 +198,11 @@ public class BattleMapEditor : Map
     protected void Load()
     {
 
+    }
+
+    public void StopEditingBattles()
+    {
+        GameManager.instance.RefreshForestBattles();
     }
 
     // At the start check for valid maps.
@@ -234,10 +244,22 @@ public class BattleMapEditor : Map
     {
         currentBattleIndex = -1;
         UpdateIndexText();
-        currentlyEditing = -1;
+        SetCurrentlyEditing(-1);
         SetCurrentMap(0);
         currentDifficulty = "0";
         LoadBaseMap();
+    }
+
+    public void DeleteBattle()
+    {
+        // Can't delete the last battle.
+        // You probably should be allowed to but whatever.
+        if (allBattlesList.Count <= 1){return;}
+        if (currentBattleIndex < 0){return;}
+        allBattlesList.RemoveAt(currentBattleIndex);
+        allBattles = GameManager.instance.ConvertListToString(allBattlesList, "#");
+        File.WriteAllText(saveDataPath+"/BattleMaps_"+baseTerrain+".txt", allBattles);
+        ChangeIndex();
     }
 
     protected override void Start()
