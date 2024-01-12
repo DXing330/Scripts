@@ -20,17 +20,65 @@ public class TacticActor : AllStats
     public int level;
     public int movementType = 0;
     public int health;
+    public void ReceiveDamage(int amount)
+    {
+        // Ignore damage that's too weak?
+        if (defense/2 > amount)
+        {
+            return;
+        }
+        health -= Mathf.Max(amount - defense, 1);
+        terrainMap.actionLog.AddActionLog(typeName+" takes "+Mathf.Max(amount - defense, 1)+" DMG.");
+        ChangeAI();
+        if (health <= 0){Death();}
+    }
     public int energy;
     public int currentMovespeed;
     public int actionsLeft;
     public int actionsToAttack = 1;
     public int currentAttackRange;
     public int attackDamage;
+    public int GenerateAttackDamage(int advantage = 0, int attackPower = -1)
+    {
+        // Most attacks have no advatnage.
+        if (advantage == 0){advantage = attackAdvantage;}
+        // Unless specified, use your normal attack damage.
+        if (attackPower <= 0){attackPower = attackDamage;}
+        // Can have advantage or disadvantage.
+        if (advantage != 0)
+        {
+            bool stronger = false;
+            if (advantage > 0){stronger = true;}
+            return RollDamageXTimes(attackPower, Mathf.Abs(advantage), stronger);
+        }
+        // Basic attacks deal on average half of your max attack power.
+        int damage = Random.Range(1, attackPower + 1);
+        return damage;
+    }
+
+    private int RollDamageXTimes(int damage, int rolls, bool advantage)
+    {
+        int baseDamage = Random.Range(1, damage + 1);
+        int newRoll = 0;
+        for (int i = 0; i < rolls; i++)
+        {
+            newRoll = Random.Range(1, damage + 1);
+            if (advantage && newRoll > baseDamage){baseDamage = newRoll;}
+            else if (!advantage && newRoll < baseDamage){baseDamage = newRoll;}
+        }
+        return baseDamage;
+    }
     public int defense;
     public int movement;
     public int initiative;
+    public int attackAdvantage = 0;
     public int counterAttacksLeft = 1;
     public int currentDirection;
+    public void ChangeDirection(int newDirection)
+    {
+        // Later can have passives/etc. that mess with this.
+        currentDirection = newDirection;
+    }
     // 0 is offensive, 1 is passive, 2 is fleeing
     public int AIType = 0;
     public int destinationIndex;
@@ -134,22 +182,19 @@ public class TacticActor : AllStats
         currentAttackRange = attackRange;
         energy = Mathf.Min(energy+1, baseEnergy);
         counterAttacksLeft = Mathf.Min(counterAttacksLeft+1, 1);
+        attackAdvantage = 0;
         ApplyBuffDebuffEffects();
         movement = 0;
     }
 
-    public void Death(bool real = true)
+    public void Death()
     {
         Color tempColor = Color.white;
         tempColor.a = 0f;
         //spriteRenderer.sprite = null;
         spriteRenderer.color = tempColor;
         actionsLeft = 0;
-        if (real)
-        {
-            spriteRenderer.color = tempColor;
-            //terrainMap.ActorDied();
-        }
+        //terrainMap.ActorDied();
         //Destroy(gameObject);
     }
 
@@ -180,23 +225,6 @@ public class TacticActor : AllStats
     public void AlertedByAlly()
     {
         AIType = 0;
-    }
-
-    public void ReceiveDamage(int amount, bool real = true)
-    {
-        // Ignore damage that's too weak?
-        if (defense/2 > amount)
-        {
-            return;
-        }
-        health -= Mathf.Max(amount - defense, 1);
-        terrainMap.actionLog.AddActionLog(typeName+" takes "+Mathf.Max(amount - defense, 1)+" DMG.");
-        ChangeAI();
-        if (health <= 0)
-        {
-            Death(real);
-        }
-        
     }
 
     public void RegainHealth(int amount)
@@ -506,11 +534,11 @@ public class TacticActor : AllStats
             {
                 if (turnPath.Count == 1)
                 {
-                    currentDirection = terrainMap.pathFinder.DirectionBetweenLocations(locationIndex, turnPath[0]);
+                    ChangeDirection(terrainMap.pathFinder.DirectionBetweenLocations(locationIndex, turnPath[0]));
                 }
                 else
                 {
-                    currentDirection = terrainMap.pathFinder.DirectionBetweenLocations(turnPath[turnPath.Count - 2], turnPath[^1]);
+                    ChangeDirection(terrainMap.pathFinder.DirectionBetweenLocations(turnPath[turnPath.Count - 2], turnPath[^1]));
                 }
                 locationIndex = turnPath[^1];
                 return;

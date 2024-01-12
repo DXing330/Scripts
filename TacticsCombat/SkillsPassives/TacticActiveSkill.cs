@@ -32,7 +32,8 @@ public class TacticActiveSkill : MonoBehaviour
         switch (effect)
         {
             case "Damage":
-                actor.ReceiveDamage(power);
+                int damage = Random.Range(power/2, power+1);
+                actor.ReceiveDamage(damage);
                 break;
             case "Heal":
                 actor.RegainHealth(power);

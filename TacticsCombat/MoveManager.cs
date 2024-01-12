@@ -308,7 +308,7 @@ public class MoveManager : MonoBehaviour
 
     public void MoveActorToTile(TacticActor actor, int location, int moveCost)
     {
-        actor.currentDirection = pathfinder.CalculateDirectionToLocation(actor, location);
+        actor.ChangeDirection(pathfinder.CalculateDirectionToLocation(actor, location));
         actor.locationIndex = location;
         actor.movement -= moveCost;
         while (actor.movement < 0)

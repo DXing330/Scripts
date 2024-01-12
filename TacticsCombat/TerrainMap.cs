@@ -443,8 +443,8 @@ public class TerrainMap : MonoBehaviour
 
     private void NonLockOnSkillActivate()
     {
-        ActorStopMoving();
         int tileNumber = 0;
+        int targetsType = actors[turnIndex].activeSkill.skillTarget;
         TacticActor target = null;
         bool specialEffect = false;
         for (int i = 0; i < targetableTiles.Count; i++)
@@ -453,6 +453,9 @@ public class TerrainMap : MonoBehaviour
             if (occupiedTiles[tileNumber] > 0)
             {
                 target = ReturnActorOnTile(tileNumber);
+                // Check if the target is valid.
+                if (targetsType == 0 && SameTeam(actors[turnIndex], ReturnActorOnTile(tileNumber))){continue;}
+                if (targetsType == 1 && !SameTeam(actors[turnIndex], ReturnActorOnTile(tileNumber))){continue;}
                 specialEffect = skillManager.ApplySkillEffect(target, actors[turnIndex].activeSkill, actors[turnIndex]);
                 if (specialEffect)
                 {
@@ -462,6 +465,7 @@ public class TerrainMap : MonoBehaviour
         }
         actors[turnIndex].ActivateSkill();
         actorInfo.UpdateInfo(actors[turnIndex]);
+        ActorStopMoving();
     }
 
     public void SwitchSkill(bool right = true)
@@ -631,7 +635,7 @@ public class TerrainMap : MonoBehaviour
         int newDirection = pathFinder.DirectionBetweenLocations(attacker.locationIndex, defender.locationIndex);
         if (newDirection >= 0)
         {
-            attacker.currentDirection = newDirection;
+            attacker.ChangeDirection(newDirection);
         }
         // If you don't use the action text them it must be a skill that triggered the battle.
         bool attackerDied = actorManager.BattleBetweenActors(attacker, defender, Counterable(attacker, defender, !actionText), DetermineFlanking(defender), skillMultiplier);
@@ -658,7 +662,7 @@ public class TerrainMap : MonoBehaviour
         int newDirection = pathFinder.DirectionBetweenLocations(actors[turnIndex].locationIndex, target.locationIndex);
         if (newDirection >= 0)
         {
-            actors[turnIndex].currentDirection = newDirection;
+            actors[turnIndex].ChangeDirection(newDirection);
         }
         // Find if they can counter attack.
         bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex], target), DetermineFlanking(target));
@@ -677,6 +681,7 @@ public class TerrainMap : MonoBehaviour
         CheckWinners();
         if (battleStarted)
         {
+            // If the current target dies then reset the current target?
             GetTargetableTiles(actors[turnIndex].currentAttackRange, 0, false);
             UpdateMap();
             HighlightTiles(false);
@@ -806,7 +811,7 @@ public class TerrainMap : MonoBehaviour
     {
         if (actors[turnIndex].team == 0)
         {
-            actors[turnIndex].currentDirection = direction;
+            actors[turnIndex].ChangeDirection(direction);
             moveManager.MoveInDirection(actors[turnIndex], direction);
             UpdateAfterMovingActor();
         }
@@ -1383,10 +1388,9 @@ public class TerrainMap : MonoBehaviour
 
     private int ReturnCurrentTargetTile()
     {
-        if (targetableTiles.Count <= 0)
-        {
-            return -1;
-        }
+        if (targetableTiles.Count <= 0){return -1;}
+        if (currentTarget >= targetableTiles.Count){return targetableTiles[0];}
+        // ERROR: doesn't work if the current target died and another target is still alive, could get an index out of bounds exception.
         return targetableTiles[currentTarget];
     }
 

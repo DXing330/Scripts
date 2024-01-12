@@ -167,7 +167,6 @@ public class ActorManager : MonoBehaviour
     {
         for (int i = 0; i < enemies.Length; i++)
         {
-            Debug.Log(locations[i]);
             GenerateActor(int.Parse(locations[i]), enemies[i], 1);
         }
     }
@@ -438,37 +437,32 @@ public class ActorManager : MonoBehaviour
     {
         int defenderLocationType = terrainMap.terrainInfo[defender.locationIndex];
         // Encourage attacking.
-        int attackAdvantage = attacker.attackDamage*6/5;
+        int attackAdvantage = 1;
+        int attackPower = attacker.attackDamage;
         if (skillPowerMultipler > 10)
         {
-            attackAdvantage += attacker.attackDamage*skillPowerMultipler/10 - attacker.attackDamage;
+            attackPower += attacker.attackDamage*skillPowerMultipler/10 - attacker.attackDamage;
         }
         // Check for flanking/ally support.
-        if (flanked)
-        {
-            attackAdvantage += attacker.attackDamage*6/5 - attacker.attackDamage;
-        }
+        if (flanked){attackAdvantage++;}
         // Calculate terrain bonuses at the end then damage each other.
         int defenderBonus = terrainTile.ReturnDefenseBonus(defenderLocationType, defender.movementType);
-        attackAdvantage = attackAdvantage*6/defenderBonus;
-        defender.ReceiveDamage(attackAdvantage);
+        attackPower = attackPower*6/defenderBonus;
+        int attackDamage = attacker.GenerateAttackDamage(attackAdvantage, attackPower);
+        defender.ReceiveDamage(attackDamage);
         if (counter)
         {
             int attackerLocationType = terrainMap.terrainInfo[attacker.locationIndex];
             int defenseBonus = terrainTile.ReturnDefenseBonus(attackerLocationType, attacker.movementType);
             int defenderPower = defender.attackDamage*6/defenseBonus;
             // Penalty for ranged defenders.
-            if (attacker.currentAttackRange < defender.currentAttackRange)
-            {
-                defenderPower/=2;
-            }
+            if (attacker.currentAttackRange < defender.currentAttackRange){defenderPower/=2;}
             int attackerHealth = attacker.health;
             int attackerDefense = attacker.defense;
-            attacker.ReceiveDamage(defenderPower);
-            if (defenderPower - attackerDefense >= attackerHealth || attackerHealth <= 1)
-            {
-                return true;
-            }
+            int defenderDamageDealt = defender.GenerateAttackDamage(0, defenderPower);
+            attacker.ReceiveDamage(defenderDamageDealt);
+            if (defenderDamageDealt - attackerDefense >= attackerHealth || attackerHealth <= 1){return true;}
+            else if (attackerHealth <= 1 && defenderDamageDealt > attackerDefense/2){return true;}
         }
         return false;
     }
