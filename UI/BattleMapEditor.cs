@@ -17,8 +17,8 @@ public class BattleMapEditor : Map
     public ActorSprites actorSprites;
     // Things that are fixed/set in the game settings/editor.
     // Can be List<int>.
-    public List<string> possibleForestEnemies;
-    public List<int> forestEnemyCosts;
+    public List<string> possibleEnemies;
+    public List<int> enemyCosts;
     public List<int> maxDifficultyCosts;
     // The current map being edited needs a base map, difficulty, enemies, enemy spawn points, player spawn points, reward for victory.
     // These vary depending on the map being edited.
@@ -117,6 +117,25 @@ public class BattleMapEditor : Map
     public List<GameObject> possibleEnemyObjects;
     public GameObject editEnemyTab;
     public int currentPageOfEnemies = 0;
+    public void ChangePageOfEnemies(bool right = true)
+    {
+        // Count how many pages there are.
+        int lastPage = possibleEnemies.Count/possibleEnemyButtons.Count;
+        // If it's an exact fit then there's one less page.
+        if (possibleEnemies.Count%possibleEnemyButtons.Count == 0){lastPage--;}
+        if (right)
+        {
+            if (currentPageOfEnemies+1<=lastPage){currentPageOfEnemies++;}
+            else {currentPageOfEnemies = 0;}
+        }
+        else
+        {
+            if (currentPageOfEnemies > 0){currentPageOfEnemies--;}
+            else {currentPageOfEnemies = lastPage;}
+        }
+        currentlySelectedEnemyType = -1;
+        UpdatePageOfEnemies();
+    }
     protected void UpdatePageOfEnemies()
     {
         int pageShift = (currentPageOfEnemies * possibleEnemyObjects.Count);
@@ -124,7 +143,7 @@ public class BattleMapEditor : Map
         {
             // We can do the switch for different enemy types later for now just hardcode forest enemies.
             // Probably we'll just make this a base class and make a different scene for every different terrain type.
-            if (i < possibleForestEnemies.Count - pageShift)
+            if (i < possibleEnemies.Count - pageShift)
             {
                 possibleEnemyObjects[i].SetActive(true);
             }
@@ -133,9 +152,9 @@ public class BattleMapEditor : Map
                 possibleEnemyObjects[i].SetActive(false);
             }
         }
-        for (int j = 0; j < Mathf.Min(possibleEnemyButtons.Count, possibleForestEnemies.Count - pageShift); j++)
+        for (int j = 0; j < Mathf.Min(possibleEnemyButtons.Count, possibleEnemies.Count - pageShift); j++)
         {
-            string enemyType = possibleForestEnemies[j + pageShift];
+            string enemyType = possibleEnemies[j + pageShift];
             possibleEnemyButtons[j].UpdateImage(actorSprites.SpriteDictionary(enemyType));
         }
         HighlightSelectedEnemyType();
@@ -243,6 +262,7 @@ public class BattleMapEditor : Map
     public void NewBattle()
     {
         currentBattleIndex = -1;
+        currentPageOfEnemies = 0;
         UpdateIndexText();
         SetCurrentlyEditing(-1);
         SetCurrentMap(0);
@@ -369,6 +389,7 @@ public class BattleMapEditor : Map
     protected void LoadCurrentBattleData()
     {
         string[] previousData = currentBattleData.Split(",");
+        currentPageOfEnemies = 0;
         currentMap = previousData[0];
         currentDifficulty = previousData[1];
         currentEnemies = previousData[2].Split("|").ToList();
@@ -524,7 +545,7 @@ public class BattleMapEditor : Map
             if (currentlySelectedEnemyType >= 0)
             {
                 // Place them down at the location.
-                currentEnemies.Add(possibleForestEnemies[currentlySelectedEnemyType]);
+                currentEnemies.Add(possibleEnemies[currentlySelectedEnemyType]);
                 currentEnemyLocations.Add(spawnLocation);
                 currentlySelectedEnemyLocation = -1;
                 return;

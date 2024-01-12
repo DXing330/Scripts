@@ -83,13 +83,12 @@ public class MoveManager : MonoBehaviour
 
     private void ForceMovement(TacticActor actor, int direction)
     {
+        // Structures can't move.
+        if (actor.species == "Structure"){return;}
         // Check if they're above a pit, if they are and they are not flying them stop force moving them.
         if (pathfinder.CheckCurrentLocationType(actor) == 7)
         {
-            if (actor.movementType != 1)
-            {
-                return;
-            }
+            if (actor.movementType != 1){return;}
         }
         // Need to check if the direction is occupied or out of bounds.
         // This checks if it's in bounds.

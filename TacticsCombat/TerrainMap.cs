@@ -1425,21 +1425,7 @@ public class TerrainMap : MonoBehaviour
         // Check the distance between the actor and the skill and make sure its within range.
         // Move it around.
         int nextTile = skillCenter;
-        switch (direction)
-        {
-            case 0:
-                nextTile -= totalColumns;
-                break;
-            case 1:
-                nextTile++;
-                break;
-            case 2:
-                nextTile += totalColumns;
-                break;
-            case 3:
-                nextTile--;
-                break;
-        }
+        nextTile = pathFinder.GetDestination(skillCenter, direction);
         if (highlightedTiles.Contains(nextTile))
         {
             skillCenter = nextTile;
