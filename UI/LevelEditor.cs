@@ -39,7 +39,24 @@ public class LevelEditor : Map
             if (allDataList[i].Length < gridSize){allDataList.RemoveAt(i);}
         }
     }
+    protected void LoadCurrentLevel()
+    {
+        currentLevelData = allDataList[levelIndex];
+        LoadLevel();
+    }
     public int levelIndex = -1;
+    public TMP_Text indexText;
+    protected void UpdateIndexText()
+    {
+        if (levelIndex < 0)
+        {
+            indexText.text = "New Level";
+        }
+        else
+        {
+            indexText.text = "Level "+(levelIndex+1).ToString();
+        }
+    }
     public void ChangeIndex(bool right = true)
     {
         if (allDataList.Count <= 0){return;}
@@ -53,6 +70,10 @@ public class LevelEditor : Map
             if (levelIndex > 0){levelIndex--;}
             else{levelIndex = allDataList.Count-1;}
         }
+        UpdateIndexText();
+        LoadCurrentLevel();
+        UpdateCenterTile();
+        UpdateMap();
     }
     protected string saveDataPath;
     public Color transColor;
@@ -201,6 +222,27 @@ public class LevelEditor : Map
         UpdateMap();
     }
 
+    public void Publish()
+    {
+        SaveCurrentLevel();
+        // It's a new battle.
+        if (levelIndex < 0)
+        {
+            if (allDataList.Count <= 0){allData = currentLevelData;}
+            else{allData += "#"+currentLevelData;}
+            UpdateAllDataList();
+            levelIndex = allDataList.Count - 1;
+            UpdateIndexText();
+        }
+        // It's an edit of another battle.
+        else
+        {
+            allDataList[levelIndex] = currentLevelData;
+            allData = GameManager.instance.ConvertListToString(allDataList, "#");
+        }
+        File.WriteAllText(saveDataPath+"/Levels.txt", allData);
+    }
+
     public void NewLevel()
     {
         allTiles.Clear();
@@ -217,6 +259,10 @@ public class LevelEditor : Map
             currentEncounterSpecifics.Add("");
             currentEncounterRespawnFreq.Add("");
         }
+        levelIndex = -1;
+        UpdateIndexText();
+        UpdateCenterTile();
+        UpdateMap();
     }
 
     protected void SaveCurrentLevel()
@@ -239,5 +285,29 @@ public class LevelEditor : Map
         currentEncounterSpecifics = dataBlocks[4].Split("|").ToList();
         currentEncounterRespawnFreq = dataBlocks[5].Split("|").ToList();
         spawnPoint = int.Parse(dataBlocks[6]);
+    }
+
+    public override void ClickOnTile(int tileNumber)
+    {
+        if (currentTiles[tileNumber] < 0){return;}
+        switch (currentlyEditing)
+        {
+            case 0:
+                SetSpawnPoint(tileNumber);
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+        }
+    }
+
+    protected void SetSpawnPoint(int tileNumber)
+    {
+        spawnPoint = currentTiles[tileNumber];
     }
 }

@@ -463,6 +463,8 @@ public class BattleMapEditor : Map
 
     public override void ClickOnTile(int tileNumber)
     {
+        // Nothing happens if you click on darkness.
+        if (currentTiles[tileNumber] < 0){return;}
         switch (currentlyEditing)
         {
             case 2:

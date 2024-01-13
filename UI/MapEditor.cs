@@ -250,6 +250,7 @@ public class MapEditor : Map
     public override void ClickOnTile(int tileNumber)
     {
         if (currentlySelectedTerrain < 0){return;}
+        if (currentTiles[tileNumber] < 0){return;}
         allTiles[currentTiles[tileNumber]] = baseTerrains[currentlySelectedTerrain];
         UpdateMap();
     }
