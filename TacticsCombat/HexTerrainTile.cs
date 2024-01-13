@@ -29,9 +29,9 @@ public class HexTerrainTile : TerrainTile
     public override void SetTileNumber(int newNumber)
     {
         tileNumber = newNumber;
-        if (!text){return;}
-        tileNumberText.text = newNumber.ToString();
     }
+
+    public override void ResetText(){tileNumberText.text = "";}
 
     public override void SetTileText(string newText)
     {

@@ -6,14 +6,9 @@ using UnityEngine.UI;
 public class TerrainTile : MonoBehaviour
 {
     public int tileNumber = -1;
-    public virtual void SetTileNumber(int newNumber)
-    {
-        tileNumber = newNumber;
-    }
-    public virtual void SetTileText(string newText)
-    {
-        return;
-    }
+    public virtual void SetTileNumber(int newNumber){tileNumber = newNumber;}
+    public virtual void ResetText(){return;}
+    public virtual void SetTileText(string newText){return;}
     public Color transColor;
     void Start()
     {
