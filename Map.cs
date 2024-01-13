@@ -18,6 +18,7 @@ public class Map : MonoBehaviour
     public List<Sprite> tileSprites;
     public List<string> allTiles;
     public List<int> currentTiles;
+    public List<string> tempTiles;
     public List<TerrainTile> terrainTiles;
     public TerrainPathfinder pathfinder;
 
@@ -216,5 +217,97 @@ public class Map : MonoBehaviour
         else{startIndex = tileNumber;}
         DetermineCornerRowColumn();
         DetermineCurrentTiles();
+    }
+
+    protected void AddRow()
+    {
+        // Just add a new row at the bottom.
+        for (int i = 0; i < totalColumns; i++)
+        {
+            allTiles.Add("0");
+        }
+        totalRows++;
+    }
+
+    protected void RemoveRow()
+    {
+        if (totalRows <= gridSize){return;}
+        // Remove the last row.
+        for (int i = 0; i < totalColumns; i++)
+        {
+            allTiles.RemoveAt(allTiles.Count - 1);
+        }
+        totalRows--;
+    }
+
+    protected void AddColumns()
+    {
+        // Add two columns at once to ensure balance.
+        // Adding two doesn't make it balanced, try adding four at a time.
+        int index = 0;
+        for (int i = 0; i < totalRows; i++)
+        {
+            for (int j = 0; j < totalColumns+4; j++)
+            {
+                if (j >= totalColumns)
+                {
+                    tempTiles.Add("0");
+                    continue;
+                }
+                tempTiles.Add(allTiles[index]);
+                index++;
+            }
+        }
+        totalColumns += 4;
+        allTiles = new List<string>(tempTiles);
+    }
+
+    protected void RemoveColumns()
+    {
+        if (totalColumns <= gridSize){return;}
+        int index = 0;
+        for (int i = 0; i < totalRows; i++)
+        {
+            for (int j = 0; j < totalColumns; j++)
+            {
+                if (j >= totalColumns - 4)
+                {
+                    index++;
+                    continue;
+                }
+                tempTiles.Add(allTiles[index]);
+                index++;
+            }
+        }
+        totalColumns -= 4;
+        allTiles = new List<string>(tempTiles);
+    }
+
+    public virtual void AdjustRows(bool increase = true)
+    {
+        tempTiles.Clear();
+        if (increase)
+        {
+            AddRow();
+        }
+        else
+        {
+            RemoveRow();
+        }
+        UpdateCenterTile();
+    }
+
+    public virtual void AdjustColumns(bool increase = true)
+    {
+        tempTiles.Clear();
+        if (increase)
+        {
+            AddColumns();
+        }
+        else
+        {
+            RemoveColumns();
+        }
+        UpdateCenterTile();
     }
 }

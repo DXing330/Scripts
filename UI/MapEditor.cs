@@ -15,7 +15,6 @@ public class MapEditor : Map
     public int mapIndex = -1;
     public int currentPage = 0;
     public List<string> mapToEdit;
-    public List<string> tempTiles;
     public List<string> possibleTerrains;
     public int currentlySelectedTerrain = -1;
     public List<GameObject> possibleTerrainButtons;
@@ -322,100 +321,16 @@ public class MapEditor : Map
         fullSize--;
     }
 
-    public void AdjustRows(bool increase = true)
+    public override void AdjustRows(bool increase = true)
     {
-        tempTiles.Clear();
-        if (increase)
-        {
-            AddRow();
-        }
-        else
-        {
-            RemoveRow();
-        }
-        UpdateCenterTile();
+        base.AdjustRows(increase);
         UpdateMap();
     }
 
-    public void AdjustColumns(bool increase = true)
+    public override void AdjustColumns(bool increase = true)
     {
-        tempTiles.Clear();
-        if (increase)
-        {
-            AddColumns();
-        }
-        else
-        {
-            RemoveColumns();
-        }
-        UpdateCenterTile();
+        base.AdjustColumns(increase);
         UpdateMap();
-    }
-
-    protected void AddRow()
-    {
-        if (totalRows >= gridSize * 2){return;}
-        // Just add a new row at the bottom.
-        for (int i = 0; i < totalColumns; i++)
-        {
-            allTiles.Add(baseTerrain);
-        }
-        totalRows++;
-    }
-
-    protected void RemoveRow()
-    {
-        if (totalRows <= gridSize){return;}
-        // Remove the last row.
-        for (int i = 0; i < totalColumns; i++)
-        {
-            allTiles.RemoveAt(allTiles.Count - 1);
-        }
-        totalRows--;
-    }
-
-    protected void AddColumns()
-    {
-        if (totalColumns >= gridSize * 2){return;}
-        // Add two columns at once to ensure balance.
-        // Adding two doesn't make it balanced, try adding four at a time.
-        int index = 0;
-        for (int i = 0; i < totalRows; i++)
-        {
-            for (int j = 0; j < totalColumns+4; j++)
-            {
-                if (j >= totalColumns)
-                {
-                    tempTiles.Add(baseTerrain);
-                    continue;
-                }
-                tempTiles.Add(allTiles[index]);
-                index++;
-            }
-        }
-        totalColumns += 4;
-        allTiles = new List<string>(tempTiles);
-    }
-
-    protected void RemoveColumns()
-    {
-        if (totalColumns <= gridSize){return;}
-        int index = 0;
-        for (int i = 0; i < totalRows; i++)
-        {
-            for (int j = 0; j < totalColumns; j++)
-            {
-                if (j >= totalColumns - 4)
-                {
-                    index++;
-                    continue;
-                }
-                tempTiles.Add(allTiles[index]);
-                index++;
-            }
-        }
-        totalColumns -= 4;
-        allTiles = new List<string>(tempTiles);
     }
 
     public void ChangePage(bool right = true)

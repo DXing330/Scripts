@@ -202,6 +202,14 @@ public class LevelEditor : Map
     {
         SwitchEditing(0);
     }
+    protected void UpdateSpawnPointOnMap()
+    {
+        int indexOfSpawn = currentTiles.IndexOf(spawnPoint);
+        if (indexOfSpawn >= 0)
+        {
+            terrainTiles[indexOfSpawn].Highlight();
+        }
+    }
 
     protected void UpdateMap()
     {
@@ -214,6 +222,19 @@ public class LevelEditor : Map
             UpdateTile(i, currentTiles[i]);
             // Also need to update the text.
         }
+        UpdateSpawnPointOnMap();
+    }
+
+    public override void AdjustRows(bool increase = true)
+    {
+        base.AdjustRows(increase);
+        UpdateMap();
+    }
+
+    public override void AdjustColumns(bool increase = true)
+    {
+        base.AdjustColumns(increase);
+        UpdateMap();
     }
 
     public override void MoveMap(int direction)
@@ -296,6 +317,7 @@ public class LevelEditor : Map
                 SetSpawnPoint(tileNumber);
                 break;
             case 1:
+                SetTerrain(tileNumber);
                 break;
             case 2:
                 break;
@@ -309,5 +331,25 @@ public class LevelEditor : Map
     protected void SetSpawnPoint(int tileNumber)
     {
         spawnPoint = currentTiles[tileNumber];
+        UpdateMap();
     }
+
+    protected void SetTerrain(int tileNumber)
+    {
+        if (currentlySelectedTerrain < 0){return;}
+        allTiles[currentTiles[tileNumber]] = currentlySelectedTerrain.ToString();
+        UpdateMap();
+    }
+
+    protected void SetEncounter(int tileNumber)
+    {
+        UpdateMap();
+    }
+
+    protected void SetEncounterSpecifics(int tileNumber)
+    {
+        UpdateMap();
+    }
+
+
 }
