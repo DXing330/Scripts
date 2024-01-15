@@ -10,18 +10,22 @@ public class Utility : MonoBehaviour
     public List<int> nodes = new List<int>();
     // Move cost of tile.
     public List<int> weights = new List<int>();
+    // Previous direction if needed.
+    public List<int> directions = new List<int>();
     
     public void ResetHeap()
     {
         size = 0;
         nodes.Clear();
         weights.Clear();
+        directions.Clear();
     }
 
     public void InitialCapacity(int capacity)
     {
         nodes = new List<int>(new int[capacity]);
         weights = new List<int>(new int[capacity]);
+        directions = new List<int>(new int[capacity]);
     }
 
     private int getLeftChildIndex(int parentIndex)
@@ -83,6 +87,9 @@ public class Utility : MonoBehaviour
         int temp2 = nodes[indexOne];
         nodes[indexOne] = nodes[indexTwo];
         nodes[indexTwo] = temp2;
+        int temp3 = directions[indexOne];
+        directions[indexOne] = directions[indexTwo];
+        directions[indexTwo] = temp3;
     }
 
     private void EnsureCapacity()
@@ -92,6 +99,7 @@ public class Utility : MonoBehaviour
             for (int i = 0; i < size; i++)
             {
                 nodes.Add(-1);
+                directions.Add(-1);
                 weights.Add(bigInt);
             }
         }
@@ -116,6 +124,15 @@ public class Utility : MonoBehaviour
         return weights[0];
     }
 
+    public int PeekDirection()
+    {
+        if (size == 0)
+        {
+            return -1;
+        }
+        return directions[0];
+    }
+
     public int Pull()
     {
         if (size == 0)
@@ -125,16 +142,18 @@ public class Utility : MonoBehaviour
         int node = nodes[0];
         nodes[0] = nodes[size-1];
         weights[0] = weights[size-1];
+        directions[0] = directions[size-1];
         size--;
         HeapifyDown();
         return node;
     }
 
-    public void AddNodeWeight(int newNode, int newWeight)
+    public void AddNodeWeight(int newNode, int newWeight, int newDirection = -1)
     {
         EnsureCapacity();
         weights[size] = newWeight;
         nodes[size] = newNode;
+        directions[size] = newDirection;
         size++;
         HeapifyUp();
     }

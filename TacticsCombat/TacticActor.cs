@@ -41,7 +41,7 @@ public class TacticActor : AllStats
     public int GenerateAttackDamage(int advantage = 0, int attackPower = -1)
     {
         // Most attacks have no advatnage.
-        if (advantage == 0){advantage = attackAdvantage;}
+        advantage += attackAdvantage;
         // Unless specified, use your normal attack damage.
         if (attackPower <= 0){attackPower = attackDamage;}
         // Can have advantage or disadvantage.
@@ -56,7 +56,7 @@ public class TacticActor : AllStats
         return damage;
     }
 
-    private int RollDamageXTimes(int damage, int rolls, bool advantage)
+    protected int RollDamageXTimes(int damage, int rolls, bool advantage)
     {
         int baseDamage = Random.Range(1, damage + 1);
         int newRoll = 0;
@@ -73,7 +73,7 @@ public class TacticActor : AllStats
     public int initiative;
     public int attackAdvantage = 0;
     public int counterAttacksLeft = 1;
-    public int currentDirection;
+    public int currentDirection = -1;
     public void ChangeDirection(int newDirection)
     {
         // Later can have passives/etc. that mess with this.
@@ -441,7 +441,7 @@ public class TacticActor : AllStats
 
     public void GetPath()
     {
-        currentPath = terrainMap.pathFinder.FindPathIndex(locationIndex, destinationIndex, movementType);
+        currentPath = terrainMap.pathFinder.FindPathIndex(locationIndex, destinationIndex, movementType, currentDirection);
         turnPath.Clear();
     }
 

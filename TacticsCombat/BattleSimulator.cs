@@ -179,7 +179,7 @@ public class BattleSimulator : MonoBehaviour
             tempActor.UpdateTarget(FindNearestEnemy());
         }
         ActorUpdateDestination();
-        tempActor.currentPath = pathFinder.FindPathIndex(tempActor.locationIndex, tempActor.destinationIndex, tempActor.movementType);
+        tempActor.currentPath = pathFinder.FindPathIndex(tempActor.locationIndex, tempActor.destinationIndex, tempActor.movementType, tempActor.currentDirection);
         tempActor.turnPath.Clear();
         MoveAction();
         tempActor.MoveAlongPath(false);

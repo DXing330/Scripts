@@ -59,7 +59,7 @@ public class TerrainPathfinder : MonoBehaviour
         heap.InitialCapacity(totalRows * totalColumns);
     }
 
-    private void ResetDistances(int startIndex)
+    private void ResetDistances(int startIndex, int startDirection = -1)
     {
         ResetHeap();
         distances.Clear();
@@ -71,7 +71,11 @@ public class TerrainPathfinder : MonoBehaviour
             {
                 // Starting tile is always distance zero.
                 distances.Add(0);
-                heap.AddNodeWeight(startIndex, 0);
+                if (startDirection < 0)
+                {
+                    heap.AddNodeWeight(startIndex, 0);
+                }
+                else{heap.AddNodeWeight(startIndex, 0, startDirection);}
                 continue;
             }
             // Other tiles are considered far away.
@@ -119,13 +123,12 @@ public class TerrainPathfinder : MonoBehaviour
     }
     
     // Returns a list of tiles to pass through, not including the start or end points, so you will end up adjacent to the destination.
-    public List<int> FindPathIndex(int startIndex, int destIndex, int moveType)
+    public List<int> FindPathIndex(int startIndex, int destIndex, int moveType, int startDirection = -1)
     {
         checkedTiles.Clear();
         savedPathList.Clear();
         // Initialize distances and previous tiles.
-        ResetDistances(startIndex);
-        //ResetHeap();
+        ResetDistances(startIndex, startDirection);
         // Each loop checks one tile.
         for (int i = 0; i < bigInt; i++)
         {
@@ -146,7 +149,7 @@ public class TerrainPathfinder : MonoBehaviour
         return actualPath;
     }
 
-    private int DetermineMovementCost(int tile, int moveType)
+    private int DetermineMovementCost(int tile, int moveType, int directionChange = -1)
     {
         int moveCost = 0;
         switch (moveType)
@@ -170,13 +173,30 @@ public class TerrainPathfinder : MonoBehaviour
                 moveCost = scoutingMoveCosts[tile];
                 break;
         }
+        if (directionChange >= 0 && moveType != 1)
+        {
+            moveCost = moveCost - 1 + directionChange;
+            if (moveCost < 1){moveCost = 1;}
+        }
         return moveCost;
+    }
+
+    private int ReturnDirectionChange(int directionOne, int directionTwo)
+    {
+        if (directionOne < 0 || directionTwo < 0){return -1;}
+        int change = Mathf.Abs(directionOne - directionTwo);
+        if (change == 4){return 2;}
+        if (change == 5){return 1;}
+        return change;
     }
 
     private void CheckClosestTile(bool path = true, int type = 0)
     {
         // Find the closest tile.
         // This part is where the heap is used making it O(nlgn) instead of O(n^2).
+        int newDirection = -1;
+        int directionChange = -1;
+        int closestDirection = heap.PeekDirection();
         int closestTile = heap.Pull();
         if (path)
         {
@@ -190,14 +210,16 @@ public class TerrainPathfinder : MonoBehaviour
         for (int i = 0; i < adjacentTiles.Count; i++)
         {
             // If the cost to move to the path from this tile is less than what we've already recorded;
+            newDirection = DirectionBetweenLocations(closestTile, adjacentTiles[i]);
+            directionChange = ReturnDirectionChange(closestDirection, newDirection);
             // Based on movement type check a different list.
-            int moveCost = DetermineMovementCost(adjacentTiles[i], type);
+            int moveCost = DetermineMovementCost(adjacentTiles[i], type, directionChange);
             if (distances[closestTile]+moveCost < distances[adjacentTiles[i]])
             {
                 // Then update the distance and the previous tile.
                 distances[adjacentTiles[i]] = distances[closestTile]+moveCost;
                 savedPathList[adjacentTiles[i]] = closestTile;
-                heap.AddNodeWeight(adjacentTiles[i], distances[adjacentTiles[i]]);
+                heap.AddNodeWeight(adjacentTiles[i], distances[adjacentTiles[i]], newDirection);
             }
         }
     }
@@ -545,10 +567,10 @@ public class TerrainPathfinder : MonoBehaviour
         return location;
     }
 
-    private List<int> FindTilesInRange(int start, int range, int moveType = -1)
+    private List<int> FindTilesInRange(int start, int range, int moveType = -1, int startDirection = -1)
     {
         reachableTiles.Clear();
-        ResetDistances(start);
+        ResetDistances(start, startDirection);
         int distance = 0;
         while (distance <= range && reachableTiles.Count < totalColumns * totalRows)
         {
@@ -567,14 +589,11 @@ public class TerrainPathfinder : MonoBehaviour
     public List<int> FindTilesInMoveRange(TacticActor actor, bool current = false)
     {
         reachableTiles.Clear();
-        int startIndex = actor.locationIndex;
         int range = actor.ReturnMaxPossibleDistance(current);
+        if (range <= 0){return reachableTiles;}
+        int startIndex = actor.locationIndex;
         int moveType = actor.movementType;
-        if (range <= 0)
-        {
-            return reachableTiles;
-        }
-        return FindTilesInRange(startIndex, range, moveType);
+        return FindTilesInRange(startIndex, range, moveType, actor.currentDirection);
     }
 
     public List<int> FindTilesInAttackRange(TacticActor currentActor, bool currentTurn = true)
@@ -612,6 +631,7 @@ public class TerrainPathfinder : MonoBehaviour
         return attackableTiles;
     }
 
+    // Skill can ignore direction generally speaking.
     public List<int> FindTilesInSkillRange(TacticActor skillUser, int skillRange)
     {
         reachableTiles.Clear();
@@ -676,10 +696,24 @@ public class TerrainPathfinder : MonoBehaviour
     public int CalculateDistanceToLocation(TacticActor actor, int destination)
     {
         int distance = 0;
-        FindPathIndex(actor.locationIndex, destination, actor.movementType);
+        int addedDist = 0;
+        int directionChange = -1;
+        List<int> directionsBetweenLocation = new List<int>();
+        directionsBetweenLocation.Add(actor.currentDirection);
+        FindPathIndex(actor.locationIndex, destination, actor.movementType, actor.currentDirection);
         for (int i = 0; i < actualPath.Count; i++)
         {
-            int addedDist = DetermineMovementCost(actualPath[i], actor.movementType);
+            // Add direction change to the calculations.
+            if (i == 0)
+            {
+                directionsBetweenLocation.Add(DirectionBetweenLocations(actor.locationIndex, actualPath[i]));
+            }
+            else
+            {
+                directionsBetweenLocation.Add(DirectionBetweenLocations(actualPath[i-1], actualPath[i]));
+            }
+            directionChange = ReturnDirectionChange(directionsBetweenLocation[i], directionsBetweenLocation[i+1]);
+            addedDist = DetermineMovementCost(actualPath[i], actor.movementType, directionChange);
             distance += addedDist;
         }
         return distance;
@@ -687,7 +721,7 @@ public class TerrainPathfinder : MonoBehaviour
 
     public int CalculateDirectionToLocation(TacticActor actor, int destination)
     {
-        FindPathIndex(actor.locationIndex, destination, actor.movementType);
+        FindPathIndex(actor.locationIndex, destination, actor.movementType, actor.currentDirection);
         if (actualPath.Count == 1)
         {
             return DirectionBetweenLocations(actor.locationIndex, destination);
