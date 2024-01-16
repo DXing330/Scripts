@@ -20,7 +20,7 @@ public class Map : MonoBehaviour
     public List<int> currentTiles;
     public List<string> tempTiles;
     public List<TerrainTile> terrainTiles;
-    public TerrainPathfinder pathfinder;
+    public BasicPathfinder pathfinder;
 
     protected virtual void Start()
     {

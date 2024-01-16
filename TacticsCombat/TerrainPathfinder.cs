@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TerrainPathfinder : MonoBehaviour
+public class TerrainPathfinder : BasicPathfinder
 {
     public bool hex = false;
     public bool square = true;
@@ -26,8 +26,6 @@ public class TerrainPathfinder : MonoBehaviour
     public List<int> occupiedTiles;
     // Fullsize is used for square maps where #rows = #columns
     private int fullSize;
-    public int totalRows;
-    public int totalColumns;
     private int bigInt = 999999;
     public List<int> adjacentTiles;
     public List<int> tempAdjTiles;
@@ -374,7 +372,7 @@ public class TerrainPathfinder : MonoBehaviour
         return -1;
     }
 
-    public bool DirectionCheck(int location, int direction)
+    public override bool DirectionCheck(int location, int direction)
     {
         if (hex)
         {
@@ -504,7 +502,7 @@ public class TerrainPathfinder : MonoBehaviour
         return (GetHexQ(locOne) > GetHexQ(locTwo));
     }
 
-    public int GetDestination(int location, int direction)
+    public override int GetDestination(int location, int direction)
     {
         if (!hex)
         {
@@ -677,7 +675,7 @@ public class TerrainPathfinder : MonoBehaviour
         return FindTilesInRange(center, span, moveType);
     }
 
-    public int CalculateDistance(int pointOne, int pointTwo)
+    public override int CalculateDistance(int pointOne, int pointTwo)
     {
         if (!hex)
         {
@@ -733,39 +731,6 @@ public class TerrainPathfinder : MonoBehaviour
             return DirectionBetweenLocations(actualPath[1], actualPath[0]);
         }
     }
-
-    private int GetRow(int location)
-    {
-        int row = 0;
-        while (location >= totalColumns)
-        {
-            location -= totalColumns;
-            row++;
-        }
-        return row;
-    }
-
-    private int GetColumn(int location)
-    {
-        if (totalColumns == 0){return location%fullSize;}
-        return location%totalColumns;
-    }
-
-    private int GetHexQ(int location)
-    {
-        return GetColumn(location);
-    }
-
-    private int GetHexR(int location)
-    {
-        return GetRow(location) - (GetColumn(location) - (GetColumn(location)%2)) / 2;
-    }
-
-    private int GetHexS(int location)
-    {
-        return -GetHexQ(location)-GetHexR(location);
-    }
-
     public TacticActor FindNearestEnemy(TacticActor currentActor, List<TacticActor> allActors)
     {
         possibleTiles.Clear();
