@@ -38,7 +38,7 @@ public class OverworldMap : Map
         locationSpecifics = allLocationSpecifics.Split("|").ToList();
         fullSize = (int) Mathf.Sqrt(allTiles.Count);
         SetTotalRowsColumns(fullSize, fullSize);
-        playerLocation = GameManager.instance.location;
+        playerLocation = GameManager.instance.currentLocation;
         UpdateCenterTile();
         UpdateMap();
         overworldPathfinder.SetTerrainInfo(allLocations, fullSize);

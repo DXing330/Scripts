@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class PlayerSettings : BasicDataManager
 {
-    private string saveDataPath;
     public string allSettings;
     // First setting will be to whether to do a simulated auto battle or not.
     public List<string> settingsList;

@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class EquipmentInventory : BasicDataManager
 {
-    private string saveDataPath;
     private string loadedData;
     public Equipment equipment;
     public List<string> allEquipment;

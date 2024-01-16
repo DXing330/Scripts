@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class ArmyDataManager : BasicDataManager
 {
-    private string saveDataPath;
     private string loadedData;
     public List<PlayerActor> partyMembers;
     public int maxArmySize = 9;

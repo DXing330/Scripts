@@ -121,6 +121,7 @@ public class LevelEditor : Map
                 encounterSpecificEditor.SetActive(true);
                 break;
         }
+        UpdateMap();
     }
     // Levels need to store some information.
     public string currentLevelData;
@@ -238,11 +239,12 @@ public class LevelEditor : Map
     public int encounterToMove = -1;
     protected void UpdateEncounterToMoveOnMap()
     {
+        if (currentlyEditing != 2){return;}
         if (encounterToMove < 0){return;}
         int indexOfSpawn = currentTiles.IndexOf(encounterToMove);
         if (indexOfSpawn >= 0)
         {
-            terrainTiles[indexOfSpawn].Highlight();
+            terrainTiles[indexOfSpawn].Highlight(false);
         }
     }
     public void SelectEncounterType(int newType)
@@ -262,11 +264,12 @@ public class LevelEditor : Map
     public int encounterSpecificToEdit = -1;
     protected void UpdateEncounterToEditOnMap()
     {
+        if (currentlyEditing != 3){return;}
         if (encounterSpecificToEdit < 0){return;}
         int indexOfSpawn = currentTiles.IndexOf(encounterSpecificToEdit);
         if (indexOfSpawn >= 0)
         {
-            terrainTiles[indexOfSpawn].Highlight();
+            terrainTiles[indexOfSpawn].Highlight(false);
         }
     }
     public string encounterSpecificsText;
@@ -345,6 +348,8 @@ public class LevelEditor : Map
                 return "Battle";
             case 1:
                 return "Switch Level";
+            case 2:
+                return "Switch Scene";
         }
         return "";
     }

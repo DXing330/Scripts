@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class UnitUpgradeData : BasicDataManager
 {
-    private string saveDataPath;
     private string loadedData;
     // Bonus health/attack/defense for each unit.
     public List<string> upgradedUnits;

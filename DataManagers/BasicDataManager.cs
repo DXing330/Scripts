@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class BasicDataManager : MonoBehaviour
 {
+    protected string saveDataPath;
+    
+    protected virtual void Start()
+    {
+        saveDataPath = Application.persistentDataPath;
+    }
+    
     public virtual void NewGame(){}
 
     public virtual void Load(){}
