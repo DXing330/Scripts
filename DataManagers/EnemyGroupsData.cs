@@ -36,8 +36,6 @@ public class EnemyGroupsData : MonoBehaviour
         {
             case 1:
                 return ReturnForestGroup(difficulty);
-            case 2:
-                return ReturnMountainGroup(difficulty);
         }
         return "Wolf";
     }
@@ -57,11 +55,6 @@ public class EnemyGroupsData : MonoBehaviour
                 rng = Random.Range(0, forestEnemiesHARD.Count);
                 return forestEnemiesHARD[rng];
         }
-        return "Wolf";
-    }
-
-    private string ReturnMountainGroup(int difficulty)
-    {
         return "Wolf";
     }
 }

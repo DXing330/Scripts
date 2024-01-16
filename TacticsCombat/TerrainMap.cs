@@ -90,10 +90,7 @@ public class TerrainMap : MonoBehaviour
         actorManager.skillData.LoadAllData();
         for (int i = 0; i < terrainTiles.Count; i++)
         {
-            if (hex)
-            {
-                terrainTiles[i].SetTileNumber(i);
-            }
+            terrainTiles[i].SetTileNumber(i);
         }
         if (GameManager.instance.randomBattle > 0)
         {
@@ -1052,20 +1049,13 @@ public class TerrainMap : MonoBehaviour
         {
             int tileType = terrainInfo[tileIndex];
             terrainTiles[imageIndex].UpdateColor(tileType);
-            if (hex)
+            if (tileType == 7)
             {
-                if (tileType == 7)
-                {
-                    terrainTiles[imageIndex].UpdateLocationImage(hexTileSprites[tileType]);
-                    terrainTiles[imageIndex].UpdateTileImage(hexTileSprites[0]);
-                    return;
-                }
-                terrainTiles[imageIndex].UpdateTileImage(hexTileSprites[tileType]);
+                terrainTiles[imageIndex].UpdateLocationImage(hexTileSprites[tileType]);
+                terrainTiles[imageIndex].UpdateTileImage(hexTileSprites[0]);
+                return;
             }
-            else
-            {
-                terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
-            }
+            terrainTiles[imageIndex].UpdateTileImage(hexTileSprites[tileType]);
         }
     }
 
@@ -1451,104 +1441,38 @@ public class TerrainMap : MonoBehaviour
     {
         lockedView = true;
         int previousFixedCenter = fixedCenter;
-        if (!hex)
+        switch (direction)
         {
-            switch (direction)
-            {
-                case -1:
-                    fixedCenter=((totalRows * totalColumns) + totalColumns)/2;
-                    break;
-                case 0:
-                    if (previousFixedCenter < totalColumns)
-                    {
-                        break;
-                    }
-                    fixedCenter-=totalColumns;
-                    break;
-                case 1:
-                    if (previousFixedCenter%totalColumns==totalColumns-1)
-                    {
-                        break;
-                    }
-                    fixedCenter++;
-                    break;
-                case 2:
-                    if (previousFixedCenter>(totalColumns*(totalRows-1))-1)
-                    {
-                        break;
-                    }
-                    fixedCenter+=totalColumns;
-                    break;
-                case 3:
-                    if (previousFixedCenter%totalColumns==0)
-                    {
-                        break;
-                    }
-                    fixedCenter--;
-                    break;
-                case 4:
-                    MoveMap(0);
-                    MoveMap(1);
-                    break;
-                case 5:
-                    MoveMap(2);
-                    MoveMap(1);
-                    break;
-                case 6:
-                    MoveMap(2);
-                    MoveMap(3);
-                    break;
-                case 7:
-                    MoveMap(0);
-                    MoveMap(3);
-                    break;
-            }
-        }
-        if (hex)
-        {
-            switch (direction)
-            {
-                case 0:
-                    if (previousFixedCenter < totalColumns){break;}
-                    fixedCenter-=totalColumns;
-                    break;
-                case 1:
-                    if (previousFixedCenter%totalColumns >= totalColumns - 2){break;}
-                    fixedCenter += 2;
-                    break;
-                case 2:
-                    if (previousFixedCenter%totalColumns >= totalColumns - 2){break;}
-                    fixedCenter += 2;
-                    break;
-                case 3:
-                    if (previousFixedCenter > (totalColumns*(totalRows-1))-1){break;}
-                    fixedCenter+=totalColumns;
-                    break;
-                case 4:
-                    if (previousFixedCenter%totalColumns <= 1){break;}
-                    fixedCenter -= 2;
-                    break;
-                case 5:
-                    if (previousFixedCenter%totalColumns <= 1){break;}
-                    fixedCenter -= 2;
-                    break;
-            }
+            case 0:
+                if (previousFixedCenter < totalColumns){break;}
+                fixedCenter-=totalColumns;
+                break;
+            case 1:
+                if (previousFixedCenter%totalColumns >= totalColumns - 2){break;}
+                fixedCenter += 2;
+                break;
+            case 2:
+                if (previousFixedCenter%totalColumns >= totalColumns - 2){break;}
+                fixedCenter += 2;
+                break;
+            case 3:
+                if (previousFixedCenter > (totalColumns*(totalRows-1))-1){break;}
+                fixedCenter+=totalColumns;
+                break;
+            case 4:
+                if (previousFixedCenter%totalColumns <= 1){break;}
+                fixedCenter -= 2;
+                break;
+            case 5:
+                if (previousFixedCenter%totalColumns <= 1){break;}
+                fixedCenter -= 2;
+                break;
         }
         UpdateCenterTile();
         UpdateMap();
         // Need to maintain the highlights according to what the player was doing.
         // Moving -> move highlights, skill -> skill highlights, etc.
         Rehighlight();
-    }
-
-    public void ChangeLockMapView()
-    {
-        lockedView = !lockedView;
-    }
-
-    public void ActorDied()
-    {
-        UpdateMap();
     }
 
     public void ClickOnTile(int tileNumber)

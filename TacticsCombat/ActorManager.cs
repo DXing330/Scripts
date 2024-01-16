@@ -187,6 +187,20 @@ public class ActorManager : MonoBehaviour
         }
     }
 
+    public void LoadEnemyInRandomSetLocations(string[] enemies, string[] locations)
+    {
+        List<string> allLocs = locations.ToList();
+        int locationIndex = 0;
+        int location = 0;
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            locationIndex = Random.Range(0, allLocs.Count);
+            location = int.Parse(allLocs[locationIndex]);
+            allLocs.RemoveAt(locationIndex);
+            GenerateActor(location, enemies[i], 1);
+        }
+    }
+
     public void SpawnPlayerTeamInFixedSpots(string[] spawnPoints)
     {
         usedTiles.Clear();
@@ -260,6 +274,7 @@ public class ActorManager : MonoBehaviour
 
     public void GenerateActor(int location, string name = "Mob", int team = 0, bool start = true)
     {
+        if (name.Length <= 0){return;}
         TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
         newActor.typeName = name;
         actorData.LoadActorData(newActor, name);

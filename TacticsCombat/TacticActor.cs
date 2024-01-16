@@ -194,7 +194,6 @@ public class TacticActor : AllStats
         //spriteRenderer.sprite = null;
         spriteRenderer.color = tempColor;
         actionsLeft = 0;
-        //terrainMap.ActorDied();
         //Destroy(gameObject);
     }
 
