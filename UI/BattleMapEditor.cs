@@ -84,15 +84,20 @@ public class BattleMapEditor : Map
         currentlyEditing = newEditing;
         if (currentlyEditing < 0){return;}
         changeEditingButtons[currentlyEditing].color = highlightColor;
-        if (currentlyEditing == 0)
+        switch (currentlyEditing)
         {
-            changeEditingTabs[0].SetActive(true);
-            UpdatePageOfEnemies();
-        }
-        if (currentlyEditing == 1)
-        {
-            changeEditingTabs[1].SetActive(true);
-            UpdatePageOfRandomEnemies();
+            case 0:
+                changeEditingTabs[0].SetActive(true);
+                UpdatePageOfEnemies();
+                break;
+            case 1:
+                changeEditingTabs[1].SetActive(true);
+                UpdatePageOfRandomEnemies();
+                break;
+            case 4:
+                changeEditingTabs[2].SetActive(true);
+                UpdatePageOfRewards();
+                break;
         }
     }
     public string currentBattleData;
@@ -108,6 +113,26 @@ public class BattleMapEditor : Map
         currentMapText.text = (int.Parse(currentMap)+1).ToString();
     }
     public string currentReward;
+    public List<TMP_Text> rewardTexts;
+    public void StartChangingRewards()
+    {
+        if (currentlyEditing != 4)
+        {
+            SetCurrentlyEditing(4);
+        }
+        else
+        {
+            SetCurrentlyEditing(-1);
+        }
+    }
+    protected void UpdatePageOfRewards()
+    {
+        string[] allRewards = currentReward.Split("|");
+        for (int i = 0; i < allRewards.Length; i++)
+        {
+            rewardTexts[i].text = allRewards[i];
+        }
+    }
     public void StartChangingEnemies()
     {
         if (currentlyEditing != 0)
@@ -120,6 +145,22 @@ public class BattleMapEditor : Map
         }
         currentlySelectedEnemyType = -1;
         currentlySelectedEnemyLocation = -1;
+    }
+    public void IncreaseReward(int type)
+    {
+        List<string> allRewards = currentReward.Split("|").ToList();
+        allRewards[type] = (int.Parse(allRewards[type]) + 1).ToString();
+        currentReward = GameManager.instance.ConvertListToString(allRewards);
+        UpdatePageOfRewards();
+    }
+    public void DecreaseReward(int type)
+    {
+        List<string> allRewards = currentReward.Split("|").ToList();
+        int currentRewardAmount = int.Parse(allRewards[type]);
+        if (currentRewardAmount <= 0){return;}
+        allRewards[type] = (currentRewardAmount - 1).ToString();
+        currentReward = GameManager.instance.ConvertListToString(allRewards);
+        UpdatePageOfRewards();
     }
     public List<TerrainTile> possibleEnemyButtons;
     public List<GameObject> possibleEnemyObjects;
@@ -369,7 +410,7 @@ public class BattleMapEditor : Map
         currentSpawnPoints.Clear();
         currentRandomEnemies.Clear();
         currentRandomEnemySpawnPoints.Clear();
-        currentReward = "0=0|1=0|2=0";
+        currentReward = "0|0|0";
         LoadBaseMap();
     }
 
