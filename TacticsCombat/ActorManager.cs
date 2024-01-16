@@ -327,15 +327,25 @@ public class ActorManager : MonoBehaviour
         GameManager.instance.MoveScenes("BattleOver");
     }
 
+    public void SetWinReward(string newReward)
+    {
+        winReward = newReward;
+    }
+
     private void ClaimDrops()
     {
+        GameManager.instance.recentlyWon = 1;
+        if (winReward.Length < 5){return;}
+        string[] allRewards = winReward.Split("|");
+        collectedBlood = int.Parse(allRewards[1]);
+        collectedGold = int.Parse(allRewards[0]);
+        collectedMana = int.Parse(allRewards[2]);
         GameManager.instance.GainResource(0, collectedBlood);
         GameManager.instance.GainResource(1, collectedMana);
         GameManager.instance.GainResource(2, collectedGold);
         GameManager.instance.recentlyGainedBlood = collectedBlood;
         GameManager.instance.recentlyGainedMana = collectedMana;
         GameManager.instance.recentlyGainedGold = collectedGold;
-        GameManager.instance.recentlyWon = 1;
     }
 
     private void ResetDrops()
@@ -344,22 +354,6 @@ public class ActorManager : MonoBehaviour
         GameManager.instance.recentlyGainedMana = 0;
         GameManager.instance.recentlyGainedGold = 0;
         GameManager.instance.recentlyWon = 0;
-    }
-
-    public void GetDrops(TacticActor actor)
-    {
-        switch (actor.dropType)
-        {
-            case 0:
-                collectedBlood += actor.dropAmount;
-                break;
-            case 1:
-                collectedMana += actor.dropAmount;
-                break;
-            case 2:
-                collectedGold += actor.dropAmount;
-                break;
-        }
     }
 
     public int WinningTeam()

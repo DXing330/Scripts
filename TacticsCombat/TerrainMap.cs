@@ -910,13 +910,7 @@ public class TerrainMap : MonoBehaviour
         // This is not needed on some maps and my be causing bugs elsewhere.
         if (win)
         {
-            for (int i = 0; i < allActors.Count; i++)
-            {
-                if (allActors[i].team != 0 && allActors[i].health <= 0)
-                {
-                    actorManager.GetDrops(allActors[i]);
-                }
-            }
+            // No longer need to claims drops.
             allActors.Clear();
         }
     }
@@ -973,6 +967,7 @@ public class TerrainMap : MonoBehaviour
         string battleData = GameManager.instance.forestFixedBattles[battleIndex];
         string[] dataBlocks = battleData.Split(",");
         LoadMap(int.Parse(dataBlocks[0]));
+        actorManager.SetWinReward(dataBlocks[1]);
         actorManager.LoadFixedBattleEnemyTeam(dataBlocks[2].Split("|"), dataBlocks[3].Split("|"));
         actorManager.SpawnPlayerTeamInFixedSpots(dataBlocks[4].Split("|"));
         actorManager.LoadEnemyInRandomSetLocations(dataBlocks[5].Split("|"), dataBlocks[6].Split("|"));
