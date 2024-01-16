@@ -22,6 +22,7 @@ public class LevelDataManager : BasicDataManager
 
     public override void Load()
     {
+        saveDataPath = Application.persistentDataPath;
         if (File.Exists(saveDataPath+"/currentLevels.txt"))
         {
             allLevels = File.ReadAllText(saveDataPath+"/currentLevels.txt");

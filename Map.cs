@@ -7,7 +7,7 @@ public class Map : MonoBehaviour
     public bool hex = true;
     public bool square = true;
     protected int startIndex;
-    public int gridSize = 7;
+    public int gridSize = 9;
     // Used for square maps.
     protected int fullSize;
     // Used for rectangular maps.

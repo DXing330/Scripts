@@ -350,6 +350,8 @@ public class LevelEditor : Map
                 return "Switch Level";
             case 2:
                 return "Switch Scene";
+            case 3:
+                return "Treasure";
         }
         return "";
     }
