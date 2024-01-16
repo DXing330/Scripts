@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class ActorManager : MonoBehaviour
 {
@@ -10,6 +11,21 @@ public class ActorManager : MonoBehaviour
     public TerrainMap terrainMap;
     public int winCondition = 0;
     public string winConditionSpecifics = null;
+    public TMP_Text battleGoal;
+    public void UpdateBattleGoal(string newGoal = "")
+    {
+        if (newGoal.Length <= 0)
+        {
+            battleGoal.text = "Defeat All Enemies";
+            return;
+        }
+        battleGoal.text = newGoal;
+    }
+    public void ResetBattleGoalText()
+    {
+        battleGoal.text = "";
+    }
+    public string winReward;
     private int teamOneCount = 0;
     private int teamZeroCount = 0;
     public TerrainTile terrainTile;

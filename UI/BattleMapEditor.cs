@@ -68,23 +68,32 @@ public class BattleMapEditor : Map
     }
     // -1 changes what to edit, 0 changes map, 1 changes difficulty, 2 changes enemy and locations, 3 changes spawn points.
     public int currentlyEditing = -1;
+    public List<Image> changeEditingButtons;
+    public List<GameObject> changeEditingTabs;
     protected void SetCurrentlyEditing(int newEditing)
     {
         // Reset to defaults then change as needed.
-        editSpawnBG.color = transColor;
-        editEnemiesBG.color = transColor;
-        editEnemyTab.SetActive(false);
-        currentlyEditing = newEditing;
-        if (currentlyEditing == 2)
+        for (int i = 0; i < changeEditingButtons.Count; i++)
         {
-            editEnemiesBG.color = highlightColor;
-            editEnemyTab.SetActive(true);
+            changeEditingButtons[i].color = transColor;
+        }
+        for (int i = 0; i < changeEditingTabs.Count; i++)
+        {
+            changeEditingTabs[i].SetActive(false);
+        }
+        currentlyEditing = newEditing;
+        if (currentlyEditing < 0){return;}
+        changeEditingButtons[currentlyEditing].color = highlightColor;
+        if (currentlyEditing == 0)
+        {
+            changeEditingTabs[0].SetActive(true);
             UpdatePageOfEnemies();
         }
-        else if (currentlyEditing == 3)
+        if (currentlyEditing == 1)
         {
-            editSpawnBG.color = highlightColor;
-        } 
+            changeEditingTabs[1].SetActive(true);
+            UpdatePageOfRandomEnemies();
+        }
     }
     public string currentBattleData;
     public string currentMap;
@@ -98,13 +107,12 @@ public class BattleMapEditor : Map
     {
         currentMapText.text = (int.Parse(currentMap)+1).ToString();
     }
-    public string currentDifficulty;
-    public Image editEnemiesBG;
+    public string currentReward;
     public void StartChangingEnemies()
     {
-        if (currentlyEditing != 2)
+        if (currentlyEditing != 0)
         {
-            SetCurrentlyEditing(2);
+            SetCurrentlyEditing(0);
         }
         else
         {
@@ -115,7 +123,6 @@ public class BattleMapEditor : Map
     }
     public List<TerrainTile> possibleEnemyButtons;
     public List<GameObject> possibleEnemyObjects;
-    public GameObject editEnemyTab;
     public int currentPageOfEnemies = 0;
     public void ChangePageOfEnemies(bool right = true)
     {
@@ -190,7 +197,6 @@ public class BattleMapEditor : Map
     public List<string> currentEnemies;
     public List<string> currentEnemyLocations;
     public int totalSpawnPoints = 9;
-    public Image editSpawnBG;
     public TMP_Text unusedSpawnPointsText;
     protected void UpdateUnusedSpawnPointsText()
     {
@@ -200,10 +206,9 @@ public class BattleMapEditor : Map
     public List<string> currentSpawnPoints;
     public void StartChangingSpawnPoints()
     {
-        if (currentlyEditing != 3)
+        if (currentlyEditing != 2)
         {
-            SetCurrentlyEditing(3);
-            editSpawnBG.color = highlightColor;
+            SetCurrentlyEditing(2);
         }
         else
         {
@@ -212,6 +217,99 @@ public class BattleMapEditor : Map
         currentlySelectedSpawnPoint = -1;
     }
     public int currentlySelectedSpawnPoint = -1;
+    public List<string> currentRandomEnemies;
+    public void IncreaseRandomEnemyAmount(int index)
+    {
+        int pageShift = (currentPageOfRandomEnemies * randomEnemyAmountBoxes.Count);
+        string enemyType = possibleEnemies[index + pageShift];
+        currentRandomEnemies.Add(enemyType);
+        UpdatePageOfRandomEnemies();
+        UpdateUnusedEnemySpawnPointsText();
+    }
+    public void DecreaseRandomEnemyAmount(int index)
+    {
+        int pageShift = (currentPageOfRandomEnemies * randomEnemyAmountBoxes.Count);
+        string enemyType = possibleEnemies[index + pageShift];
+        int indexOf = currentRandomEnemies.IndexOf(enemyType);
+        if (indexOf >= 0){currentRandomEnemies.RemoveAt(indexOf);}
+        UpdatePageOfRandomEnemies();
+        UpdateUnusedEnemySpawnPointsText();
+    }
+    public void StartChangingRandomEnemies()
+    {
+        if (currentlyEditing != 1)
+        {
+            SetCurrentlyEditing(1);
+        }
+        else
+        {
+            SetCurrentlyEditing(-1);
+        }
+    }
+    public int currentPageOfRandomEnemies = 0;
+    public void ChangePageOfRandomEnemies(bool right = true)
+    {
+        // Count how many pages there are.
+        int lastPage = possibleEnemies.Count/possibleEnemyButtons.Count;
+        // If it's an exact fit then there's one less page.
+        if (possibleEnemies.Count%possibleEnemyButtons.Count == 0){lastPage--;}
+        if (right)
+        {
+            if (currentPageOfRandomEnemies+1<=lastPage){currentPageOfRandomEnemies++;}
+            else {currentPageOfRandomEnemies = 0;}
+        }
+        else
+        {
+            if (currentPageOfRandomEnemies > 0){currentPageOfRandomEnemies--;}
+            else {currentPageOfRandomEnemies = lastPage;}
+        }
+        UpdatePageOfRandomEnemies();
+    }
+    protected void UpdatePageOfRandomEnemies()
+    {
+        int pageShift = (currentPageOfRandomEnemies * randomEnemyAmountBoxes.Count);
+        for (int i = 0; i < randomEnemyAmountBoxes.Count; i++)
+        {
+            if (i < possibleEnemies.Count - pageShift)
+            {
+                randomEnemyAmountBoxes[i].SetActive(true);
+            }
+            else
+            {
+                randomEnemyAmountBoxes[i].SetActive(false);
+            }
+        }
+        for (int j = 0; j < Mathf.Min(possibleRandomEnemies.Count, possibleEnemies.Count - pageShift); j++)
+        {
+            string enemyType = possibleEnemies[j + pageShift];
+            possibleRandomEnemies[j].UpdateImage(actorSprites.SpriteDictionary(enemyType));
+            int randomEnemyCount = currentRandomEnemies.Count(s => s == enemyType);
+            randomEnemyAmountTexts[j].text = randomEnemyCount.ToString();
+        }
+    }
+    public List<GameObject> randomEnemyAmountBoxes;
+    public List<TerrainTile> possibleRandomEnemies;
+    public List<TMP_Text> randomEnemyAmountTexts;
+    public List<string> currentRandomEnemySpawnPoints;
+    public void StartChangingRandomEnemySpawnPoints()
+    {
+        if (currentlyEditing != 3)
+        {
+            SetCurrentlyEditing(3);
+        }
+        else
+        {
+            SetCurrentlyEditing(-1);
+        }
+    }
+    public int currentlySelectedEnemySpawnPoint = -1;
+    public TMP_Text unusedEnemySpawnPointsText;
+    protected void UpdateUnusedEnemySpawnPointsText()
+    {
+        // Can have more spawn points than enemies, but not less.
+        int remainder = Mathf.Max(0, currentRandomEnemies.Count - currentRandomEnemySpawnPoints.Count);
+        unusedEnemySpawnPointsText.text = remainder.ToString();
+    }
 
     // Loading is done once at the start so a specific load function isn't needed.
     protected void Load()
@@ -269,7 +367,9 @@ public class BattleMapEditor : Map
         currentEnemies.Clear();
         currentEnemyLocations.Clear();
         currentSpawnPoints.Clear();
-        currentDifficulty = "0";
+        currentRandomEnemies.Clear();
+        currentRandomEnemySpawnPoints.Clear();
+        currentReward = "0=0|1=0|2=0";
         LoadBaseMap();
     }
 
@@ -349,9 +449,27 @@ public class BattleMapEditor : Map
                 terrainTiles[indexOfSpawn].Highlight();
                 if (currentlyEditing == 3)
                 {
-                    if (spawnPoint == currentlySelectedSpawnPoint)
+                    if (spawnPoint == currentlySelectedEnemySpawnPoint)
                     {
                         terrainTiles[indexOfSpawn].Highlight(false);
+                    }
+                }
+            }
+        }
+        // Update enemy spawn points.
+        for (int i = 0; i < currentRandomEnemySpawnPoints.Count; i++)
+        {
+            if (currentRandomEnemySpawnPoints[i].Length <= 0){continue;}
+            int spawnPoint = int.Parse(currentRandomEnemySpawnPoints[i]);
+            int indexOfSpawn = currentTiles.IndexOf(spawnPoint);
+            if (indexOfSpawn >= 0)
+            {
+                terrainTiles[indexOfSpawn].Highlight(false);
+                if (currentlyEditing == 5)
+                {
+                    if (spawnPoint == currentlySelectedEnemySpawnPoint)
+                    {
+                        terrainTiles[indexOfSpawn].Highlight();
                     }
                 }
             }
@@ -366,18 +484,19 @@ public class BattleMapEditor : Map
 
     public bool SaveCurrentBattle()
     {
-        currentBattleData = currentMap+","+currentDifficulty+","+GameManager.instance.ConvertListToString(currentEnemies)+","+GameManager.instance.ConvertListToString(currentEnemyLocations)+","+GameManager.instance.ConvertListToString(currentSpawnPoints);
+        currentBattleData = currentMap+","+currentReward+","+GameManager.instance.ConvertListToString(currentEnemies)+","+GameManager.instance.ConvertListToString(currentEnemyLocations)+","+GameManager.instance.ConvertListToString(currentSpawnPoints)+","+GameManager.instance.ConvertListToString(currentRandomEnemies)+","+GameManager.instance.ConvertListToString(currentRandomEnemySpawnPoints);
         // Need to check some conditions to see if it's a valid battle.
         // Battle needs enemies.
-        if (currentEnemies.Count <= 0){return false;}
-        // Battle needs spawn points.
+        if (currentEnemies.Count <= 0 && currentRandomEnemies.Count <= 0){return false;}
+        // Battle needs spawn points for both players and enemies.
         if (currentSpawnPoints.Count < totalSpawnPoints){return false;}
+        if (currentRandomEnemySpawnPoints.Count < currentRandomEnemies.Count){return false;}
         return true;
     }
 
     public void SaveCurrentBattleVoid()
     {
-        currentBattleData = currentMap+","+currentDifficulty+","+GameManager.instance.ConvertListToString(currentEnemies)+","+GameManager.instance.ConvertListToString(currentEnemyLocations)+","+GameManager.instance.ConvertListToString(currentSpawnPoints);
+        currentBattleData = currentMap+","+currentReward+","+GameManager.instance.ConvertListToString(currentEnemies)+","+GameManager.instance.ConvertListToString(currentEnemyLocations)+","+GameManager.instance.ConvertListToString(currentSpawnPoints)+","+GameManager.instance.ConvertListToString(currentRandomEnemies)+","+GameManager.instance.ConvertListToString(currentRandomEnemySpawnPoints);
     }
 
     public void UndoEdits()
@@ -391,10 +510,19 @@ public class BattleMapEditor : Map
         string[] previousData = currentBattleData.Split(",");
         currentPageOfEnemies = 0;
         currentMap = previousData[0];
-        currentDifficulty = previousData[1];
+        currentReward = previousData[1];
         currentEnemies = previousData[2].Split("|").ToList();
         currentEnemyLocations = previousData[3].Split("|").ToList();
+        GameManager.instance.RemoveEmptyListItems(currentEnemies);
+        GameManager.instance.RemoveEmptyListItems(currentEnemyLocations);
         currentSpawnPoints = previousData[4].Split("|").ToList();
+        if (previousData.Length > 5)
+        {
+            currentRandomEnemies = previousData[5].Split("|").ToList();
+            currentRandomEnemySpawnPoints = previousData[6].Split("|").ToList();
+            GameManager.instance.RemoveEmptyListItems(currentRandomEnemies);
+            GameManager.instance.RemoveEmptyListItems(currentRandomEnemySpawnPoints);
+        }
         LoadBaseMap();
     }
 
@@ -414,12 +542,15 @@ public class BattleMapEditor : Map
         totalRows = int.Parse(loadedDataBlocks[1]);
         totalColumns = int.Parse(loadedDataBlocks[2]);
         // Remove out of bounds enemies and spawn points.
-        for (int i = 0; i < currentEnemyLocations.Count; i++)
+        if (currentEnemyLocations.Count > 0)
         {
-            if (int.Parse(currentEnemyLocations[i]) >= totalRows * totalColumns)
+            for (int i = 0; i < currentEnemyLocations.Count; i++)
             {
-                currentEnemyLocations.RemoveAt(i);
-                currentEnemies.RemoveAt(i);
+                if (int.Parse(currentEnemyLocations[i]) >= totalRows * totalColumns)
+                {
+                    currentEnemyLocations.RemoveAt(i);
+                    currentEnemies.RemoveAt(i);
+                }
             }
         }
         for (int i = 0; i < currentSpawnPoints.Count; i++)
@@ -467,14 +598,19 @@ public class BattleMapEditor : Map
         if (currentTiles[tileNumber] < 0){return;}
         switch (currentlyEditing)
         {
-            case 2:
+            case 0:
                 SetEnemy(tileNumber);
                 HighlightSelectedEnemyType();
                 UpdateMap();
                 break;
-            case 3:
+            case 2:
                 SetSpawnPoint(tileNumber);
                 UpdateUnusedSpawnPointsText();
+                UpdateMap();
+                break;
+            case 3:
+                SetRandomEnemySpawnPoint(tileNumber);
+                UpdateUnusedEnemySpawnPointsText();
                 UpdateMap();
                 break;
         }
@@ -485,6 +621,7 @@ public class BattleMapEditor : Map
         string spawnLocation = currentTiles[tileNumber].ToString();
         // Can't spawn on enemies.
         if (currentEnemyLocations.Contains(spawnLocation)){return;}
+        if (currentRandomEnemySpawnPoints.Contains(spawnLocation)){return;}
         // Check if this overlaps with a tile already in the spawn zone.
         int overlap = 0;
         if (currentSpawnPoints.Contains(spawnLocation)){overlap = 1;}
@@ -538,6 +675,7 @@ public class BattleMapEditor : Map
         string spawnLocation = currentTiles[tileNumber].ToString();
         // Can't place an enemy on a spawn point.
         if (currentSpawnPoints.Contains(spawnLocation)){return;}
+        if (currentRandomEnemySpawnPoints.Contains(spawnLocation)){return;}
         // Can't place an enemy on another enemy.
         int overlap = 0;
         if (currentEnemyLocations.Contains(spawnLocation)){overlap = 1;}
@@ -577,6 +715,30 @@ public class BattleMapEditor : Map
                 currentlySelectedEnemyLocation = currentTiles[tileNumber];
             }
             currentlySelectedEnemyType = -1;
+        }
+    }
+
+    protected void SetRandomEnemySpawnPoint(int tileNumber)
+    {
+        string spawnLocation = currentTiles[tileNumber].ToString();
+        if (currentEnemyLocations.Contains(spawnLocation)){return;}
+        if (currentSpawnPoints.Contains(spawnLocation)){return;}
+        int overlap = 0;
+        if (currentRandomEnemySpawnPoints.Contains(spawnLocation)){overlap = 1;}
+        // Can either place or remove random spawn points.
+        if (overlap == 0)
+        {
+            currentRandomEnemySpawnPoints.Add(spawnLocation);
+        }
+        else
+        {
+            if (currentlySelectedEnemySpawnPoint == int.Parse(spawnLocation))
+            {
+                int indexOf = currentRandomEnemySpawnPoints.IndexOf(spawnLocation);
+                currentRandomEnemySpawnPoints.RemoveAt(indexOf);
+                currentlySelectedEnemySpawnPoint = -1;
+            }
+            else{currentlySelectedEnemySpawnPoint = int.Parse(spawnLocation);}
         }
     }
 }

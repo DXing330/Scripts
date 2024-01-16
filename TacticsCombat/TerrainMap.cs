@@ -63,6 +63,7 @@ public class TerrainMap : MonoBehaviour
     {
         simulator.ResetWinChanceText();
         battleStarted = true;
+        actorManager.ResetBattleGoalText();
         SortByInitiative();
         ActorsTurn();
     }

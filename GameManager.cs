@@ -72,6 +72,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public int CountOccurencesOfStringInList(List<string> listToCountFrom, string stringToCount)
+    {
+        int count = listToCountFrom.Count(s => s == stringToCount);
+        return count;
+    }
+
     public int playerLevel = 1;
     public int goldCoins = 0;
     public int manaCrystals = 0;
