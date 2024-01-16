@@ -24,8 +24,6 @@ public class Map : MonoBehaviour
 
     protected virtual void Start()
     {
-        //InitializeTiles();
-        SetTotalRowsColumns(fullSize, fullSize);
     }
 
     public void SetTotalRowsColumns(int rows = -1, int columns = -1)

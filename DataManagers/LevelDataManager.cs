@@ -31,6 +31,12 @@ public class LevelDataManager : BasicDataManager
         {
             NewGame();
         }
+        allLevelsList = allLevels.Split("#").ToList();
+        if (allLevelsList.Count < 2)
+        {
+            allLevels = defaultAllLevels;
+            allLevelsList = allLevels.Split("#").ToList();
+        }
     }
 
     public override void Save()

@@ -45,6 +45,7 @@ public class TerrainTile : MonoBehaviour
         rectTransform.pivot = new Vector2(xPivot, yPivot);
     }
 
+    // Don't use this with hexes, it looks ugly.
     public void ResetTileImage()
     {
         tileImage.sprite = null;
