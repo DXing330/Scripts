@@ -219,7 +219,7 @@ public class Map : MonoBehaviour
         DetermineCurrentTiles();
     }
 
-    protected void AddRow()
+    protected virtual void AddRow()
     {
         // Just add a new row at the bottom.
         for (int i = 0; i < totalColumns; i++)
@@ -229,7 +229,7 @@ public class Map : MonoBehaviour
         totalRows++;
     }
 
-    protected void RemoveRow()
+    protected virtual void RemoveRow()
     {
         if (totalRows <= gridSize){return;}
         // Remove the last row.
@@ -240,7 +240,7 @@ public class Map : MonoBehaviour
         totalRows--;
     }
 
-    protected void AddColumns()
+    protected virtual void AddColumns()
     {
         // Add two columns at once to ensure balance.
         // Adding two doesn't make it balanced, try adding four at a time.
@@ -262,7 +262,7 @@ public class Map : MonoBehaviour
         allTiles = new List<string>(tempTiles);
     }
 
-    protected void RemoveColumns()
+    protected virtual void RemoveColumns()
     {
         if (totalColumns <= gridSize){return;}
         int index = 0;

@@ -70,6 +70,7 @@ public class LevelEditor : Map
             if (levelIndex > 0){levelIndex--;}
             else{levelIndex = allDataList.Count-1;}
         }
+        SwitchEditing(-1);
         UpdateIndexText();
         LoadCurrentLevel();
         UpdateCenterTile();
@@ -87,6 +88,18 @@ public class LevelEditor : Map
             editingButtons[i].color = transColor;
         }
         terrainEditor.SetActive(false);
+        encounterEditor.SetActive(false);
+        encounterSpecificEditor.SetActive(false);
+        // Sometimes reset everything you've selected.
+        if (newEditing < 0)
+        {
+            newEditing = -1;
+            currentlySelectedTerrain = -1;
+            currentlySelectedEncounter = -1;
+            encounterToMove = -1;
+            encounterSpecificToEdit = -1;
+            return;
+        }
         if (newEditing == currentlyEditing)
         {
             currentlyEditing = -1;
@@ -94,10 +107,19 @@ public class LevelEditor : Map
         }
         currentlyEditing = newEditing;
         editingButtons[currentlyEditing].color = selectColor;
-        if (currentlyEditing == 1)
+        switch (currentlyEditing)
         {
-            terrainEditor.SetActive(true);
-            UpdateTerrainEditor();
+            case 1:
+                terrainEditor.SetActive(true);
+                UpdateTerrainEditor();
+                break;
+            case 2:
+                encounterEditor.SetActive(true);
+                UpdateEncounterEditor();
+                break;
+            case 3:
+                encounterSpecificEditor.SetActive(true);
+                break;
         }
     }
     // Levels need to store some information.
@@ -191,9 +213,77 @@ public class LevelEditor : Map
     // Need to store events/battles/etc on each terrain.
     // Can move to other scenes as well, then specifics will decide the spawn point, if any.
     public List<string> currentEncounters;
-    public List<string> encounterRowColumns;
+    public GameObject encounterEditor;
+    public List<Image> encounterEditButtons;
+    protected void HighlightSelectedEncounter()
+    {
+        for (int i = 0; i < encounterEditButtons.Count; i++)
+        {
+            encounterEditButtons[i].color = transColor;
+        }
+        if (currentlySelectedEncounter >= 0)
+        {
+            encounterEditButtons[currentlySelectedEncounter].color = selectColor;
+        }
+    }
+    protected void UpdateEncounterEditor()
+    {
+        HighlightSelectedEncounter();
+    }
+    public void StartChangingEncounters()
+    {
+        SwitchEditing(2);
+    }
+    public int currentlySelectedEncounter = -1;
+    public int encounterToMove = -1;
+    protected void UpdateEncounterToMoveOnMap()
+    {
+        if (encounterToMove < 0){return;}
+        int indexOfSpawn = currentTiles.IndexOf(encounterToMove);
+        if (indexOfSpawn >= 0)
+        {
+            terrainTiles[indexOfSpawn].Highlight();
+        }
+    }
+    public void SelectEncounterType(int newType)
+    {
+        encounterToMove = -1;
+        if (currentlySelectedEncounter == newType){currentlySelectedEncounter = -1;}
+        else{currentlySelectedEncounter = newType;}
+        HighlightSelectedEncounter();
+    }
     // Need specific info on what happens, types of battles/encounters/etc.
     public List<string> currentEncounterSpecifics;
+    public void StartChangingEncounterSpecifics()
+    {
+        SwitchEditing(3);
+    }
+    public GameObject encounterSpecificEditor;
+    public int encounterSpecificToEdit = -1;
+    protected void UpdateEncounterToEditOnMap()
+    {
+        if (encounterSpecificToEdit < 0){return;}
+        int indexOfSpawn = currentTiles.IndexOf(encounterSpecificToEdit);
+        if (indexOfSpawn >= 0)
+        {
+            terrainTiles[indexOfSpawn].Highlight();
+        }
+    }
+    public string encounterSpecificsText;
+    public void UpdateSpecificsText(string newString)
+    {
+        if (encounterSpecificToEdit < 0){return;}
+        if (newString.Length <= 0)
+        {
+            encounterSpecificsText = encounterSpecificsText.Remove(encounterSpecificsText.Length - 1, 1);
+        }
+        else
+        {
+            encounterSpecificsText += newString;
+        }
+        currentEncounterSpecifics[encounterSpecificToEdit] = encounterSpecificsText;
+        UpdateMap();
+    }
     // Encounter can be one time or respawning.
     public List<string> currentEncounterRespawnFreq;
     // Need to know where to spawn the player when they first enter the level.
@@ -223,12 +313,126 @@ public class LevelEditor : Map
             // Also need to update the text.
         }
         UpdateSpawnPointOnMap();
+        UpdateEncounterToMoveOnMap();
+        UpdateEncounterToEditOnMap();
+    }
+
+    protected override void UpdateTile(int imageIndex, int tileIndex)
+    {
+        base.UpdateTile(imageIndex, tileIndex);
+        if (tileIndex < 0 || tileIndex >= (totalRows * totalColumns))
+        {
+            return;
+        }
+        if (tileIndex >= currentEncounters.Count && tileIndex < allTiles.Count)
+        {
+            for (int i = currentEncounters.Count; i < allTiles.Count; i++)
+            {
+                currentEncounters.Add("");
+                currentEncounterSpecifics.Add("");
+            }
+        }
+        terrainTiles[imageIndex].SetTileText(EncounterText(currentEncounters[tileIndex])+"\n"+currentEncounterSpecifics[tileIndex]);
+    }
+
+    protected string EncounterText(string enctype)
+    {
+        if (enctype.Length <= 0){return "";}
+        int intType = int.Parse(enctype);
+        switch (intType)
+        {
+            case 0:
+                return "Battle";
+            case 1:
+                return "Switch Level";
+        }
+        return "";
     }
 
     public override void AdjustRows(bool increase = true)
     {
         base.AdjustRows(increase);
         UpdateMap();
+    }
+
+    protected override void AddRow()
+    {
+        for (int i = 0; i < totalColumns; i++)
+        {
+            allTiles.Add("0");
+            currentEncounters.Add("");
+            currentEncounterSpecifics.Add("");
+        }
+        totalRows++;
+    }
+
+    protected override void RemoveRow()
+    {
+        if (totalRows <= gridSize){return;}
+        // Remove the last row.
+        for (int i = 0; i < totalColumns; i++)
+        {
+            allTiles.RemoveAt(allTiles.Count - 1);
+            currentEncounters.RemoveAt(currentEncounters.Count - 1);
+            currentEncounterSpecifics.RemoveAt(currentEncounterSpecifics.Count - 1);
+        }
+        totalRows--;
+    }
+
+    protected override void AddColumns()
+    {
+        // Add four columns at once to ensure balance.
+        int index = 0;
+        List<string> tempEnc = new List<string>();
+        List<string> tempEncSpec = new List<string>();
+        for (int i = 0; i < totalRows; i++)
+        {
+            for (int j = 0; j < totalColumns+4; j++)
+            {
+                if (j >= totalColumns)
+                {
+                    tempTiles.Add("0");
+                    tempEnc.Add("");
+                    tempEncSpec.Add("");
+                    continue;
+                }
+                tempTiles.Add(allTiles[index]);
+                tempEnc.Add(currentEncounters[index]);
+                tempEncSpec.Add(currentEncounterSpecifics[index]);
+                index++;
+            }
+        }
+        totalColumns += 4;
+        allTiles = new List<string>(tempTiles);
+        currentEncounters = new List<string>(tempEnc);
+        currentEncounterSpecifics = new List<string>(tempEncSpec);
+    }
+
+    protected override void RemoveColumns()
+    {
+        if (totalColumns <= gridSize){return;}
+        int index = 0;
+        List<string> tempEnc = new List<string>();
+        List<string> tempEncSpec = new List<string>();
+        for (int i = 0; i < totalRows; i++)
+        {
+            for (int j = 0; j < totalColumns; j++)
+            {
+                if (j >= totalColumns - 4)
+                {
+                    index++;
+                    continue;
+                }
+                tempTiles.Add(allTiles[index]);
+                tempEnc.Add(currentEncounters[index]);
+                tempEncSpec.Add(currentEncounterSpecifics[index]);
+                index++;
+            }
+        }
+        totalColumns -= 4;
+        allTiles = new List<string>(tempTiles);
+        currentEncounters = new List<string>(tempEnc);
+        currentEncounterSpecifics = new List<string>(tempEncSpec);
     }
 
     public override void AdjustColumns(bool increase = true)
@@ -320,8 +524,10 @@ public class LevelEditor : Map
                 SetTerrain(tileNumber);
                 break;
             case 2:
+                SetEncounter(tileNumber);
                 break;
             case 3:
+                SetEncounterSpecifics(tileNumber);
                 break;
             case 4:
                 break;
@@ -343,11 +549,52 @@ public class LevelEditor : Map
 
     protected void SetEncounter(int tileNumber)
     {
+        if (currentlySelectedEncounter >= 0)
+        {
+            currentEncounters[currentTiles[tileNumber]] = currentlySelectedEncounter.ToString();
+        }
+        else if (currentlySelectedEncounter < 0 && encounterToMove < 0)
+        {
+            encounterToMove = currentTiles[tileNumber];
+        }
+        else if (currentlySelectedEncounter < 0 && encounterToMove > 0)
+        {
+            if (encounterToMove == currentTiles[tileNumber])
+            {
+                currentEncounters[currentTiles[tileNumber]] = "";
+                encounterToMove = -1;
+            }
+            else
+            {
+                SwitchEncounters(currentTiles[tileNumber], encounterToMove);
+            }
+        }
         UpdateMap();
+    }
+
+    protected void SwitchEncounters(int tileOne, int tileTwo)
+    {
+        string tempEnc = currentEncounters[tileOne];
+        string tempEncSpec = currentEncounterSpecifics[tileOne];
+        currentEncounters[tileOne] = currentEncounters[tileTwo];
+        currentEncounterSpecifics[tileOne] = currentEncounterSpecifics[tileTwo];
+        currentEncounters[tileTwo] = tempEnc;
+        currentEncounterSpecifics[tileTwo] = tempEncSpec;
     }
 
     protected void SetEncounterSpecifics(int tileNumber)
     {
+        int tileIndex = currentTiles[tileNumber];
+        if (encounterSpecificToEdit != tileIndex)
+        {
+            encounterSpecificToEdit = tileIndex;
+            encounterSpecificsText = currentEncounterSpecifics[tileIndex];
+        }
+        else if (encounterSpecificToEdit == tileIndex)
+        {
+            encounterSpecificToEdit = -1;
+            encounterSpecificsText = "";
+        }
         UpdateMap();
     }
 
