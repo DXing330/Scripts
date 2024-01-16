@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -183,6 +184,7 @@ public class ActorManager : MonoBehaviour
     {
         for (int i = 0; i < enemies.Length; i++)
         {
+            if (locations[i].Length <= 0){continue;}
             GenerateActor(int.Parse(locations[i]), enemies[i], 1);
         }
     }

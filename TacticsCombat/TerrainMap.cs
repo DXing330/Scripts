@@ -18,7 +18,6 @@ public class TerrainMap : MonoBehaviour
     public int roundIndex = 0;
     public int roundLimit = 30;
     private int fixedCenter;
-    private bool lockedView = true;
     public int gridSize = 9;
     public bool square = true;
     public int fullSize = 13;
@@ -976,6 +975,7 @@ public class TerrainMap : MonoBehaviour
         LoadMap(int.Parse(dataBlocks[0]));
         actorManager.LoadFixedBattleEnemyTeam(dataBlocks[2].Split("|"), dataBlocks[3].Split("|"));
         actorManager.SpawnPlayerTeamInFixedSpots(dataBlocks[4].Split("|"));
+        actorManager.LoadEnemyInRandomSetLocations(dataBlocks[5].Split("|"), dataBlocks[6].Split("|"));
     }
 
     protected void LoadMap(int mapIndex)
@@ -1439,7 +1439,6 @@ public class TerrainMap : MonoBehaviour
 
     public void MoveMap(int direction)
     {
-        lockedView = true;
         int previousFixedCenter = fixedCenter;
         switch (direction)
         {
