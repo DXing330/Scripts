@@ -27,6 +27,11 @@ public class Utility : MonoBehaviour
         nodes = new List<int>(new int[capacity]);
         weights = new List<int>(new int[capacity]);
         directions = new List<int>(new int[capacity]);
+        for (int i = 0; i < capacity; i++)
+        {
+            nodes[i] = -1;
+            weights[i] = bigInt;
+        }
     }
 
     private int getLeftChildIndex(int parentIndex)
@@ -136,7 +141,6 @@ public class Utility : MonoBehaviour
 
     public int Pull()
     {
-        size = nodes.Count;
         if (size == 0)
         {
             return -1;

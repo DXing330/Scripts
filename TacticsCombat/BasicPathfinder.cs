@@ -142,13 +142,11 @@ public class BasicPathfinder : MonoBehaviour
         checkedTiles.Clear();
         savedPathList.Clear();
         distances.Clear();
-        SetCurrentTiles(newTiles);
         for (int i = 0; i < allTiles.Count; i++)
         {
             savedPathList.Add(-1);
             if (i == start)
             {
-                Debug.Log(start);
                 distances.Add(0);
                 heap.AddNodeWeight(start, 0);
                 continue;
@@ -160,7 +158,6 @@ public class BasicPathfinder : MonoBehaviour
             CheckTile();
             if (checkedTiles.Contains(dest))
             {
-                Debug.Log("Found dest");
                 break;
             }
         }
@@ -182,6 +179,7 @@ public class BasicPathfinder : MonoBehaviour
         int moveCost = 1;
         int closestTile = heap.Pull();
         checkedTiles.Add(closestTile);
+        if (closestTile < 0){return;}
         RecurviseAdjacency(closestTile);
         for (int i = 0; i < adjacentTiles.Count; i++)
         {
@@ -193,8 +191,6 @@ public class BasicPathfinder : MonoBehaviour
             }
             if (distances[closestTile]+moveCost < distances[adjacentTiles[i]])
             {
-                Debug.Log("Updating distance of tile: "+adjacentTiles[i]);
-                Debug.Log("New dist: "+(distances[closestTile]+moveCost));
                 distances[adjacentTiles[i]] = distances[closestTile]+moveCost;
                 savedPathList[adjacentTiles[i]] = closestTile;
                 heap.AddNodeWeight(adjacentTiles[i], distances[adjacentTiles[i]]);
@@ -205,16 +201,10 @@ public class BasicPathfinder : MonoBehaviour
     public int totalRows;
     public int totalColumns;
     public List<string> allTiles;
-    public List<int> currentTiles;
 
     public void SetAllTiles(List<string> newTiles)
     {
         allTiles = new List<string>(newTiles);
-    }
-
-    public void SetCurrentTiles(List<int> newTiles)
-    {
-        currentTiles = newTiles;
     }
 
     public void SetTotalRowsColumns(int rows, int columns)
