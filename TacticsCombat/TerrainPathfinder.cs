@@ -8,12 +8,9 @@ public class TerrainPathfinder : BasicPathfinder
 {
     public bool hex = false;
     public bool square = true;
-    public Utility heap;
     public TerrainTile terrainTile;
     // Raw terrain types.
     private List<int> terrainInfo;
-    // Stores the previous tile on the optimal path for each tile.
-    public List<int> savedPathList;
     // The actual path to the tile.
     public List<int> actualPath;
     // Stores the move cost for each tile.
@@ -26,13 +23,6 @@ public class TerrainPathfinder : BasicPathfinder
     public List<int> occupiedTiles;
     // Fullsize is used for square maps where #rows = #columns
     private int fullSize;
-    private int bigInt = 999999;
-    public List<int> adjacentTiles;
-    public List<int> tempAdjTiles;
-    public List<int> adjTracker;
-    public List<int> distances;
-    // Shortest path tree.
-    public List<int> checkedTiles;
     // Reachable tiles.
     public List<int> reachableTiles;
     public List<int> attackableTiles;
@@ -51,13 +41,7 @@ public class TerrainPathfinder : BasicPathfinder
         }
     }
 
-    private void ResetHeap()
-    {
-        heap.ResetHeap();
-        heap.InitialCapacity(totalRows * totalColumns);
-    }
-
-    private void ResetDistances(int startIndex, int startDirection = -1)
+    protected void ResetDistances(int startIndex, int startDirection = -1)
     {
         ResetHeap();
         distances.Clear();
@@ -188,7 +172,7 @@ public class TerrainPathfinder : BasicPathfinder
         return change;
     }
 
-    private void CheckClosestTile(bool path = true, int type = 0)
+    protected void CheckClosestTile(bool path = true, int type = 0)
     {
         // Find the closest tile.
         // This part is where the heap is used making it O(nlgn) instead of O(n^2).
@@ -218,144 +202,6 @@ public class TerrainPathfinder : BasicPathfinder
                 distances[adjacentTiles[i]] = distances[closestTile]+moveCost;
                 savedPathList[adjacentTiles[i]] = closestTile;
                 heap.AddNodeWeight(adjacentTiles[i], distances[adjacentTiles[i]], newDirection);
-            }
-        }
-    }
-
-    // O(1);
-    private List<int> AdjacentFromIndex(int location)
-    {
-        tempAdjTiles.Clear();
-        if (!hex)
-        {
-            if (location%totalColumns > 0)
-            {
-                tempAdjTiles.Add(location-1);
-            }
-            if (location%totalColumns < totalColumns - 1)
-            {
-                tempAdjTiles.Add(location+1);
-            }
-            if (location < (totalRows - 1) * totalColumns)
-            {
-                tempAdjTiles.Add(location+totalColumns);
-            }
-            if (location > totalColumns - 1)
-            {
-                tempAdjTiles.Add(location-totalColumns);
-            }
-        }
-        if (hex)
-        {
-            int currentRow = GetRow(location);
-            int currentColumn = GetColumn(location);
-            // The top and bottom row have some special cases.
-            if (currentRow < totalRows - 1 && currentRow > 0)
-            {
-                tempAdjTiles.Add(location+totalColumns);
-                tempAdjTiles.Add(location-totalColumns);
-                if (currentColumn < totalColumns - 1 && currentColumn > 0)
-                {
-                    tempAdjTiles.Add(location+1);
-                    tempAdjTiles.Add(location-1);
-                    if (currentColumn%2 == 1)
-                    {
-                        tempAdjTiles.Add(location+totalColumns+1);
-                        tempAdjTiles.Add(location+totalColumns-1);
-                    }
-                    else if (currentColumn%2 == 0)
-                    {
-                        tempAdjTiles.Add(location-totalColumns+1);
-                        tempAdjTiles.Add(location-totalColumns-1);
-                    }
-                }
-                else if (currentColumn == 0)
-                {
-                    tempAdjTiles.Add(location+1);
-                    tempAdjTiles.Add(location-totalColumns+1);
-                }
-                else if (currentColumn == totalColumns - 1)
-                {
-                    tempAdjTiles.Add(location-1);
-                    tempAdjTiles.Add(location-totalColumns-1);
-                }
-            }
-            if (currentRow == 0)
-            {
-                tempAdjTiles.Add(location+totalColumns);
-                // Corner cases.
-                if (currentColumn == 0)
-                {
-                    tempAdjTiles.Add(location + 1);
-                }
-                else if (currentColumn == totalColumns - 1)
-                {
-                    tempAdjTiles.Add(location - 1);
-                }
-                else
-                {
-                    tempAdjTiles.Add(location + 1);
-                    tempAdjTiles.Add(location - 1);
-                    if (currentColumn%2 == 1)
-                    {
-                        tempAdjTiles.Add(location + totalColumns + 1);
-                        tempAdjTiles.Add(location + totalColumns - 1);
-                    }
-                }
-            }
-            if (currentRow == totalRows - 1)
-            {
-                tempAdjTiles.Add(location-totalColumns);
-                // Corner cases.
-                if (currentColumn == 0)
-                {
-                    tempAdjTiles.Add(location + 1);
-                    tempAdjTiles.Add(location - totalColumns + 1);
-                }
-                else if (currentColumn == totalColumns - 1)
-                {
-                    tempAdjTiles.Add(location - 1);
-                    tempAdjTiles.Add(location - totalColumns - 1);
-                }
-                else
-                {
-                    tempAdjTiles.Add(location + 1);
-                    tempAdjTiles.Add(location - 1);
-                    if (currentColumn%2 == 0)
-                    {
-                        tempAdjTiles.Add(location - totalColumns + 1);
-                        tempAdjTiles.Add(location - totalColumns - 1);
-                    }
-                }
-            }
-        }
-        return tempAdjTiles;
-    }
-
-    public void RecurviseAdjacency(int location, int range = 1)
-    {
-        adjacentTiles.Clear();
-        if (range <= 0)
-        {
-            return;
-        }
-        adjacentTiles = new List<int>(AdjacentFromIndex(location));
-        if (range == 1)
-        {
-            return;
-        }
-        adjTracker = new List<int>(adjacentTiles);
-        for (int i = 0; i < range - 1; i++)
-        {
-            if (i > 0)
-            {
-                // Only add newly added tiles.
-                adjTracker = new List<int>(adjacentTiles.Except(adjTracker));
-            }
-            for (int j = 0; j < adjTracker.Count; j++)
-            {
-                AdjacentFromIndex(adjTracker[j]);
-                adjacentTiles.AddRange(tempAdjTiles.Except(adjacentTiles));
             }
         }
     }

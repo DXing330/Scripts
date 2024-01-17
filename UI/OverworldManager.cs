@@ -148,9 +148,23 @@ public class OverworldManager : Map
         DetermineCurrentTiles();
     }
 
-    public void MovePlayer(int direction)
+    public override void MoveMap(int direction)
     {
+        int previousLocation = currentLocation;
         currentLocation = pathfinder.GetDestination(currentLocation, direction);
+        // Can't move onto mountains.
+        if (allTiles[currentLocation] == "2"){currentLocation = previousLocation;}
         UpdateMap();
+    }
+
+    public override void ClickOnTile(int tileNumber)
+    {
+        if (currentLocation == currentTiles[tileNumber]){return;}
+        if (currentTiles[tileNumber] < 0){return;}
+        if (pathfinder.DestReachable(currentLocation, currentTiles[tileNumber], currentTiles))
+        {
+            currentLocation = currentTiles[tileNumber];
+            UpdateMap();
+        }
     }
 }

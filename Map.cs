@@ -133,7 +133,6 @@ public class Map : MonoBehaviour
 
     public virtual void ClickOnTile(int tileNumber)
     {
-        Debug.Log(tileNumber);
         for (int i = 0; i < terrainTiles.Count; i++)
         {
             terrainTiles[i].SetTileText(pathfinder.CalculateDistance(tileNumber, i).ToString());

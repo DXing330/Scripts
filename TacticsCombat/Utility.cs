@@ -23,6 +23,7 @@ public class Utility : MonoBehaviour
 
     public void InitialCapacity(int capacity)
     {
+        size = capacity;
         nodes = new List<int>(new int[capacity]);
         weights = new List<int>(new int[capacity]);
         directions = new List<int>(new int[capacity]);
@@ -135,6 +136,7 @@ public class Utility : MonoBehaviour
 
     public int Pull()
     {
+        size = nodes.Count;
         if (size == 0)
         {
             return -1;

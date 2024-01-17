@@ -74,7 +74,6 @@ public class ActionLog : MonoBehaviour
     {
         if (actionTexts.Count >= actionLog.Count){return;}
         float scrollValue = scrollbar.value;
-        //Debug.Log("Scroll Value: "+scrollValue);
         // currentPage ranges in value from 0 to actionLog.Count - 10.
         currentPage = (int) (scrollValue * (actionLog.Count - 10));
         UpdateActionTexts();
