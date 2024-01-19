@@ -360,7 +360,7 @@ public class BattleMapEditor : Map
 
     public void StopEditingBattles()
     {
-        GameManager.instance.RefreshForestBattles();
+        GameManager.instance.RefreshBattles();
     }
 
     // At the start check for valid maps.

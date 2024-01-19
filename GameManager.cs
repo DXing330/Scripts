@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
 
     public void ReturnToHub()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Hub");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Overworld");
         SaveData();
     }
 
@@ -97,11 +97,12 @@ public class GameManager : MonoBehaviour
     public int randomBattle = 0;
     public string battleName = "";
     public List<string> forestFixedTerrains;
-    public List<string> forestFixedBattles;
+    public List<string> fixedBattles;
     public List<int> fixedBattleTerrain;
     public List<string> fixedBattleActors;
     public int battleLocationType;
     public int battleDifficulty;
+    public int battleNumber;
     public int battleWinCondition = 0;
     public string winConSpecifics = "";
 
@@ -149,11 +150,11 @@ public class GameManager : MonoBehaviour
         else{NewGame();}
         player.UpdateStats();
         familiar.UpdateStats();
-        RefreshForestMaps();
-        RefreshForestBattles();
+        RefreshMaps();
+        RefreshBattles();
     }
 
-    public void RefreshForestMaps()
+    public void RefreshMaps()
     {
         if (File.Exists(saveDataPath+"/Maps_1.txt"))
         {
@@ -168,16 +169,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void RefreshForestBattles()
+    public void RefreshBattles()
     {
         if (File.Exists(saveDataPath+"/BattleMaps_1.txt"))
         {
-            forestFixedBattles = File.ReadAllText(saveDataPath+"/BattleMaps_1.txt").Split("#").ToList();
-            for (int i = 0; i < forestFixedBattles.Count; i++)
+            fixedBattles = File.ReadAllText(saveDataPath+"/BattleMaps_1.txt").Split("#").ToList();
+            for (int i = 0; i < fixedBattles.Count; i++)
             {
-                if (forestFixedBattles[i].Length < 9)
+                if (fixedBattles[i].Length < 9)
                 {
-                    forestFixedBattles.RemoveAt(i);
+                    fixedBattles.RemoveAt(i);
                 }
             }
         }
@@ -260,14 +261,15 @@ public class GameManager : MonoBehaviour
 
     public void ResetParty()
     {
-        if (playerActors.Count <= basePartySize){return;}
+        //if (playerActors.Count <= basePartySize){return;}
         playerActors.Clear();
         playerActors.Add(player);
         playerActors.Add(familiar);
     }
 
-    public void UpdateLocation(int newLocation)
+    public void UpdateLocation(int newLocation, int newLevel = -1)
     {
+        if (newLevel >= 0){currentLevel = newLevel;}
         currentLocation = newLocation;
         QuickSave();
     }
@@ -277,6 +279,13 @@ public class GameManager : MonoBehaviour
         ResetBattleRandomness();
         battleLocationType = battleLocation;
         battleDifficulty = difficulty;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("BattleMap");
+    }
+
+    public void StartRandomBattle(int newBattle)
+    {
+        randomBattle = 0;
+        battleNumber = newBattle;
         UnityEngine.SceneManagement.SceneManager.LoadScene("BattleMap");
     }
 

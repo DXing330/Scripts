@@ -108,17 +108,19 @@ public class TerrainMap : MonoBehaviour
         else if (GameManager.instance.randomBattle <= 0)
         {
             // If you have a battle map ready then use it.
-            if (GameManager.instance.forestFixedBattles.Count > 0)
+            if (GameManager.instance.battleNumber >= 0)
             {
-                int battleIndex = Random.Range(0, GameManager.instance.forestFixedBattles.Count);
-                LoadBattle(battleIndex);
+                LoadBattle(GameManager.instance.battleNumber);
             }
+            // Otherwise pick a random battle?
             else
             {
-                baseTerrain = GameManager.instance.battleLocationType;
-                GenerateMap(baseTerrain, fullSize);
-                actorManager.LoadEnemyTeam();
-                actorManager.LoadPlayerTeam();
+                int battleIndex = Random.Range(0, GameManager.instance.fixedBattles.Count);
+                LoadBattle(battleIndex);
+                //baseTerrain = GameManager.instance.battleLocationType;
+                //GenerateMap(baseTerrain, fullSize);
+                //actorManager.LoadEnemyTeam();
+                //actorManager.LoadPlayerTeam();
             }
         }
         pathFinder.SetTerrainInfo(terrainInfo, totalRows, totalColumns, occupiedTiles);
@@ -964,7 +966,12 @@ public class TerrainMap : MonoBehaviour
 
     protected void LoadBattle(int battleIndex)
     {
-        string battleData = GameManager.instance.forestFixedBattles[battleIndex];
+        // Ensure it's in bounds.
+        if (battleIndex >= GameManager.instance.fixedBattles.Count)
+        {
+            battleIndex = Random.Range(0, GameManager.instance.fixedBattles.Count);
+        }
+        string battleData = GameManager.instance.fixedBattles[battleIndex];
         string[] dataBlocks = battleData.Split(",");
         LoadMap(int.Parse(dataBlocks[0]));
         actorManager.SetWinReward(dataBlocks[1]);

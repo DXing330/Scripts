@@ -74,7 +74,7 @@ public class MapEditor : Map
 
     public void StopEditingMaps()
     {
-        GameManager.instance.RefreshForestMaps();
+        GameManager.instance.RefreshMaps();
     }
 
     protected override void Start()

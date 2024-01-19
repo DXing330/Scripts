@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class OverworldManager : Map
 {
+    // bools
+    protected bool interactable = true;
     // Data.
     public int currentLevel;
     public int currentLocation;
@@ -23,6 +25,7 @@ public class OverworldManager : Map
         if (currentLevel < 0){currentLevel = 0;}
         currentLocation = GameManager.instance.currentLocation;
         LoadLevel();
+        interactable = true;
     }
 
     protected void LoadLevel(bool newLevel = false)
@@ -111,24 +114,24 @@ public class OverworldManager : Map
         int currentColumn = GetColumn(tileNumber);
         // First deal with vertical distances.
         int rowDiff = centerRow - currentRow;
-        while (Mathf.Abs(rowDiff) > 1)
+        while (Mathf.Abs(rowDiff) > 2)
         {
             // You are above the center row.
             if (rowDiff > 0)
             {
-                rowDiff -= 2;
-                exactCenter -= totalColumns * 2;
+                rowDiff -= 1;
+                exactCenter -= totalColumns * 1;
             }
             // You are below the center row.
             else
             {
-                rowDiff += 2;
-                exactCenter += totalColumns * 2;
+                rowDiff += 1;
+                exactCenter += totalColumns * 1;
             }
         }
         // Next deal with the column difference.
         int colDiff = centerColumn - currentColumn;
-        while (Mathf.Abs(colDiff) > 1)
+        while (Mathf.Abs(colDiff) > 3)
         {
             // You are left from center.
             if (colDiff > 0)
@@ -150,21 +153,92 @@ public class OverworldManager : Map
 
     public override void MoveMap(int direction)
     {
+        if (!interactable){return;}
         int previousLocation = currentLocation;
         currentLocation = pathfinder.GetDestination(currentLocation, direction);
         // Can't move onto mountains.
         if (allTiles[currentLocation] == "2"){currentLocation = previousLocation;}
         UpdateMap();
+        if (currentLocation != previousLocation)
+        {
+            MoveIntoTile(currentLocation);
+        }
     }
 
     public override void ClickOnTile(int tileNumber)
     {
+        if (!interactable){return;}
         if (currentLocation == currentTiles[tileNumber]){return;}
         if (currentTiles[tileNumber] < 0){return;}
-        if (pathfinder.DestReachable(currentLocation, currentTiles[tileNumber], currentTiles))
+        List<int> path = new List<int>(pathfinder.DestReachable(currentLocation, currentTiles[tileNumber], currentTiles));
+        if (path.Count <= 0){return;}
+        StartCoroutine(MoveAlongPath(path));
+    }
+
+    IEnumerator MoveAlongPath(List<int> path)
+    {
+        interactable = false;
+        for (int i = path.Count - 1; i > -1; i--)
         {
-            currentLocation = currentTiles[tileNumber];
+            currentLocation = path[i];
             UpdateMap();
+            MoveIntoTile(currentLocation);
+            yield return new WaitForSeconds(0.1f);
         }
+        interactable = true;
+    }
+
+    protected void MoveIntoTile(int tileLocation)
+    {
+        GameManager.instance.UpdateLocation(currentLocation, currentLevel);
+        switch (levelLocations[tileLocation])
+        {
+            case "0":
+                StartBattle(tileLocation);
+                break;
+            case "1":
+                break;
+            case "2":
+                break;
+            case "3":
+                break;
+        }
+    }
+
+    protected void StartBattle(int battleLocation)
+    {
+        int battleNumber = DetermineBattleNumber(battleLocation);
+        GameManager.instance.StartRandomBattle(battleNumber);
+    }
+
+    protected int DetermineBattleNumber(int battleLocation)
+    {
+        string possibleBattles = locationSpecifics[battleLocation];
+        if (possibleBattles.Length <= 0){return -1;}
+        string[] ranges = possibleBattles.Split(",");
+        List<int> battleIndexList = new List<int>();
+        for (int i = 0; i < ranges.Length; i++)
+        {
+            // Go through each possible range.
+            string[] innerRange = ranges[i].Split("-");
+            // Some are actual ranges.
+            if (innerRange.Length > 1)
+            {
+                int lowerBound = int.Parse(innerRange[0]);
+                int upperBound = int.Parse(innerRange[1]);
+                for (int j = lowerBound; j < upperBound + 1; j++)
+                {
+                    battleIndexList.Add(j);
+                }
+            }
+            // Some are individual battles.
+            else if (innerRange.Length == 1)
+            {
+                battleIndexList.Add(int.Parse(innerRange[0]));
+            }
+        }
+        // Then pick a battle from the possible battles.
+        int rng = Random.Range(0, battleIndexList.Count);
+        return battleIndexList[rng];
     }
 }

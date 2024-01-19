@@ -135,7 +135,7 @@ public class BasicPathfinder : MonoBehaviour
         }
     }
     // Can be easily adjusted to return the path to a destination.
-    public bool DestReachable(int start, int dest, List<int> newTiles)
+    public List<int> DestReachable(int start, int dest, List<int> newTiles)
     {
         List<int> path = new List<int>();
         ResetHeap();
@@ -161,7 +161,7 @@ public class BasicPathfinder : MonoBehaviour
                 break;
             }
         }
-        if (!checkedTiles.Contains(dest)){return false;}
+        if (!checkedTiles.Contains(dest)){return path;}
         // Check if there distance is valid.
         int totalDistance = 0;
         int pathIndex = dest;
@@ -171,8 +171,8 @@ public class BasicPathfinder : MonoBehaviour
             pathIndex = savedPathList[pathIndex];
             totalDistance += distances[pathIndex];
         }
-        if (totalDistance >= bigInt){return false;}
-        return true;
+        if (totalDistance >= bigInt){path.Clear();}
+        return path;
     }
     protected virtual void CheckTile()
     {
