@@ -52,17 +52,29 @@ public class TacticActor : AllStats
             return RollDamageXTimes(attackPower, Mathf.Abs(advantage), stronger);
         }
         // Basic attacks deal on average half of your max attack power.
-        int damage = Random.Range(1, attackPower + 1);
+        int damage = Random.Range(attackPower/2, attackPower*3/2);
         return damage;
     }
 
     protected int RollDamageXTimes(int damage, int rolls, bool advantage)
     {
-        int baseDamage = Random.Range(1, damage + 1);
+        int lowerBound = damage/2;
+        int upperBound = damage*3/2;
+        if (advantage)
+        {
+            lowerBound += rolls;
+            upperBound += rolls;
+        }
+        else
+        {
+            lowerBound -= rolls;
+            upperBound -= rolls;
+        }
+        int baseDamage = Random.Range(lowerBound, upperBound);
         int newRoll = 0;
         for (int i = 0; i < rolls; i++)
         {
-            newRoll = Random.Range(1, damage + 1);
+            newRoll = Random.Range(lowerBound, upperBound);
             if (advantage && newRoll > baseDamage){baseDamage = newRoll;}
             else if (!advantage && newRoll < baseDamage){baseDamage = newRoll;}
         }

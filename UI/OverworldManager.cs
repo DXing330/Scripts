@@ -70,8 +70,11 @@ public class OverworldManager : Map
         // Undefined tiles are deep water.
         if (tileIndex < 0 || tileIndex >= (totalRows * totalColumns))
         {
-            terrainTiles[imageIndex].UpdateColor(4);
-            terrainTiles[imageIndex].UpdateTileImage(tileSprites[4]);
+            // Black tiles for out of bounds.
+            terrainTiles[imageIndex].UpdateColor(-1);
+            // Deep water tiles for out of bounds.
+            //terrainTiles[imageIndex].UpdateColor(4);
+            //terrainTiles[imageIndex].UpdateTileImage(tileSprites[4]);
         }
         else
         {
@@ -197,10 +200,13 @@ public class OverworldManager : Map
                 StartBattle(tileLocation);
                 break;
             case "1":
+                SwitchLevel(tileLocation);
                 break;
             case "2":
+                // SwitchScenes(tileLocation);
                 break;
             case "3":
+                // FindTreasure(tileLocation);
                 break;
         }
     }
@@ -240,5 +246,13 @@ public class OverworldManager : Map
         // Then pick a battle from the possible battles.
         int rng = Random.Range(0, battleIndexList.Count);
         return battleIndexList[rng];
+    }
+
+    protected void SwitchLevel(int levelLocation)
+    {
+        string newLevel = locationSpecifics[levelLocation];
+        if (newLevel.Length <= 0){return;}
+        currentLevel = int.Parse(newLevel);
+        LoadLevel(true);
     }
 }
