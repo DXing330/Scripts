@@ -18,10 +18,32 @@ public class TerrainTile : MonoBehaviour
     //plains=0,forest=1,mountain=2,water=3,deepWater=4,desert=5
     public RectTransform rectTransform;
     public Image backgroundColor;
+    public void ResetAllImages()
+    {
+        ResetLocationEffect();
+        ResetLocationImage();
+        ResetImage();
+        ResetHighlight();
+        ResetAOEHighlight();
+        ResetDirectionalArrows();
+    }
     // The terrain.
     public Image tileImage;
     // Any special features.
     public Image locationImage;
+    public Image locationEffect;
+    public void ResetLocationEffect()
+    {
+        locationEffect.sprite = null;
+        locationEffect.color = transColor;
+    }
+    public void UpdateLocationEffect(Sprite newTile)
+    {
+        Color tempColor = Color.white;
+        tempColor.a = 0.8f;
+        locationEffect.sprite = newTile;
+        locationEffect.color = tempColor;
+    }
     // Any actors.
     public Image actorImage;
     public Image highlight;

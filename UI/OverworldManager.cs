@@ -52,10 +52,7 @@ public class OverworldManager : Map
         //UpdateCenterTile(currentLocation);
         for (int i = 0; i < terrainTiles.Count; i++)
         {
-            terrainTiles[i].ResetImage();
-            terrainTiles[i].ResetLocationImage();
-            terrainTiles[i].ResetHighlight();
-            terrainTiles[i].ResetText();
+            terrainTiles[i].ResetAllImages();
             UpdateTile(i, currentTiles[i]);
             if (currentTiles[i] == currentLocation)
             {

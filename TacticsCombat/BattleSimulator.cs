@@ -169,7 +169,7 @@ public class BattleSimulator : MonoBehaviour
         {
             return;
         }
-        terrainEffectManager.AffectActorOnTerrain(tempActor, terrainInfo[tempActor.locationIndex]);
+        terrainEffectManager.BaseTerrainEffect(tempActor, terrainInfo[tempActor.locationIndex]);
         UpdateOccupiedTiles();
         pathFinder.UpdateOccupiedTiles(occupiedTiles);
         tempActor.StartTurn();

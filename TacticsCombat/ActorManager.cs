@@ -39,6 +39,14 @@ public class ActorManager : MonoBehaviour
     public int collectedGold = 0;
     public int collectedMana = 0;
     public int collectedBlood = 0;
+    
+    public void LoadBattle(string[] dataBlocks)
+    {
+        SetWinReward(dataBlocks[1]);
+        LoadFixedBattleEnemyTeam(dataBlocks[2].Split("|"), dataBlocks[3].Split("|"));
+        SpawnPlayerTeamInFixedSpots(dataBlocks[4].Split("|"));
+        LoadEnemyInRandomSetLocations(dataBlocks[5].Split("|"), dataBlocks[6].Split("|"));
+    }
 
     void Start()
     {

@@ -26,8 +26,9 @@ public class TerrainMap : MonoBehaviour
     public int baseTerrain = 0;
     public List<TerrainTile> terrainTiles;
     public List<int> currentTiles;
+    // Equivalent of allTiles in other maps.
     public List<int> terrainInfo;
-    public List<string> terrainEffects;
+    public List<int> terrainEffects;
     public List<int> terrainEffectDurations;
     public List<int> allUnoccupied;
     public List<int> occupiedTiles;
@@ -45,6 +46,7 @@ public class TerrainMap : MonoBehaviour
     public TerrainPathfinder pathFinder;
     public List<Sprite> tileSprites;
     public List<Sprite> hexTileSprites;
+    public List<Sprite> tileEffectSprites;
     public List<TacticActor> actors;
     public List<TacticActor> allActors;
     public List<TacticActor> aliveActors;
@@ -63,7 +65,7 @@ public class TerrainMap : MonoBehaviour
         simulator.ResetWinChanceText();
         battleStarted = true;
         actorManager.ResetBattleGoalText();
-        SortByInitiative();
+        NewRound();
         ActorsTurn();
     }
 
@@ -99,7 +101,7 @@ public class TerrainMap : MonoBehaviour
             for (int i = 0; i < fullSize * fullSize; i++)
             {
                 allUnoccupied.Add(0);
-                terrainEffects.Add("none");
+                terrainEffects.Add(-1);
                 terrainEffectDurations.Add(0);
             }
             actorManager.LoadFixedEnemyTeam();
@@ -124,6 +126,8 @@ public class TerrainMap : MonoBehaviour
             }
         }
         pathFinder.SetTerrainInfo(terrainInfo, totalRows, totalColumns, occupiedTiles);
+        terrainEffectManager.SetTerrainInfo(terrainInfo);
+        terrainEffectManager.SetTileEffects(terrainEffects);
         UpdateCenterTile(1);
         UpdateMap();
         simulator.UpdateSimulation();
@@ -161,7 +165,7 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
-    private void SortByInitiative()
+    protected void SortByInitiative()
     {
         aliveActors.Clear();
         for (int i = 0; i < allActors.Count; i++)
@@ -173,6 +177,14 @@ public class TerrainMap : MonoBehaviour
         }
         actors = turnOrder.InitiativeThreadedByTeam(aliveActors);
         UpdateOccupiedTiles();
+    }
+
+    protected void NewRound()
+    {
+        SortByInitiative();
+        // Possible for terrain to change every turn.
+        terrainEffects = terrainEffectManager.UpdateTileEffects(terrainInfo, terrainEffects);
+        UpdateMap();
     }
 
     public void NextTurn()
@@ -187,12 +199,12 @@ public class TerrainMap : MonoBehaviour
             //RemoveActors();
             turnIndex = 0;
             roundIndex++;
-            if (roundIndex > roundLimit)
+            if (roundIndex > roundLimit && auto)
             {
                 actorManager.ReturnToHub(false);
                 return;
             }
-            SortByInitiative();
+            NewRound();
         }
         ClearHighlightedTiles();
         ActorsTurn();
@@ -207,7 +219,8 @@ public class TerrainMap : MonoBehaviour
     {
         // Check on terrain effects.
         actionLog.AddTerrainEffect(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
-        terrainEffectManager.AffectActorOnTerrain(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
+        terrainEffectManager.BaseTerrainEffect(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
+        terrainEffectManager.SpecialTerrainEffect(actors[turnIndex], terrainEffects[actors[turnIndex].locationIndex]);
         if (!actors[turnIndex].Actable())
         {
             NextTurn();
@@ -377,15 +390,25 @@ public class TerrainMap : MonoBehaviour
             TacticActor skillTarget = ReturnActorOnTile(skillTargetLocation);
             if (skillTarget == null){return;}
             string targetName = skillTarget.typeName;
-            bool specialEffect = false;
             actionLog.AddSkillAction(actors[turnIndex], skillTarget);
-            specialEffect = skillManager.ApplySkillEffect(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);
+            ApplySkillEffects(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);
+        }
+        // !Lock == aoe.
+    }
+
+    protected void ApplySkillEffects(TacticActor skillTarget, TacticActiveSkill skill, TacticActor skillUser)
+    {
+        bool specialEffect = false;
+        string[] allEffects = skill.effect.Split("+");
+        for (int i = 0; i < allEffects.Length; i++)
+        {
+            if (allEffects[i].Length <= 0){continue;}
+            specialEffect = skillManager.ApplySkillEffect(skillTarget, skill, skillUser, allEffects[i]);
             if (specialEffect)
             {
                 SpecialSkillActivation(skillTarget);
             }
         }
-        // !Lock == aoe.
     }
 
     private void SpecialSkillActivation(TacticActor target)
@@ -429,12 +452,7 @@ public class TerrainMap : MonoBehaviour
 
     private void LockOnSkillActivate()
     {
-        bool specialEffect = false;
-        specialEffect = skillManager.ApplySkillEffect(ReturnCurrentTarget(), actors[turnIndex].activeSkill, actors[turnIndex]);
-        if (specialEffect)
-        {
-            SpecialSkillActivation(ReturnCurrentTarget());
-        }
+        ApplySkillEffects(ReturnCurrentTarget(), actors[turnIndex].activeSkill, actors[turnIndex]);
         actors[turnIndex].ActivateSkill();
         actorInfo.UpdateInfo(actors[turnIndex]);
         ActorStopMoving();
@@ -445,7 +463,6 @@ public class TerrainMap : MonoBehaviour
         int tileNumber = 0;
         int targetsType = actors[turnIndex].activeSkill.skillTarget;
         TacticActor target = null;
-        bool specialEffect = false;
         for (int i = 0; i < targetableTiles.Count; i++)
         {
             tileNumber = targetableTiles[i];
@@ -455,11 +472,7 @@ public class TerrainMap : MonoBehaviour
                 // Check if the target is valid.
                 if (targetsType == 0 && SameTeam(actors[turnIndex], ReturnActorOnTile(tileNumber))){continue;}
                 if (targetsType == 1 && !SameTeam(actors[turnIndex], ReturnActorOnTile(tileNumber))){continue;}
-                specialEffect = skillManager.ApplySkillEffect(target, actors[turnIndex].activeSkill, actors[turnIndex]);
-                if (specialEffect)
-                {
-                    SpecialSkillActivation(target);
-                }
+                ApplySkillEffects(target, actors[turnIndex].activeSkill, actors[turnIndex]);
             }
         }
         actors[turnIndex].ActivateSkill();
@@ -974,13 +987,10 @@ public class TerrainMap : MonoBehaviour
         string battleData = GameManager.instance.fixedBattles[battleIndex];
         string[] dataBlocks = battleData.Split(",");
         LoadMap(int.Parse(dataBlocks[0]));
-        actorManager.SetWinReward(dataBlocks[1]);
-        actorManager.LoadFixedBattleEnemyTeam(dataBlocks[2].Split("|"), dataBlocks[3].Split("|"));
-        actorManager.SpawnPlayerTeamInFixedSpots(dataBlocks[4].Split("|"));
-        actorManager.LoadEnemyInRandomSetLocations(dataBlocks[5].Split("|"), dataBlocks[6].Split("|"));
+        actorManager.LoadBattle(dataBlocks);
     }
 
-    protected void LoadMap(int mapIndex)
+    public void LoadMap(int mapIndex)
     {
         string mapInfo = GameManager.instance.forestFixedTerrains[mapIndex];
         string[] mapInfoBlocks = mapInfo.Split(",");
@@ -1058,6 +1068,11 @@ public class TerrainMap : MonoBehaviour
                 return;
             }
             terrainTiles[imageIndex].UpdateTileImage(hexTileSprites[tileType]);
+            int effectType = terrainEffects[tileIndex];
+            if (effectType >= 0 && effectType < tileEffectSprites.Count)
+            {
+                terrainTiles[imageIndex].UpdateLocationEffect(tileEffectSprites[effectType]);
+            }
         }
     }
 
@@ -1119,11 +1134,7 @@ public class TerrainMap : MonoBehaviour
         // O(n)
         for (int i = 0; i < terrainTiles.Count; i++)
         {
-            terrainTiles[i].ResetImage();
-            terrainTiles[i].ResetLocationImage();
-            terrainTiles[i].ResetHighlight();
-            terrainTiles[i].ResetAOEHighlight();
-            terrainTiles[i].ResetDirectionalArrows();
+            terrainTiles[i].ResetAllImages();
             UpdateTile(i, currentTiles[i]);
         }
         // O(n^2)

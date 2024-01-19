@@ -5,11 +5,13 @@ using UnityEngine;
 public class SkillEffectManager : MonoBehaviour
 {
     private int powerDenominator = 10;
-    public bool ApplySkillEffect(TacticActor target, TacticActiveSkill skill, TacticActor user)
+    public bool ApplySkillEffect(TacticActor target, TacticActiveSkill skill, TacticActor user, string individualEffect = "")
     {
+        string effect = skill.effect;
+        if (individualEffect.Length > 0){effect = individualEffect;}
         // Determine skill power.
         int power = Mathf.Max(skill.basePower, skill.currentPower);
-        switch (skill.effect)
+        switch (effect)
         {
             case "Damage":
                 power *= user.attackDamage;

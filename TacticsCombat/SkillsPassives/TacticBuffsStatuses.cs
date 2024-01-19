@@ -42,7 +42,10 @@ public class TacticBuffsStatuses : MonoBehaviour
                 break;
             case "DIZZY":
                 actor.weight--;
-                actor.attackDamage -= actor.baseAttack/5;
+                actor.attackAdvantage--;
+                break;
+            case "FOCUS":
+                actor.attackAdvantage++;
                 break;
         }
     }

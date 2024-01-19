@@ -55,7 +55,6 @@ public class TacticActor : AllStats
         int damage = Random.Range(attackPower/2, attackPower*3/2);
         return damage;
     }
-
     protected int RollDamageXTimes(int damage, int rolls, bool advantage)
     {
         int lowerBound = damage/2;
