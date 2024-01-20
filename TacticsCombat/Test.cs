@@ -11,8 +11,13 @@ public class Test : MonoBehaviour
 
     void Start()
     {
-        RecurviseAdjacency(0, 2);
-        Debug.Log(string.Join(", ", adjacentTiles.Select(x => x.ToString())));
+        //RecurviseAdjacency(0, 2);
+        string test1 = "TerrainChange";
+        string test2 = "TerrainChange+1";
+        string test3 = "1+TerrainChange";
+        Debug.Log(test2.Contains(test1));
+        Debug.Log(test3.Contains(test1));
+        //Debug.Log(string.Join(", ", adjacentTiles.Select(x => x.ToString())));
     }
 
     private List<int> AdjacentFromIndex(int location)

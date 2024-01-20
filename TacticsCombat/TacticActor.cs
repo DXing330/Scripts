@@ -20,7 +20,7 @@ public class TacticActor : AllStats
     public int level;
     public int movementType = 0;
     public int health;
-    public void ReceiveDamage(int amount)
+    public void ReceiveDamage(int amount, int type = 0)
     {
         // Ignore damage that's too weak?
         if (defense/2 > amount)

@@ -100,17 +100,4 @@ public class ActionLog : MonoBehaviour
         }
         AddActionLog(newAction);
     }
-
-    public void AddTerrainEffect(TacticActor actor, int terrainType)
-    {
-        string newAction = "";
-        switch (terrainType)
-        {
-            case 7:
-                newAction = actor.typeName+" is on top of a chasm.";
-                break;
-        }
-        if (newAction.Length < 6){return;}
-        AddActionLog(newAction);
-    }
 }

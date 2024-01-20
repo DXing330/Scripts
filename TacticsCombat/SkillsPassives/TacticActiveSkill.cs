@@ -27,12 +27,14 @@ public class TacticActiveSkill : MonoBehaviour
     public string flavorText;
 
     // Definitely don't need two of these.
-    public void AffectActor(TacticActor actor, int power = 0)
+    public void AffectActor(TacticActor actor, int power = 0, string newEffect = "")
     {
-        switch (effect)
+        string specificEffect = effect;
+        if (newEffect.Length > 0){specificEffect = newEffect;}
+        switch (specificEffect)
         {
             case "Damage":
-                int damage = Random.Range(power/2, power+1);
+                int damage = Random.Range(power/2, power*3/2);
                 actor.ReceiveDamage(damage);
                 break;
             case "Heal":

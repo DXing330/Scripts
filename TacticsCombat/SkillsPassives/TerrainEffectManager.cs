@@ -86,6 +86,7 @@ public class TerrainEffectManager : MonoBehaviour
 
     protected void ChasmTerrain(TacticActor actor)
     {
+        ActionLog.instance.AddActionLog(actor.typeName+" is over a chasm.");
         // Fly or die.
         if (actor.movementType == 1)
         {
@@ -103,10 +104,10 @@ public class TerrainEffectManager : MonoBehaviour
     }
 
     // These are more temporary tile effects, like fire, burns but goes out.
-    public void SpecialTerrainEffect(TacticActor actor, int effectLocation)
+    public void SpecialTerrainEffect(TacticActor actor, int locationEffect)
     {
-        if (tileEffects[effectLocation] < 0){return;}
-        switch (tileEffects[effectLocation])
+        if (locationEffect < 0){return;}
+        switch (locationEffect)
         {
             case 0:
                 FireEffect(actor);
@@ -117,7 +118,10 @@ public class TerrainEffectManager : MonoBehaviour
     protected void FireEffect(TacticActor actor)
     {
         // Bigger things get more burns?
-        actor.ReceiveDamage(fireBaseDamage * Mathf.Max(1, actor.size));
+        ActionLog.instance.AddActionLog(actor.typeName+" is surrounded by fire.");
+        int multiplier = Mathf.Max(1, actor.size);
+        int damage = Random.Range(fireBaseDamage*multiplier/2, fireBaseDamage*multiplier*3/2);
+        actor.ReceiveDamage(damage + actor.defense);
         // Suffocation?
     }
 }

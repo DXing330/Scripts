@@ -29,6 +29,11 @@ public class TerrainMap : MonoBehaviour
     // Equivalent of allTiles in other maps.
     public List<int> terrainInfo;
     public List<int> terrainEffects;
+    protected void ChangeTerrainEffect(int location, string newEffect)
+    {
+        terrainEffects[location] = int.Parse(newEffect);
+        UpdateMap();
+    }
     public List<int> terrainEffectDurations;
     public List<int> allUnoccupied;
     public List<int> occupiedTiles;
@@ -218,7 +223,6 @@ public class TerrainMap : MonoBehaviour
     public void ActorsTurn()
     {
         // Check on terrain effects.
-        actionLog.AddTerrainEffect(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
         terrainEffectManager.BaseTerrainEffect(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
         terrainEffectManager.SpecialTerrainEffect(actors[turnIndex], terrainEffects[actors[turnIndex].locationIndex]);
         if (!actors[turnIndex].Actable())
@@ -406,14 +410,16 @@ public class TerrainMap : MonoBehaviour
             specialEffect = skillManager.ApplySkillEffect(skillTarget, skill, skillUser, allEffects[i]);
             if (specialEffect)
             {
-                SpecialSkillActivation(skillTarget);
+                SpecialSkillActivation(skillTarget, allEffects[i]);
             }
         }
     }
 
-    private void SpecialSkillActivation(TacticActor target)
+    private void SpecialSkillActivation(TacticActor target, string specialEffect = "")
     {
-        switch (actors[turnIndex].activeSkill.effect)
+        string special = actors[turnIndex].activeSkill.effect;
+        if (specialEffect.Length > 0){special = specialEffect;}
+        switch (special)
         {
             case "Battle":
                 BattleBetweenActors(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower, false);
@@ -434,6 +440,9 @@ public class TerrainMap : MonoBehaviour
                 break;
             case "Teleport":
                 moveManager.Teleport(actors[turnIndex], targetableTiles[currentTarget]);
+                break;
+            case "TerrainChange":
+                ChangeTerrainEffect(target.locationIndex, actors[turnIndex].activeSkill.effectSpecifics);
                 break;
         }
     }
@@ -463,9 +472,13 @@ public class TerrainMap : MonoBehaviour
         int tileNumber = 0;
         int targetsType = actors[turnIndex].activeSkill.skillTarget;
         TacticActor target = null;
+        // Terrain change is an extra special effect for AOEs, make sure you apply it properly.
+        bool terrainChanger = false;
+        if (actors[turnIndex].activeSkill.effect.Contains("TerrainChange")){terrainChanger = true;}
         for (int i = 0; i < targetableTiles.Count; i++)
         {
             tileNumber = targetableTiles[i];
+            if (terrainChanger){ChangeTerrainEffect(tileNumber, actors[turnIndex].activeSkill.effectSpecifics);}
             if (occupiedTiles[tileNumber] > 0)
             {
                 target = ReturnActorOnTile(tileNumber);
@@ -1007,6 +1020,7 @@ public class TerrainMap : MonoBehaviour
         for (int i = 0; i < totalRows * totalColumns; i++)
         {
             allUnoccupied.Add(0);
+            terrainEffects.Add(-1);
         }
     }
 
@@ -1190,6 +1204,11 @@ public class TerrainMap : MonoBehaviour
 
     private void Rehighlight()
     {
+        for (int i = 0; i < terrainTiles.Count; i++)
+        {
+            terrainTiles[i].ResetHighlight();
+            terrainTiles[i].ResetAOEHighlight();
+        }
         switch (currentHighlighting)
         {
             case 0:
@@ -1441,13 +1460,11 @@ public class TerrainMap : MonoBehaviour
     {
         currentHighlighting = 4;
         //UpdateCenterTile(skillCenter);
-        UpdateMap();
-        HighlightTiles();
         // Need to keep track of the skill's center location.
         // Highlight the center location and tiles around it within the span.
         targetableTiles = new List<int>(pathFinder.FindTilesInSkillSpan(skillCenter, skillSpan));
         targetableTiles.Add(skillCenter);
-        HighlightSkillAOE();
+        Rehighlight();
     }
 
     public void MoveMap(int direction)

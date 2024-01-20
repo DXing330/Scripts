@@ -44,7 +44,7 @@ public class SkillEffectManager : MonoBehaviour
         }
         if (skill.effect.StartsWith("Battle")){return true;}
         power /= powerDenominator;
-        skill.AffectActor(target, power);
+        skill.AffectActor(target, power, effect);
         return false;
     }
 }

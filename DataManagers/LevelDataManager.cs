@@ -16,7 +16,6 @@ public class LevelDataManager : BasicDataManager
 
     public override void NewGame()
     {
-        Debug.Log("Reset All Levels");
         allLevels = defaultAllLevels;
         Save();
     }
