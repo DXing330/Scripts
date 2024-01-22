@@ -250,6 +250,9 @@ public class TerrainMap : MonoBehaviour
 
     public void ActorEndTurn()
     {
+        terrainEffectManager.BaseTerrainEffect(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
+        terrainEffectManager.SpecialTerrainEffect(actors[turnIndex], terrainEffects[actors[turnIndex].locationIndex]);
+        actors[turnIndex].EndTurn();
         NextTurn();
     }
 

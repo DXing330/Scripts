@@ -20,11 +20,12 @@ public class TacticActor : AllStats
     public int level;
     public int movementType = 0;
     public int health;
-    public void ReceiveDamage(int amount, int type = 0)
+    public void ReceiveDamage(int amount, int direction = -1, int type = 0)
     {
         // Ignore damage that's too weak?
         if (defense/2 > amount)
         {
+            terrainMap.actionLog.AddActionLog(typeName+" takes 0 DMG.");
             return;
         }
         health -= Mathf.Max(amount - defense, 1);
@@ -104,6 +105,40 @@ public class TacticActor : AllStats
     public List<int> buffDebuffsDurations;
     public List<string> passiveNames;
     public List<string> activeSkillNames;
+    public List<string> temporaryPassives;
+    public List<string> temporaryActives;
+    protected void ResetTempSkills()
+    {
+        // Remove any temporary passives/actives.
+        if (temporaryPassives.Count <= 0 && temporaryActives.Count <= 0){return;}
+        string skillName = "";
+        for (int i = 0; i < temporaryPassives.Count; i++)
+        {
+            if (temporaryPassives.Count <= 0){continue;}
+            skillName = temporaryPassives[i];
+            for (int j = 0; j < passiveNames.Count; j++)
+            {
+                if (passiveNames[j] == skillName)
+                {
+                    passiveNames.RemoveAt(j);
+                }
+            }
+        }
+        for (int i = 0; i < temporaryActives.Count; i++)
+        {
+            if (temporaryActives.Count <= 0){continue;}
+            skillName = temporaryActives[i];
+            for (int j = 0; j < activeSkillNames.Count; j++)
+            {
+                if (activeSkillNames[j] == skillName)
+                {
+                    activeSkillNames.RemoveAt(j);
+                }
+            }
+        }
+        temporaryActives.Clear();
+        temporaryPassives.Clear();
+    }
     public string npcMoveSkill = "none";
     public string npcAttackSkill = "none";
     public string npcSupportSkill = "none";
@@ -126,18 +161,6 @@ public class TacticActor : AllStats
         defense = baseDefense;
         currentAttackRange = attackRange;
         initiative = baseInitiative;
-    }
-
-    public void SetBaseStats(string baseStats, int newLevel = 1)
-    {
-        level = newLevel;
-        string[] newBase = baseStats.Split("|");
-        baseHealth = int.Parse(newBase[0]);
-        baseMovement = int.Parse(newBase[1]);
-        baseAttack = int.Parse(newBase[2]);
-        baseDefense = int.Parse(newBase[3]);
-        baseEnergy = int.Parse(newBase[4]);
-        baseActions = int.Parse(newBase[5]);
     }
 
     public void CopyStats(TacticActor actorToCopy)
@@ -194,8 +217,15 @@ public class TacticActor : AllStats
         energy = Mathf.Min(energy+1, baseEnergy);
         counterAttacksLeft = Mathf.Min(counterAttacksLeft+1, 1);
         attackAdvantage = 0;
+        // These might give you temporary active/passive skills.
         ApplyBuffDebuffEffects();
+        // Then go through any start of turn passives?
         movement = 0;
+    }
+
+    public void EndTurn()
+    {
+        ResetTempSkills();
     }
 
     public void Death()
