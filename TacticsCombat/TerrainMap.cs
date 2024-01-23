@@ -852,7 +852,7 @@ public class TerrainMap : MonoBehaviour
     {
         if (auto){npc = false;}
         actors[turnIndex].NPCStartTurn(npc);
-        NextTurn();
+        ActorEndTurn();
         return;
     }
 
