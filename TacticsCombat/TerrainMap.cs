@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class TerrainMap : MonoBehaviour
 {
+    // During coroutine disable buttons.
+    public bool interactable = true;
     public bool hex = true;
     public BattleSimulator simulator;
     public bool battleStarted = false;
@@ -194,6 +196,8 @@ public class TerrainMap : MonoBehaviour
 
     public void NextTurn()
     {
+        // If it's not interactable then do nothing.
+        while (!interactable){}
         // Need this first one in case they try to click the end turn button before player team loads in.
         if (!battleStarted){return;}
         CheckWinners();
@@ -252,7 +256,6 @@ public class TerrainMap : MonoBehaviour
     {
         terrainEffectManager.BaseTerrainEffect(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
         terrainEffectManager.SpecialTerrainEffect(actors[turnIndex], terrainEffects[actors[turnIndex].locationIndex]);
-        actors[turnIndex].EndTurn();
         NextTurn();
     }
 
@@ -1472,6 +1475,7 @@ public class TerrainMap : MonoBehaviour
 
     public void MoveMap(int direction)
     {
+        if (!battleStarted || !interactable){return;}
         int previousFixedCenter = fixedCenter;
         switch (direction)
         {
@@ -1509,7 +1513,7 @@ public class TerrainMap : MonoBehaviour
 
     public void ClickOnTile(int tileNumber)
     {
-        if (!battleStarted){return;}
+        if (!battleStarted || !interactable){return;}
         switch (actionManager.state)
         {
             case 0:
@@ -1540,22 +1544,40 @@ public class TerrainMap : MonoBehaviour
                 actionManager.attackMenu.UpdateTarget(ReturnCurrentTarget());
                 break;
             case 3:
-                int tempSTarget = targetableTiles.IndexOf(currentTiles[tileNumber]);
-                if (tempSTarget < 0)
+                if (actors[turnIndex].activeSkill.lockOn == 1)
                 {
-                    return;
+                    int tempSTarget = targetableTiles.IndexOf(currentTiles[tileNumber]);
+                    if (tempSTarget < 0)
+                    {
+                        return;
+                    }
+                    if (currentTarget == tempSTarget)
+                    {
+                        ActivateSkill();
+                        actionManager.ChangeState(0);
+                    }
+                    else
+                    {
+                        currentTarget = tempSTarget;
+                        SeeTarget();
+                        actionManager.skillMenu.lockOnMenu.UpdateTarget(ReturnCurrentTarget());
+                    }
                 }
-                if (currentTarget == tempSTarget)
+                else if (actors[turnIndex].activeSkill.lockOn == 0)
                 {
-                    ActivateSkill();
-                    actionManager.ChangeState(0);
+                    int tempCenter = highlightedTiles.IndexOf(currentTiles[tileNumber]);
+                    if (tempCenter < 0){return;}
+                    if (skillCenter == currentTiles[tileNumber])
+                    {
+                        ActivateSkill();
+                        actionManager.ChangeState(0);
+                    }
+                    else
+                    {
+                        skillCenter = currentTiles[tileNumber];
+                        SeeSkillSpan();
+                    }
                 }
-                else
-                {
-                    currentTarget = tempSTarget;
-                    SeeTarget();
-                }
-                actionManager.skillMenu.lockOnMenu.UpdateTarget(ReturnCurrentTarget());
                 break;
         }
     }

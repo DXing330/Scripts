@@ -78,6 +78,7 @@ public class TacticActor : AllStats
             if (advantage && newRoll > baseDamage){baseDamage = newRoll;}
             else if (!advantage && newRoll < baseDamage){baseDamage = newRoll;}
         }
+        if (baseDamage < 0){return 0;}
         return baseDamage;
     }
     public int defense;
@@ -217,16 +218,15 @@ public class TacticActor : AllStats
         energy = Mathf.Min(energy+1, baseEnergy);
         counterAttacksLeft = Mathf.Min(counterAttacksLeft+1, 1);
         attackAdvantage = 0;
+        // After getting a full round of access to temp skills/passives remove them.
+        ResetTempSkills();
         // These might give you temporary active/passive skills.
         ApplyBuffDebuffEffects();
         // Then go through any start of turn passives?
         movement = 0;
     }
 
-    public void EndTurn()
-    {
-        ResetTempSkills();
-    }
+    public void EndTurn(){}
 
     public void Death()
     {

@@ -7,18 +7,28 @@ public class ActionManager : MonoBehaviour
 {
     public TMP_Text actionsLeft;
     public TerrainMap terrainMap;
-    public GameObject moveArrows;
+    public List<GameObject> actionMenus;
+    protected void DisableMenus(int menuIndex = -1)
+    {
+        for (int i = 0; i < actionMenus.Count; i++)
+        {
+            actionMenus[i].SetActive(false);
+        }
+        if (menuIndex > 0){EnableMenu(menuIndex - 1);}
+    }
+    protected void EnableMenu(int menuIndex)
+    {
+        if (menuIndex < 0 || menuIndex >= actionMenus.Count){return;}
+        actionMenus[menuIndex].SetActive(true);
+    }
     public MoveMenu moveMenu;
-    public GameObject battleMenu;
     public AttackMenu attackMenu;
-    public GameObject skillSelect;
     public SkillMenu skillMenu;
     public GameObject returnButton;
     public GameObject moveButton;
     public GameObject attackButton;
     public GameObject skillButton;
     public GameObject viewButton;
-    public GameObject viewMenu;
     public int state = 0;
     public TacticActor currentActor;
 
@@ -87,89 +97,29 @@ public class ActionManager : MonoBehaviour
 
     private void UpdateState()
     {
+        DisableMenus(state);
         switch (state)
         {
             case 0:
                 terrainMap.ViewCurrentActor();
-                DisableMovement();
-                DisableAttack();
-                DisableSkills();
-                DisableViewing();
                 break;
             case 1:
                 terrainMap.ActorStartMoving();
-                EnableMovement();
-                DisableAttack();
-                DisableSkills();
-                DisableViewing();
                 break;
             case 2:
                 terrainMap.ActorStartAttacking();
                 attackMenu.UpdateTarget(terrainMap.ReturnCurrentTarget());
-                DisableMovement();
-                EnableAttack();
-                DisableSkills();
-                DisableViewing();
                 break;
             case 3:
                 terrainMap.ActorStartUsingSkills();
                 skillMenu.skillList.SetActor(currentActor);
                 // Use the current actor to get a list of skill names.
                 skillMenu.UpdateSkill(terrainMap.ReturnCurrentSkill());
-                DisableMovement();
-                DisableAttack();
-                EnableSkills();
-                DisableViewing();
                 break;
             case 4:
                 terrainMap.StartViewingActorInfo();
-                DisableMovement();
-                DisableAttack();
-                DisableSkills();
-                EnableViewing();
                 break;
         }
-    }
-
-    private void EnableMovement()
-    {
-        moveArrows.SetActive(true);
-        moveMenu.UpdateMovementText();
-    }
-
-    private void DisableMovement()
-    {
-        moveArrows.SetActive(false);
-    }
-
-    private void EnableAttack()
-    {
-        battleMenu.SetActive(true);
-    }
-
-    private void DisableAttack()
-    {
-        battleMenu.SetActive(false);
-    }
-
-    private void EnableSkills()
-    {
-        skillSelect.SetActive(true);
-    }
-
-    private void DisableSkills()
-    {
-        skillSelect.SetActive(false);
-    }
-
-    private void EnableViewing()
-    {
-        viewMenu.SetActive(true);
-    }
-
-    private void DisableViewing()
-    {
-        viewMenu.SetActive(false);
     }
 
     public void CheckIfAttackAgain()
