@@ -17,8 +17,10 @@ public class TacticPassiveSkill : MonoBehaviour
 
     }
 
-    protected void CheckConditions()
+    // Probably need a different one for each timing.
+    protected bool CheckConditions()
     {
-
+        if (condition == "None"){return true;}
+        return false;
     }
 }
