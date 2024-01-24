@@ -8,6 +8,18 @@ public class TerrainEffectManager : MonoBehaviour
     public List<int> tileEffects;
     public int fireBaseDamage = 6;
 
+    public bool TerrainTypeAffectable(int terrainType, int terrainEffect)
+    {
+        switch (terrainEffect)
+        {
+            // Fire can't start on water tiles.
+            case 0:
+                if (terrainType == 3 || terrainType == 4){return false;}
+                return true;
+        }
+        return true;
+    }
+
     public void SetTerrainInfo(List<int> newTiles)
     {
         terrainInfo = newTiles;

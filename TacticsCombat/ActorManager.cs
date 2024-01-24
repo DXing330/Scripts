@@ -33,6 +33,7 @@ public class ActorManager : MonoBehaviour
     public ActorDataManager actorData;
     public EnemyGroupsData groupsData;
     public SkillDataManager skillData;
+    public PassiveSkillDataManager passiveData;
     private int tries = 0;
     public List<int> usedTiles;
     public List<int> unusableTiles;

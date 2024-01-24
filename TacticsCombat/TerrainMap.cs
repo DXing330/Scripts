@@ -33,6 +33,7 @@ public class TerrainMap : MonoBehaviour
     public List<int> terrainEffects;
     protected void ChangeTerrainEffect(int location, string newEffect)
     {
+        if (!terrainEffectManager.TerrainTypeAffectable(terrainInfo[location], int.Parse(newEffect))){return;}
         terrainEffects[location] = int.Parse(newEffect);
         UpdateMap();
     }
@@ -197,7 +198,11 @@ public class TerrainMap : MonoBehaviour
     public void NextTurn()
     {
         // If it's not interactable then do nothing.
-        while (!interactable){}
+        if (!interactable)
+        {
+            NextTurn();
+            return;
+        }
         // Need this first one in case they try to click the end turn button before player team loads in.
         if (!battleStarted){return;}
         CheckWinners();

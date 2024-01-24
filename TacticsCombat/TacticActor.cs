@@ -104,10 +104,20 @@ public class TacticActor : AllStats
     public TerrainMap terrainMap;
     public List<string> buffDebuffNames;
     public List<int> buffDebuffsDurations;
-    public List<string> passiveNames;
+    public List<string> passiveSkillNames;
     public List<string> activeSkillNames;
     public List<string> temporaryPassives;
+    public void GainTempPassive(string newSkill)
+    {
+        temporaryPassives.Add(newSkill);
+        passiveSkillNames.Add(newSkill);
+    }
     public List<string> temporaryActives;
+    public void GainTempActive(string newSkill)
+    {
+        temporaryActives.Add(newSkill);
+        activeSkillNames.Add(newSkill);
+    }
     protected void ResetTempSkills()
     {
         // Remove any temporary passives/actives.
@@ -117,11 +127,11 @@ public class TacticActor : AllStats
         {
             if (temporaryPassives.Count <= 0){continue;}
             skillName = temporaryPassives[i];
-            for (int j = 0; j < passiveNames.Count; j++)
+            for (int j = 0; j < passiveSkillNames.Count; j++)
             {
-                if (passiveNames[j] == skillName)
+                if (passiveSkillNames[j] == skillName)
                 {
-                    passiveNames.RemoveAt(j);
+                    passiveSkillNames.RemoveAt(j);
                 }
             }
         }
@@ -145,6 +155,7 @@ public class TacticActor : AllStats
     public string npcSupportSkill = "none";
     public TacticActiveSkill activeSkill;
     public TacticBuffsStatuses buffDebuff;
+    public TacticPassiveSkill passiveSkill;
 
     void Start()
     {
@@ -589,14 +600,14 @@ public class TacticActor : AllStats
 
     IEnumerator ShowMovementPath()
     {
-        //terrainMap.paused = true;
+        //terrainMap.interactable = false;
         for (int i = 0; i < turnPath.Count; i++)
         {
             locationIndex = turnPath[i];
             terrainMap.UpdateOnActorTurn();
             yield return new WaitForSeconds(.1f);
         }
-        //terrainMap.paused = false;
+        //terrainMap.interactable = true;
     }
 
     public bool Moveable()
@@ -677,6 +688,11 @@ public class TacticActor : AllStats
             return true;
         }
         return false;
+    }
+
+    public int ReturnMoveCostForTile(int baseCost, int tileType, int direction)
+    {
+        return baseCost;
     }
 
     public int ReturnMaxPossibleDistance(bool current = false)

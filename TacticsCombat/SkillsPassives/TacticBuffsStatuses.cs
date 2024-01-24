@@ -47,6 +47,9 @@ public class TacticBuffsStatuses : MonoBehaviour
             case "FOCUS":
                 actor.attackAdvantage++;
                 break;
+            case "BLIND":
+                actor.attackAdvantage--;
+                break;
         }
     }
 }

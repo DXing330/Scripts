@@ -30,6 +30,12 @@ public class SkillEffectManager : MonoBehaviour
             case "Act":
                 power *= powerDenominator;
                 break;
+            case "Active":
+                // Add the skill to the temp active lists?
+                return false;
+            case "Passive":
+                // Add the skill to the temp passive lists?
+                return false;
             case "Battle":
                 return true;
             case "Summon":

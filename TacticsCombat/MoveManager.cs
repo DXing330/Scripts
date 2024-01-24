@@ -12,7 +12,7 @@ public class MoveManager : MonoBehaviour
         moveMenu.UpdateMovementText();
     }
 
-    private int DetermineMoveCost(int moveType, int destination)
+    protected int DetermineMoveCost(int moveType, int destination)
     {
         int cost = 1;
         switch (moveType)
@@ -109,6 +109,7 @@ public class MoveManager : MonoBehaviour
         }
         int line = LineCheck(displacer.locationIndex, displacedActor.locationIndex);
         int power = displacementPower + (displacer.weight) - (displacedActor.weight);
+        power += DirectionDisplacementPowerAdjustment(displacer, displacedActor);
         if (power <= 0){return;}
         if (line < 0){return;}
         else if (line == 0)
@@ -127,6 +128,17 @@ public class MoveManager : MonoBehaviour
         {
             DisplaceAlongS(displacedActor, displacer.locationIndex, power, push);
         }
+    }
+
+    protected int DirectionDisplacementPowerAdjustment(TacticActor displacer, TacticActor displacedActor)
+    {
+        // Ignore directionless things.
+        if (displacer.currentDirection < 0 || displacedActor.currentDirection < 0){return 0;}
+        // Pushing things from behind is better.
+        if (displacer.currentDirection == displacedActor.currentDirection){return 1;}
+        // Pushing from the front is bad.
+        else if (Mathf.Abs(displacer.currentDirection-displacedActor.currentDirection) == 3){return -1;}
+        return 0;
     }
 
     private void DisplaceHorizontally(TacticActor displaced, int displacerLocation, int power, int direction)

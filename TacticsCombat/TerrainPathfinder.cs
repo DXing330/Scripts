@@ -577,6 +577,7 @@ public class TerrainPathfinder : BasicPathfinder
             return DirectionBetweenLocations(actualPath[1], actualPath[0]);
         }
     }
+
     public TacticActor FindNearestEnemy(TacticActor currentActor, List<TacticActor> allActors)
     {
         possibleTiles.Clear();
