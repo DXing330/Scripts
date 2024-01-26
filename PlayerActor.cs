@@ -180,6 +180,7 @@ public class PlayerActor : AllStats
         allEquipment.UpdateStats();
         GameManager.instance.actorData.LoadActorData(playerActor, typeName);
         CopyAllStats(playerActor);
+        playerActor.typeName = typeName;
         playerActor.baseHealth += allEquipment.baseHealth;
         playerActor.baseAttack += allEquipment.baseAttack;
         playerActor.baseDefense += allEquipment.baseDefense;
@@ -193,7 +194,7 @@ public class PlayerActor : AllStats
 
     public void SetName(string newName)
     {
-        if (newName == "none" || newName.Length < 3){return;}
+        if (newName == "none" || newName.Length < 1){return;}
         typeName = newName;
         SideCharacterUpdateStats();
     }

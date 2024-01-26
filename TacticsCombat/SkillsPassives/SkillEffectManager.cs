@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SkillEffectManager : MonoBehaviour
 {
+    public TerrainMap terrainMap;
     private int powerDenominator = 10;
     public bool ApplySkillEffect(TacticActor target, TacticActiveSkill skill, TacticActor user, string individualEffect = "")
     {
@@ -44,6 +45,8 @@ public class SkillEffectManager : MonoBehaviour
                 return true;
             case "Teleport":
                 return true;
+            case "Tame":
+                return true;
             case "Battle+Status":
                 skill.AddBuffDebuff(target, skill.effectSpecifics, power);
                 return true;
@@ -52,5 +55,39 @@ public class SkillEffectManager : MonoBehaviour
         power /= powerDenominator;
         skill.AffectActor(target, power, effect);
         return false;
+    }
+
+    public void ApplySpecialSkillEffect(string specialEffect, TacticActor target, TacticActiveSkill skill, TacticActor user)
+    {
+        switch (specialEffect)
+        {
+            case "Tame":
+                if (TryToTame(target, skill, user))
+                {
+                    Tame(target);
+                }
+                break;
+        }
+    }
+
+    protected bool TryToTame(TacticActor tameTarget, TacticActiveSkill skill, TacticActor tamer)
+    {
+        // Check if you're using the right skill.
+        if (skill.effectSpecifics != tameTarget.species){return false;}
+        // Check if you're winning.
+        if (tameTarget.health >= tamer.health){return false;}
+        // Check if you're strong enough.
+        //if (tameTarget.attackDamage > tamer.attackDamage){return false;}
+        // Do a roll to see if it works.
+        // Roll function.
+        return true;
+    }
+
+    protected void Tame(TacticActor tameTarget)
+    {
+        // Remove them from the battle.
+        tameTarget.health = 0;
+        // Add then to your party for later use.
+        GameManager.instance.armyData.GainFighter(tameTarget.typeName);
     }
 }

@@ -435,6 +435,9 @@ public class TerrainMap : MonoBehaviour
             case "TerrainChange":
                 ChangeTerrainEffect(target.locationIndex, actors[turnIndex].activeSkill.effectSpecifics);
                 break;
+            case "Tame":
+                skillManager.ApplySpecialSkillEffect("Tame", target, actors[turnIndex].activeSkill, actors[turnIndex]);
+                break;
         }
     }
 

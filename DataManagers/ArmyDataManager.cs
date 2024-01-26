@@ -57,6 +57,8 @@ public class ArmyDataManager : BasicDataManager
     {
         availableFighters.Clear();
         fighterHealths.Clear();
+        LoadAvailableFighters();
+        GetAllPartyMembers();
         Save();
     }
 
@@ -80,12 +82,7 @@ public class ArmyDataManager : BasicDataManager
             GameManager.instance.RemoveEmptyListItems(availableFighters);
             GameManager.instance.RemoveEmptyListItems(fighterHealths);
         }
-        for (int i = 0; i < Mathf.Min(availableFighters.Count, partyMembers.Count); i++)
-        {
-            if (availableFighters[i].Length <= 0){continue;}
-            partyMembers[i].typeName = availableFighters[i];
-            partyMembers[i].UpdateCurrentHealth(int.Parse(fighterHealths[i]));
-        }
+        LoadAvailableFighters();
         GetAllPartyMembers();
     }
 
@@ -93,5 +90,19 @@ public class ArmyDataManager : BasicDataManager
     {
         availableFighters.Add(fighterName);
         fighterHealths.Add("-1");
+        LoadAvailableFighters();
+        GetAllPartyMembers();
+    }
+
+    protected void LoadAvailableFighters()
+    {
+        if (availableFighters.Count <= 0){return;}
+        for (int i = 0; i < Mathf.Min(availableFighters.Count, partyMembers.Count); i++)
+        {
+            if (availableFighters[i].Length <= 0){continue;}
+            partyMembers[i].typeName = availableFighters[i];
+            partyMembers[i].SideCharacterUpdateStats();
+            partyMembers[i].UpdateCurrentHealth(int.Parse(fighterHealths[i]));
+        }
     }
 }
