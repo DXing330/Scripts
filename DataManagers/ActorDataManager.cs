@@ -19,8 +19,8 @@ public class ActorDataManager : MonoBehaviour
     public List<string> actorMoveSkills;
     public List<string> actorAttackSkills;
     public List<string> actorSupportSkills;
-    public List<string> actorDropTypes;
-    public List<string> actorDropAmounts;
+    public List<string> actorPassiveSkills;
+    //public List<string> actorDropAmounts;
     public List<string> actorAITypes;
     public List<string> actorSizes;
     public List<string> actorSpecies;
@@ -42,8 +42,8 @@ public class ActorDataManager : MonoBehaviour
         actorMoveSkills = configBlocks[10].Split("|").ToList();
         actorAttackSkills = configBlocks[11].Split("|").ToList();
         actorSupportSkills = configBlocks[12].Split("|").ToList();
-        actorDropTypes = configBlocks[13].Split("|").ToList();
-        actorDropAmounts = configBlocks[14].Split("|").ToList();
+        actorPassiveSkills = configBlocks[13].Split("|").ToList();
+        //actorDropAmounts = configBlocks[14].Split("|").ToList();
         actorAITypes = configBlocks[15].Split("|").ToList();
         actorSizes = configBlocks[16].Split("|").ToList();
         actorSpecies = configBlocks[17].Split("|").ToList();
@@ -69,8 +69,6 @@ public class ActorDataManager : MonoBehaviour
         actor.npcMoveSkill = actorMoveSkills[index];
         actor.npcAttackSkill = actorAttackSkills[index];
         actor.npcSupportSkill = actorSupportSkills[index];
-        actor.dropType = int.Parse(actorDropTypes[index]);
-        actor.dropAmount = int.Parse(actorDropAmounts[index]);
         actor.AIType = int.Parse(actorAITypes[index]);
         actor.size = int.Parse(actorSizes[index]);
         actor.species = actorSpecies[index];

@@ -7,9 +7,6 @@ public class TacticActor : AllStats
 {
     // 0 is player's team, other teams are NPCs.
     public int team = 0;
-    // Basic enemies drop 1 gold.
-    public int dropType = 2;
-    public int dropAmount = 1;
     public bool delayed = false;
     public bool delayable = true;
     // Race/class/etc.
