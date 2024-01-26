@@ -83,59 +83,6 @@ public class ActorManager : MonoBehaviour
         }
     }
 
-    public void LoadPlayerTeam(bool fix = false)
-    {
-        // Can load this based on the party list now.
-        /*if (!fix)
-        {
-            tries = 0;
-            int enemyCount = usedTiles.Count;
-            for (int i = 0; i < GameManager.instance.playerActors.Count; i++)
-            {
-                GenerateRandomLocation();
-                LoadPlayerTeamMemberFromActor(GameManager.instance.playerActors[i].playerActor, usedTiles[^1]);
-            }
-        }*/
-        if (!fix)
-        {
-            tries = 0;
-            int enemyCount = usedTiles.Count;
-            for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
-            {
-                if (GameManager.instance.armyData.armyFormation[i] == "none")
-                {
-                    continue;
-                }
-                // Randomly spawn in the player team.
-                GenerateRandomLocation();
-                // Spawn the player as soon as you get a location for them.
-                LoadPlayerTeamMember(GameManager.instance.armyData.armyFormation[i], usedTiles[^1]);
-            }
-        }
-        if (fix)
-        {
-            int column = 0;
-            int row = 0;
-            for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
-            {
-                string actorType = GameManager.instance.armyData.armyFormation[i];
-                int rowColLoc = row*terrainMap.fullSize+(column);
-                LoadPlayerTeamMember(actorType, rowColLoc);
-                column++;
-                if (column >= 3)
-                {
-                    column = 0;
-                    row++;
-                }
-            }
-        }
-    }
-
-    private void LoadPlayerTeamMemberFromActor(TacticActor actor, int location)
-    {
-        LoadActor(actor, location);
-    }
-
     private void LoadPlayerTeamMember(string type, int location)
     {
         if (type == "Player")

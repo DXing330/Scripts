@@ -101,37 +101,16 @@ public class TerrainMap : MonoBehaviour
         {
             terrainTiles[i].SetTileNumber(i);
         }
-        if (GameManager.instance.randomBattle > 0)
+        // If you have a battle map ready then use it.
+        if (GameManager.instance.battleNumber >= 0)
         {
-            terrainInfo = GameManager.instance.fixedBattleTerrain;
-            fullSize = (int) Mathf.Sqrt(terrainInfo.Count);
-            allUnoccupied.Clear();
-            for (int i = 0; i < fullSize * fullSize; i++)
-            {
-                allUnoccupied.Add(0);
-                terrainEffects.Add(-1);
-                terrainEffectDurations.Add(0);
-            }
-            actorManager.LoadFixedEnemyTeam();
-            actorManager.LoadPlayerTeam(true);
+            LoadBattle(GameManager.instance.battleNumber);
         }
-        else if (GameManager.instance.randomBattle <= 0)
+        // Otherwise pick a random battle?
+        else
         {
-            // If you have a battle map ready then use it.
-            if (GameManager.instance.battleNumber >= 0)
-            {
-                LoadBattle(GameManager.instance.battleNumber);
-            }
-            // Otherwise pick a random battle?
-            else
-            {
-                int battleIndex = Random.Range(0, GameManager.instance.fixedBattles.Count);
-                LoadBattle(battleIndex);
-                //baseTerrain = GameManager.instance.battleLocationType;
-                //GenerateMap(baseTerrain, fullSize);
-                //actorManager.LoadEnemyTeam();
-                //actorManager.LoadPlayerTeam();
-            }
+            int battleIndex = Random.Range(0, GameManager.instance.fixedBattles.Count);
+            LoadBattle(battleIndex);
         }
         pathFinder.SetTerrainInfo(terrainInfo, totalRows, totalColumns, occupiedTiles);
         terrainEffectManager.SetTerrainInfo(terrainInfo);

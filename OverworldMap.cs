@@ -259,9 +259,6 @@ public class OverworldMap : Map
             case "Shop":
                 TalkToMerchant(locationSpecifics[playerLocation]);
                 break;
-            case "Battle":
-                EnterFixedBatte(locationSpecifics[playerLocation]);
-                break;
         }
     }
 
@@ -279,11 +276,6 @@ public class OverworldMap : Map
                 EnterBattle(locationSpecifics[playerLocation]);
                 break;
         }
-    }
-
-    private void EnterFixedBatte(string battleName)
-    {
-        GameManager.instance.GenerateFixedBattle(battleName);
     }
 
     private void UpdateWinCon(string winCon = "")

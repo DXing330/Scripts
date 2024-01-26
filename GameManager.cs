@@ -324,14 +324,6 @@ public class GameManager : MonoBehaviour
         fixedBattleActors.Clear();
     }
 
-    public void GenerateFixedBattle(string namedBattle)
-    {
-        randomBattle = 1;
-        battleName = namedBattle;
-        UpdateFixedBattleData();
-        UnityEngine.SceneManagement.SceneManager.LoadScene("BattleMap");
-    }
-
     private void UpdateFixedBattleData()
     {
         string[] newWinCons = fixedBattleData.ReturnFixedWinCons(battleName).Split("=");
