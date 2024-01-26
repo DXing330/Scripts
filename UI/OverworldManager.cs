@@ -28,7 +28,7 @@ public class OverworldManager : Map
         interactable = true;
     }
 
-    protected void LoadLevel(bool newLevel = false)
+    protected void LoadLevel(bool newLevel = false, int previousLevel = -1)
     {
         currentLevelData = GameManager.instance.levelData.allLevelsList[currentLevel];
         string[] dataBlocks = currentLevelData.Split(",");
@@ -39,9 +39,42 @@ public class OverworldManager : Map
         locationSpecifics = dataBlocks[4].Split("|").ToList();
         currentLevelSpawnPoint = int.Parse(dataBlocks[6]);
         if (newLevel || currentLocation < 0){currentLocation = currentLevelSpawnPoint;}
+        if (previousLevel >= 0)
+        {
+            SpawnNearPreviousEntrance(previousLevel);
+        }
         pathfinder.SetTotalRowsColumns(totalRows, totalColumns);
         pathfinder.SetAllTiles(allTiles);
         UpdateMap();
+    }
+
+    protected void SpawnNearPreviousEntrance(int previousLevel)
+    {
+        int previousEntranceLocation = -1;
+        // Find an appropriate place to spawn the player, close to the previous level entrance.
+        // Find the location of the previous level entrance.
+        for (int i = 0; i < levelLocations.Count; i++)
+        {
+            if (levelLocations[i] == "1" && int.Parse(locationSpecifics[i]) == previousLevel)
+            {
+                previousEntranceLocation = i;
+                break;
+            }
+        }
+        if (previousEntranceLocation >= 0)
+        {
+            // Find an appropriate spawn point.
+            pathfinder.RecurviseAdjacency(previousEntranceLocation);
+            List<int> adjacentFromEntrance = pathfinder.adjacentTiles;
+            for (int i = 0; i < adjacentFromEntrance.Count; i++)
+            {
+                if (allTiles[adjacentFromEntrance[i]] != "2")
+                {
+                    currentLocation = adjacentFromEntrance[i];
+                    break;
+                }
+            }
+        }
     }
 
     protected void UpdateMap()
@@ -249,7 +282,8 @@ public class OverworldManager : Map
     {
         string newLevel = locationSpecifics[levelLocation];
         if (newLevel.Length <= 0){return;}
+        int previousLevel = currentLevel;
         currentLevel = int.Parse(newLevel);
-        LoadLevel(true);
+        LoadLevel(true, previousLevel);
     }
 }

@@ -65,6 +65,7 @@ public class ActorDataManager : MonoBehaviour
         actor.baseActions = int.Parse(actorActions[index]);
         actor.attackRange = int.Parse(actorRanges[index]);
         actor.movementType = int.Parse(actorMovetypes[index]);
+        actor.LoadPassiveSkills(actorPassiveSkills[index].Split(",").ToList());
         //actor.activeSkillNames = actorSkills[index].Split(",").ToList();
         actor.npcMoveSkill = actorMoveSkills[index];
         actor.npcAttackSkill = actorAttackSkills[index];

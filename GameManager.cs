@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     public UnitUpgradeData upgradeData;
     public ScriptedBattleDataManager fixedBattleData;
     private string saveDataPath;
+    public string newGameData;
     public string loadedData;
 
     private void Awake()
@@ -134,14 +135,7 @@ public class GameManager : MonoBehaviour
         if (File.Exists(saveDataPath+"/saveData.txt"))
         {
             loadedData = File.ReadAllText(saveDataPath+"/saveData.txt");
-            string[] dataBlocks = loadedData.Split("|");
-            playerLevel = int.Parse(dataBlocks[0]);
-            bloodCrystals = int.Parse(dataBlocks[1]);
-            manaCrystals = int.Parse(dataBlocks[2]);
-            goldCoins = int.Parse(dataBlocks[3]);
-            time = int.Parse(dataBlocks[4]);
-            currentLevel = int.Parse(dataBlocks[5]);
-            currentLocation = int.Parse(dataBlocks[6]);
+            LoadDataString();
             for (int i = 0; i < gameData.Count; i++)
             {
                 gameData[i].Load();
@@ -152,6 +146,18 @@ public class GameManager : MonoBehaviour
         familiar.UpdateStats();
         RefreshMaps();
         RefreshBattles();
+    }
+
+    protected void LoadDataString()
+    {
+        string[] dataBlocks = loadedData.Split("|");
+        playerLevel = int.Parse(dataBlocks[0]);
+        bloodCrystals = int.Parse(dataBlocks[1]);
+        manaCrystals = int.Parse(dataBlocks[2]);
+        goldCoins = int.Parse(dataBlocks[3]);
+        time = int.Parse(dataBlocks[4]);
+        currentLevel = int.Parse(dataBlocks[5]);
+        currentLocation = int.Parse(dataBlocks[6]);
     }
 
     public void RefreshMaps()
@@ -188,13 +194,8 @@ public class GameManager : MonoBehaviour
     public void NewGame()
     {
         saveDataPath = Application.persistentDataPath;
-        playerLevel = 1;
-        bloodCrystals = 0;
-        manaCrystals = 0;
-        goldCoins = 0;
-        time = 0;
-        currentLevel = -1;
-        currentLocation = -1;
+        loadedData = newGameData;
+        LoadDataString();
         File.WriteAllText(saveDataPath+"/skillData.txt", "");
         for (int i = 0; i < gameData.Count; i++)
         {

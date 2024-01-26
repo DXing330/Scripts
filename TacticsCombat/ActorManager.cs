@@ -271,6 +271,11 @@ public class ActorManager : MonoBehaviour
         skillData.LoadDataForSkill(tacticActive, skillName);
     }
 
+    public void LoadPassiveData(TacticPassiveSkill passive, string passiveName)
+    {
+        passiveData.LoadDataForPassive(passive, passiveName);
+    }
+
     public void LoadActor(TacticActor actorToCopy, int location, int team = 0)
     {
         TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));

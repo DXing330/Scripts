@@ -102,7 +102,24 @@ public class TacticActor : AllStats
     public List<string> buffDebuffNames;
     public List<int> buffDebuffsDurations;
     public List<string> passiveSkillNames;
+    public void LoadPassiveSkills(List<string> newSkills)
+    {
+        passiveSkillNames.Clear();
+        for (int i = 0; i < newSkills.Count; i++)
+        {
+            if (newSkills[i].Length <= 0){continue;}
+            passiveSkillNames.Add(newSkills[i]);
+        }
+    }
     public List<string> activeSkillNames;
+    public void LoadActiveSkills(List<string> newSkills)
+    {
+        for (int i = 0; i < newSkills.Count; i++)
+        {
+            if (newSkills[i].Length <= 0){continue;}
+            activeSkillNames.Add(newSkills[i]);
+        }
+    }
     public List<string> temporaryPassives;
     public void GainTempPassive(string newSkill)
     {
@@ -187,6 +204,7 @@ public class TacticActor : AllStats
         attackRange = actorToCopy.attackRange;
         movementType = actorToCopy.movementType;
         activeSkillNames = actorToCopy.activeSkillNames;
+        passiveSkillNames = actorToCopy.passiveSkillNames;
         npcMoveSkill = actorToCopy.npcMoveSkill;
         npcAttackSkill = actorToCopy.npcAttackSkill;
         npcSupportSkill = actorToCopy.npcSupportSkill;
@@ -231,10 +249,27 @@ public class TacticActor : AllStats
         // These might give you temporary active/passive skills.
         ApplyBuffDebuffEffects();
         // Then go through any start of turn passives?
+        TurnPassives(0);
         movement = 0;
     }
 
-    public void EndTurn(){}
+    protected void TurnPassives(int timing = 0)
+    {
+        if (passiveSkillNames.Count <= 0){return;}
+        // Go through all the passives.
+        for (int i = 0; i < passiveSkillNames.Count; i++)
+        {
+            terrainMap.actorManager.LoadPassiveData(passiveSkill, passiveSkillNames[i]);
+            // Try to apply the start of turn ones.
+            if (passiveSkill.timing != timing){continue;}
+            if (passiveSkill.StartTurnConditions(this)){passiveSkill.AffectActor(this);}
+        }
+    }
+
+    public void EndTurn()
+    {
+        TurnPassives(1);
+    }
 
     public void Death()
     {

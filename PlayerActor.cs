@@ -133,6 +133,11 @@ public class PlayerActor : AllStats
         {
             playerActor.activeSkillNames.Add(learntSkills[i]);
         }
+        playerActor.passiveSkillNames.Clear();
+        for (int i = 0; i < Mathf.Min(currentLevel, learntPassives.Count); i++)
+        {
+            playerActor.passiveSkillNames.Add(learntPassives[i]);
+        }
     }
 
     // Mob characters don't get any level bonuses, just equipment bonuses.
