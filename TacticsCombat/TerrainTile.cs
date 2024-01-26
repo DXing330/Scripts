@@ -40,7 +40,7 @@ public class TerrainTile : MonoBehaviour
     public void UpdateLocationEffect(Sprite newTile)
     {
         Color tempColor = Color.white;
-        tempColor.a = 0.8f;
+        tempColor.a = 0.6f;
         locationEffect.sprite = newTile;
         locationEffect.color = tempColor;
     }

@@ -26,6 +26,7 @@ public class ActionLog : MonoBehaviour
     public List<TMP_Text> actionTexts;
     public int currentPage = 0;
     public Scrollbar scrollbar;
+    public TerrainMap terrainMap;
 
     private void ResetTexts()
     {
@@ -81,6 +82,8 @@ public class ActionLog : MonoBehaviour
 
     public void AddActionLog(string newAction)
     {
+        string currentRound = "Round "+(terrainMap.roundIndex+1).ToString()+"-"+(terrainMap.turnIndex+1).ToString();
+        newAction = currentRound+":"+newAction;
         actionLog.Insert(0, newAction);
         currentPage = 0;
         UpdateActionTexts();

@@ -16,7 +16,7 @@ public class TerrainMap : MonoBehaviour
     protected int startIndex;
     protected int cornerColumn;
     protected int cornerRow;
-    private int turnIndex = 0;
+    public int turnIndex = 0;
     public int roundIndex = 0;
     public int roundLimit = 30;
     private int fixedCenter;
@@ -661,7 +661,7 @@ public class TerrainMap : MonoBehaviour
         UpdateMap();
     }
 
-    private void BattleBetweenActors(TacticActor attacker, TacticActor defender, int skillMultiplier = 0, bool actionText = true)
+    protected void BattleBetweenActors(TacticActor attacker, TacticActor defender, int skillMultiplier = 0, bool actionText = true)
     {
         if (actionText)
         {
@@ -679,6 +679,12 @@ public class TerrainMap : MonoBehaviour
         {
             ActorStopMoving();
             actionManager.ChangeState(0);
+            CheckWinners();
+            return;
+        }
+        else
+        {
+            actorInfo.UpdateInfo(actors[turnIndex]);
         }
         CheckWinners();
         if (battleStarted)
@@ -695,25 +701,7 @@ public class TerrainMap : MonoBehaviour
         }
         actors[turnIndex].actionsLeft--;
         TacticActor target = ReturnCurrentTarget();
-        int newDirection = pathFinder.DirectionBetweenLocations(actors[turnIndex].locationIndex, target.locationIndex);
-        if (newDirection >= 0)
-        {
-            actors[turnIndex].ChangeDirection(newDirection);
-        }
-        // Find if they can counter attack.
-        bool attackerDied = actorManager.BattleBetweenActors(actors[turnIndex], target, Counterable(actors[turnIndex], target), DetermineFlanking(target));
-        // If they die while attacking, automatically end their turn.
-        if (attackerDied || actors[turnIndex].actionsLeft <= 0)
-        {
-            ActorStopMoving();
-            actionManager.ChangeState(0);
-            CheckWinners();
-            return;
-        }
-        else
-        {
-            actorInfo.UpdateInfo(actors[turnIndex]);
-        }
+        BattleBetweenActors(actors[turnIndex], target, 0, false);
         CheckWinners();
         if (battleStarted)
         {
