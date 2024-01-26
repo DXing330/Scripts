@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ArmyFormationManager : MonoBehaviour
 {
-    public ActorSprites actorSprites;
+    /*public ActorSprites actorSprites;
     public List<FormationTile> formationTiles;
     public List<FormationTile> reserveFighters;
     private bool selected = false;
@@ -235,5 +235,5 @@ public class ArmyFormationManager : MonoBehaviour
             return actorSprites.allSprites[1];
         }
         return actorSprites.SpriteDictionary(actorName);
-    }
+    }*/
 }

@@ -76,6 +76,25 @@ public class ActorDataManager : MonoBehaviour
         actor.baseInitiative = int.Parse(actorInitiatives[index]);
     }
 
+    public void LoadPlayerActorData(PlayerActor actor, string newName)
+    {
+        int index = actorNames.IndexOf(newName);
+        if (index < 0)
+        {
+            return;
+        }
+        actor.baseHealth = int.Parse(actorHealths[index]);
+        actor.baseAttack = int.Parse(actorAttacks[index]);
+        actor.baseDefense = int.Parse(actorDefenses[index]);
+        actor.baseEnergy = int.Parse(actorEnergies[index]);
+        actor.baseMovement = int.Parse(actorMovements[index]);
+        actor.baseActions = int.Parse(actorActions[index]);
+        actor.attackRange = int.Parse(actorRanges[index]);
+        actor.moveType = int.Parse(actorMovetypes[index]);
+        actor.size = int.Parse(actorSizes[index]);
+        actor.baseInitiative = int.Parse(actorInitiatives[index]);
+    }
+
     public string ReturnActorBaseStats(string actorName)
     {
         int index = actorNames.IndexOf(actorName);

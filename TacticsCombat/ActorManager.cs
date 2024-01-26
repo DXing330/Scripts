@@ -65,42 +65,17 @@ public class ActorManager : MonoBehaviour
     {
         if (actor == null){return;}
         if (actor.typeName == "Player" || actor.typeName == "Familiar" || actor.typeName == ""){return;}
-        int indexOf = GameManager.instance.armyData.armyFormation.IndexOf(actor.typeName);
-        if (indexOf < 0){return;}
-        GameManager.instance.armyData.armyFormation[indexOf] = "none";
+        GameManager.instance.armyData.PartyMemberDefeated(actor.typeName);
     }
 
-    private void LosePlayerArmy()
+    protected void LosePlayerArmy()
     {
-        for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
-        {
-            string name = GameManager.instance.armyData.armyFormation[i];
-            if (name == "Player" || name == "Familiar")
-            {
-                continue;
-            }
-            GameManager.instance.armyData.armyFormation[i] = "none";
-        }
+        GameManager.instance.armyData.PartyWipe();
     }
 
-    private void LoadPlayerTeamMember(string type, int location)
+    protected void LoadPlayerTeamMember(int index, int location)
     {
-        if (type == "Player")
-        {
-            LoadActor(GameManager.instance.player.playerActor, location);
-        }
-        else if (type == "Familiar")
-        {
-            LoadActor(GameManager.instance.familiar.playerActor, location);
-        }
-        else if (type == "none")
-        {
-            return;
-        }
-        else
-        {
-            GenerateActor(location, type, 0);
-        }
+        LoadActor(GameManager.instance.armyData.allPartyMembers[index].playerActor, location);
     }
 
     public void LoadEnemyTeam()
@@ -166,18 +141,14 @@ public class ActorManager : MonoBehaviour
         {
             usedTiles.Add(int.Parse(spawnPoints[i]));
         }
-        for (int i = 0; i < GameManager.instance.armyData.armyFormation.Count; i++)
+        for (int i = 0; i < GameManager.instance.armyData.allPartyMembers.Count; i++)
         {
-            if (GameManager.instance.armyData.armyFormation[i] == "none")
-            {
-                continue;
-            }
             // Randomly spawn in the player team.
             int spawnIndex = Random.Range(0, usedTiles.Count);
             int spawnPoint = usedTiles[spawnIndex];
             usedTiles.RemoveAt(spawnIndex);
             // Spawn the player as soon as you get a location for them.
-            LoadPlayerTeamMember(GameManager.instance.armyData.armyFormation[i], spawnPoint);
+            LoadPlayerTeamMember(i, spawnPoint);
         }
     }
 

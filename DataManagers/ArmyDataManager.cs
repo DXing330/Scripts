@@ -9,74 +9,89 @@ public class ArmyDataManager : BasicDataManager
 {
     private string loadedData;
     public List<PlayerActor> partyMembers;
-    public int maxArmySize = 9;
-    public List<string> armyFormation = new List<string>(9);
-    public List<string> availableFighters = new List<string>(0);
-
-    private void AdjustLists()
+    public List<PlayerActor> allPartyMembers;
+    protected void GetAllPartyMembers()
     {
-        GameManager.instance.RemoveEmptyListItems(availableFighters);
-        for (int i = 0; i < armyFormation.Count; i++)
+        allPartyMembers.Clear();
+        allPartyMembers.Add(GameManager.instance.player);
+        allPartyMembers.Add(GameManager.instance.familiar);
+        for (int i = 0; i < partyMembers.Count; i++)
         {
-            if (armyFormation[i].Length < 3)
+            if (partyMembers[i].typeName.Length <= 0 || partyMembers[i].currentHealth <= 0){continue;}
+            allPartyMembers.Add(partyMembers[i]);
+        }
+        for (int i = 0; i < allPartyMembers.Count; i++)
+        {
+            if (allPartyMembers[i].typeName == "Player" || allPartyMembers[i].typeName == "Familiar")
             {
-                armyFormation[i] = "none";
+                allPartyMembers[i].UpdateStats();
+            }
+            else
+            {
+                allPartyMembers[i].SideCharacterUpdateStats();
             }
         }
     }
-
-    private void LoadPartyMembersByName()
+    public void PartyMemberDefeated(string memberName)
     {
-        GameManager.instance.ResetParty();
-        int partyMemberIndex = 0;
-        for (int i = 0; i < armyFormation.Count; i++)
+        for (int i = 0; i < partyMembers.Count; i++)
         {
-            if (armyFormation[i] == "none" || armyFormation[i] == "Player" || armyFormation[i] == "Familiar"){continue;}
-            partyMembers[partyMemberIndex].SetName(armyFormation[i]);
-            GameManager.instance.playerActors.Add(partyMembers[partyMemberIndex]);
-            partyMemberIndex++;
+            if (partyMembers[i].typeName == memberName)
+            {
+                partyMembers[i].currentHealth = 0;
+                return;
+            }
         }
     }
+    public void PartyWipe()
+    {
+        for (int i = 0; i < partyMembers.Count; i++)
+        {
+            partyMembers[i].currentHealth = 0;
+        }
+    }
+    public List<string> availableFighters = new List<string>(0);
+    public List<string> fighterHealths = new List<string>(0);
 
     public override void NewGame()
     {
-        armyFormation.Clear();
-        for (int i = 0; i < maxArmySize; i++)
-        {
-            armyFormation.Add("none");
-        }
-        armyFormation[0] = "Familiar";
-        armyFormation[1] = "Player";
         availableFighters.Clear();
+        fighterHealths.Clear();
         Save();
     }
 
     public override void Save()
     {
         saveDataPath = Application.persistentDataPath;
-        string armyData = GameManager.instance.ConvertListToString(armyFormation);
-        File.WriteAllText(saveDataPath+"/armyData.txt", armyData);
         string fighterData = GameManager.instance.ConvertListToString(availableFighters);
+        fighterData += "#"+GameManager.instance.ConvertListToString(fighterHealths);
         File.WriteAllText(saveDataPath+"/fighters.txt", fighterData);
     }
 
     public override void Load()
     {
         saveDataPath = Application.persistentDataPath;
-        loadedData = File.ReadAllText(saveDataPath+"/armyData.txt");
-        armyFormation = loadedData.Split("|").ToList();
-        loadedData = File.ReadAllText(saveDataPath+"/fighters.txt");
-        availableFighters = loadedData.Split("|").ToList();
-        if (armyFormation.Count < maxArmySize)
+        if (File.Exists(saveDataPath+"/fighters.txt"))
         {
-            NewGame();
+            loadedData = File.ReadAllText(saveDataPath+"/fighters.txt");
+            string[] dataBlocks = loadedData.Split("#");
+            availableFighters = dataBlocks[0].Split("|").ToList();
+            fighterHealths = dataBlocks[1].Split("|").ToList();
+            GameManager.instance.RemoveEmptyListItems(availableFighters);
+            GameManager.instance.RemoveEmptyListItems(fighterHealths);
         }
-        AdjustLists();
-        LoadPartyMembersByName();
+        for (int i = 0; i < Mathf.Min(availableFighters.Count, partyMembers.Count); i++)
+        {
+            if (availableFighters[i].Length <= 0){continue;}
+            partyMembers[i].typeName = availableFighters[i];
+            partyMembers[i].UpdateCurrentHealth(int.Parse(fighterHealths[i]));
+        }
+        GetAllPartyMembers();
     }
 
     public void GainFighter(string fighterName)
     {
         availableFighters.Add(fighterName);
+        fighterHealths.Add("-1");
     }
 }

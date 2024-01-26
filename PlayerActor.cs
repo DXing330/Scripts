@@ -9,7 +9,12 @@ public class PlayerActor : AllStats
     public string allBaseStats;
     public string typeName;
     public int currentLevel;
-    public int currentHealth;
+    public int currentHealth = -1;
+    public int ReturnCurrentHealth()
+    {
+        if (currentHealth < 0){return baseHealth;}
+        else {return currentHealth;}
+    }
     public void UpdateCurrentHealth(int newHealth = -1)
     {
         if (newHealth < 0){currentHealth = baseHealth;}
@@ -135,7 +140,7 @@ public class PlayerActor : AllStats
         currentLevel = GameManager.instance.playerLevel;
         playerActor.typeName = typeName;
         playerActor.level = currentLevel;
-        if (currentHealth >= baseHealth)
+        if (currentHealth < 0 || currentHealth >= baseHealth)
         {
             playerActor.baseHealth = baseHealth+((currentLevel-1) * healthPerLevel)+allEquipment.baseHealth;
         }
