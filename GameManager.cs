@@ -194,8 +194,22 @@ public class GameManager : MonoBehaviour
     public void NewGame()
     {
         saveDataPath = Application.persistentDataPath;
-        loadedData = newGameData;
-        LoadDataString();
+        if (newGameData.Length > 0)
+        {
+            loadedData = newGameData;
+            LoadDataString();
+        }
+        else
+        {
+            playerLevel = 1;
+            bloodCrystals = 0;
+            manaCrystals = 0;
+            goldCoins = 0;
+            time = 0;
+            currentLevel = -1;
+            currentLocation = -1;
+
+        }
         File.WriteAllText(saveDataPath+"/skillData.txt", "");
         for (int i = 0; i < gameData.Count; i++)
         {
