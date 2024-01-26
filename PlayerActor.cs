@@ -6,8 +6,15 @@ using UnityEngine;
 public class PlayerActor : AllStats
 {
     public TacticActor playerActor;
+    public string allBaseStats;
     public string typeName;
     public int currentLevel;
+    public int currentHealth;
+    public void UpdateCurrentHealth(int newHealth = -1)
+    {
+        if (newHealth < 0){currentHealth = baseHealth;}
+        else {currentHealth = newHealth;}
+    }
     public int healthPerLevel = 3;
     public int energyPerLevel = 1;
     public string species = "Undead";
@@ -20,6 +27,21 @@ public class PlayerActor : AllStats
     public string equipBoots = "none";
     public string equipAccessory = "none";
     public EquipmentContainer allEquipment;
+
+    public void ResetAllData()
+    {
+        typeName = "";
+        currentLevel = 0;
+        learntPassives.Clear();
+        learntSkills.Clear();
+        UnequipAll();
+    }
+
+    public void ResetBaseStats()
+    {
+        if (allBaseStats.Length < 9){return;}
+        LoadStatsFromStringList(allBaseStats.Split("|").ToList());
+    }
 
     // If you load an invalid equip set.
     private void UnequipAll()
@@ -113,7 +135,14 @@ public class PlayerActor : AllStats
         currentLevel = GameManager.instance.playerLevel;
         playerActor.typeName = typeName;
         playerActor.level = currentLevel;
-        playerActor.baseHealth = baseHealth+((currentLevel-1) * healthPerLevel)+allEquipment.baseHealth;
+        if (currentHealth >= baseHealth)
+        {
+            playerActor.baseHealth = baseHealth+((currentLevel-1) * healthPerLevel)+allEquipment.baseHealth;
+        }
+        else
+        {
+            playerActor.baseHealth = currentHealth+allEquipment.baseHealth;
+        }
         playerActor.baseAttack = baseAttack+allEquipment.baseAttack;
         playerActor.baseDefense = baseDefense+allEquipment.baseDefense;
         playerActor.baseEnergy = baseEnergy+((currentLevel-1) * energyPerLevel)+allEquipment.baseEnergy;

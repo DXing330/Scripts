@@ -59,4 +59,18 @@ public class AllStats : MonoBehaviour
         allStatList.Add(baseInitiative);
         return allStatList;
     }
+
+    public virtual void LoadStatsFromStringList(List<string> allStats)
+    {
+        baseHealth = int.Parse(allStats[0]);
+        baseAttack = int.Parse(allStats[1]);
+        baseDefense = int.Parse(allStats[2]);
+        baseEnergy = int.Parse(allStats[3]);
+        baseMovement = int.Parse(allStats[4]);
+        moveType = int.Parse(allStats[5]);
+        attackRange = int.Parse(allStats[6]);
+        baseActions = int.Parse(allStats[7]);
+        size = int.Parse(allStats[8]);
+        baseInitiative = int.Parse(allStats[9]);
+    }
 }
