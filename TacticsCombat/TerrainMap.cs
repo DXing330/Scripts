@@ -125,7 +125,7 @@ public class TerrainMap : MonoBehaviour
     private void CheckWinners()
     {
         // Some kind of turn limit.
-        if (roundIndex > roundLimit)
+        if (roundIndex > roundLimit && auto)
         {
             actorManager.ReturnToHub(false);
             return;
@@ -189,7 +189,6 @@ public class TerrainMap : MonoBehaviour
         turnIndex++;
         if (turnIndex >= actors.Count)
         {
-            //RemoveActors();
             turnIndex = 0;
             roundIndex++;
             if (roundIndex > roundLimit && auto)

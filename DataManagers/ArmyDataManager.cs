@@ -38,6 +38,8 @@ public class ArmyDataManager : BasicDataManager
         {
             if (partyMembers[i].typeName == memberName)
             {
+                // If they're already defeated find the next one with the same name.
+                if (partyMembers[i].currentHealth == 0){continue;}
                 partyMembers[i].currentHealth = 0;
                 return;
             }
@@ -50,8 +52,38 @@ public class ArmyDataManager : BasicDataManager
             partyMembers[i].currentHealth = 0;
         }
     }
+    public void UpdatePartyHealth(List<string> names, List<int> healths)
+    {
+        // O(n^2)
+        for (int i = 0; i < allPartyMembers.Count; i++)
+        {
+            if (allPartyMembers[i].currentHealth <= 0){continue;}
+            string memberName = allPartyMembers[i].typeName;
+            int indexOf = names.IndexOf(memberName);
+            if (indexOf >= 0)
+            {
+                allPartyMembers[i].UpdateCurrentHealth(healths[indexOf]);
+                names.RemoveAt(indexOf);
+                healths.RemoveAt(indexOf);
+            }
+        }
+        UpdateAvailableHealths();
+    }
     public List<string> availableFighters = new List<string>(0);
     public List<string> fighterHealths = new List<string>(0);
+    protected void UpdateAvailableHealths()
+    {
+        availableFighters.Clear();
+        fighterHealths.Clear();
+        for (int i = 0; i < allPartyMembers.Count; i++)
+        {
+            if (allPartyMembers[i].typeName == "Player" || allPartyMembers[i].typeName == "Familiar"){continue;}
+            int currentHealth = allPartyMembers[i].ReturnCurrentHealth();
+            if (currentHealth <= 0){continue;}
+            availableFighters.Add(allPartyMembers[i].typeName);
+            fighterHealths.Add(currentHealth.ToString());
+        }
+    }
 
     public override void NewGame()
     {
