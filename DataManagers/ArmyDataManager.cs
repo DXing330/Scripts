@@ -112,8 +112,11 @@ public class ArmyDataManager : BasicDataManager
         {
             loadedData = File.ReadAllText(saveDataPath+"/fighters.txt");
             string[] dataBlocks = loadedData.Split("#");
-            availableFighters = dataBlocks[0].Split("|").ToList();
-            fighterHealths = dataBlocks[1].Split("|").ToList();
+            if (dataBlocks.Length >= 2)
+            {
+                availableFighters = dataBlocks[0].Split("|").ToList();
+                fighterHealths = dataBlocks[1].Split("|").ToList();
+            }
             GameManager.instance.RemoveEmptyListItems(availableFighters);
             GameManager.instance.RemoveEmptyListItems(fighterHealths);
         }

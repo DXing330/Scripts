@@ -97,7 +97,9 @@ public class GameManager : MonoBehaviour
     public List<string> familiarActives;
     public int randomBattle = 0;
     public string battleName = "";
+    public string fixedTerrainString;
     public List<string> forestFixedTerrains;
+    public string fixedBattleString;
     public List<string> fixedBattles;
     public List<int> fixedBattleTerrain;
     public List<string> fixedBattleActors;
@@ -151,6 +153,7 @@ public class GameManager : MonoBehaviour
     protected void LoadDataString()
     {
         string[] dataBlocks = loadedData.Split("|");
+        if (dataBlocks.Length < 7){dataBlocks = newGameData.Split("|");}
         playerLevel = int.Parse(dataBlocks[0]);
         bloodCrystals = int.Parse(dataBlocks[1]);
         manaCrystals = int.Parse(dataBlocks[2]);
@@ -162,32 +165,44 @@ public class GameManager : MonoBehaviour
 
     public void RefreshMaps()
     {
+        forestFixedTerrains = fixedTerrainString.Split("#").ToList();
+        /*
         if (File.Exists(saveDataPath+"/Maps_1.txt"))
         {
             forestFixedTerrains = File.ReadAllText(saveDataPath+"/Maps_1.txt").Split("#").ToList();
-            for (int i = 0; i < forestFixedTerrains.Count; i++)
-            {
-                if (forestFixedTerrains[i].Length < 9)
-                {
-                    forestFixedTerrains.RemoveAt(i);
-                }
-            }
         }
+        else
+        {
+            forestFixedTerrains = fixedTerrainString.Split("#").ToList();
+        }
+        for (int i = 0; i < forestFixedTerrains.Count; i++)
+        {
+            if (forestFixedTerrains[i].Length < 9)
+            {
+                forestFixedTerrains.RemoveAt(i);
+            }
+        }*/
     }
 
     public void RefreshBattles()
     {
+        fixedBattles = fixedBattleString.Split("#").ToList();
+        /*
         if (File.Exists(saveDataPath+"/BattleMaps_1.txt"))
         {
             fixedBattles = File.ReadAllText(saveDataPath+"/BattleMaps_1.txt").Split("#").ToList();
-            for (int i = 0; i < fixedBattles.Count; i++)
-            {
-                if (fixedBattles[i].Length < 9)
-                {
-                    fixedBattles.RemoveAt(i);
-                }
-            }
         }
+        else
+        {
+            fixedBattles = fixedBattleString.Split("#").ToList();
+        }
+        for (int i = 0; i < fixedBattles.Count; i++)
+        {
+            if (fixedBattles[i].Length < 9)
+            {
+                fixedBattles.RemoveAt(i);
+            }
+        }*/
     }
 
     [ContextMenu("New Game")]
