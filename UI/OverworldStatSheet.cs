@@ -18,7 +18,8 @@ public class OverworldStatSheet : MonoBehaviour
         actorName.text = actor.typeName;
         List<int> allStats = actor.ReturnStatList();
         healthBarText.text = actor.ReturnCurrentHealth()+"/"+allStats[0];
-        greenHealthBar.localScale = new Vector3(actor.ReturnCurrentHealth()/allStats[0], 1, 0);
+        float xScale = ((float) actor.ReturnCurrentHealth())/((float) allStats[0]);
+        greenHealthBar.localScale = new Vector3(xScale, 1, 0);
         for (int i = 0; i < statTexts.Count; i++)
         {
             statTexts[i].text = allStats[i+1].ToString();

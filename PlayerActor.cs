@@ -181,6 +181,10 @@ public class PlayerActor : AllStats
         GameManager.instance.actorData.LoadActorData(playerActor, typeName);
         CopyAllStats(playerActor);
         playerActor.typeName = typeName;
+        if (currentHealth >= 0)
+        {
+            playerActor.baseHealth = Mathf.Min(currentHealth, playerActor.baseHealth);
+        }
         playerActor.baseHealth += allEquipment.baseHealth;
         playerActor.baseAttack += allEquipment.baseAttack;
         playerActor.baseDefense += allEquipment.baseDefense;

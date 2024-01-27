@@ -62,7 +62,8 @@ public class ArmyDataManager : BasicDataManager
             int indexOf = names.IndexOf(memberName);
             if (indexOf >= 0)
             {
-                allPartyMembers[i].UpdateCurrentHealth(healths[indexOf]);
+                int health = Mathf.Max(0, healths[indexOf]);
+                allPartyMembers[i].UpdateCurrentHealth(health);
                 names.RemoveAt(indexOf);
                 healths.RemoveAt(indexOf);
             }
@@ -83,6 +84,8 @@ public class ArmyDataManager : BasicDataManager
             availableFighters.Add(allPartyMembers[i].typeName);
             fighterHealths.Add(currentHealth.ToString());
         }
+        LoadAvailableFighters();
+        GetAllPartyMembers();
     }
 
     public override void NewGame()
@@ -128,7 +131,15 @@ public class ArmyDataManager : BasicDataManager
 
     protected void LoadAvailableFighters()
     {
-        if (availableFighters.Count <= 0){return;}
+        if (availableFighters.Count <= 0)
+        {
+            for (int i = 0; i < Mathf.Min(availableFighters.Count, partyMembers.Count); i++)
+            {
+                partyMembers[i].typeName = "";
+                partyMembers[i].UpdateCurrentHealth();
+            }
+            return;
+        }
         for (int i = 0; i < Mathf.Min(availableFighters.Count, partyMembers.Count); i++)
         {
             if (availableFighters[i].Length <= 0){continue;}
