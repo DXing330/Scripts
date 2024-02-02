@@ -25,6 +25,7 @@ public class SkillDataManager : MonoBehaviour
         LoadAllData();
     }
 
+    [ContextMenu("Load")]
     public void LoadAllData()
     {
         string[] configBlocks = configData.Split("#");

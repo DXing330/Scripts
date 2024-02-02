@@ -1341,6 +1341,7 @@ public class TerrainMap : MonoBehaviour
         }
         for (int i = 0; i < highlightedTiles.Count; i++)
         {
+            // Target unoccupied tiles.
             if (targetsType == 4)
             {
                 if (occupiedTiles[highlightedTiles[i]] <= 0)
@@ -1355,9 +1356,18 @@ public class TerrainMap : MonoBehaviour
                 {
                     continue;
                 }
-                if (targetsType == 1 && !SameTeam(actors[turnIndex], ReturnActorOnTile(highlightedTiles[i])))
+                else if (targetsType == 1 && !SameTeam(actors[turnIndex], ReturnActorOnTile(highlightedTiles[i])))
                 {
                     continue;
+                }
+                // Only target the main characters.
+                else if (targetsType == 6)
+                {
+                    string name = ReturnActorOnTile(highlightedTiles[i]).typeName;
+                    if (name != "Familiar" && name != "Player")
+                    {
+                        continue;
+                    }
                 }
                 targetableTiles.Add(highlightedTiles[i]);
             }

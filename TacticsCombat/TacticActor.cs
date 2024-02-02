@@ -17,8 +17,24 @@ public class TacticActor : AllStats
     public int level;
     public int movementType = 0;
     public int health;
+    protected int ReceiveDamagePassives(int amount, int direction = -1, int type = 0)
+    {
+        if (passiveSkillNames.Count <= 0){return amount;}
+        for (int i = 0; i < passiveSkillNames.Count; i++)
+        {
+            terrainMap.actorManager.LoadPassiveData(passiveSkill, passiveSkillNames[i]);
+            if (passiveSkill.timing != 4){continue;}
+            if (passiveSkill.DamagedConditions(this, amount, direction, type))
+            {
+                amount = passiveSkill.AffectDamage(amount);
+            }
+        }
+        return amount;
+    }
     public void ReceiveDamage(int amount, int direction = -1, int type = 0)
     {
+        // Apply any defensive passives.
+        amount = ReceiveDamagePassives(amount, direction, type);
         // Ignore damage that's too weak?
         if (defense/2 > amount)
         {

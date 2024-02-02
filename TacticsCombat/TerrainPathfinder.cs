@@ -208,6 +208,7 @@ public class TerrainPathfinder : BasicPathfinder
 
     public int DirectionBetweenLocations(int startLocation, int nextLocation)
     {
+        // Check if they're directly adjacent from each other first.
         for (int i = 0; i < 6; i++)
         {
             if (GetDestination(startLocation, i) == nextLocation)
@@ -215,7 +216,30 @@ public class TerrainPathfinder : BasicPathfinder
                 return i;
             }
         }
-        return -1;
+        // Then just check the direction manually.
+        int startRow = GetRow(startLocation);
+        int nextRow = GetRow(nextLocation);
+        int startCol = GetColumn(startLocation);
+        int nextCol = GetColumn(nextLocation);
+        // First check if they're in a column.
+        if (startCol == nextCol)
+        {
+            // Then either face up.
+            if (startRow < nextRow){return 3;}
+            // Or down.
+            return 0;
+        }
+        // Otherwise check if left or right.
+        else if (startCol < nextCol)
+        {
+            if (startRow < nextRow){return 2;}
+            return 1;
+        }
+        else
+        {
+            if (startRow < nextRow){return 4;}
+            return 5;
+        }
     }
 
     public override bool DirectionCheck(int location, int direction)

@@ -18,6 +18,7 @@ public class PassiveSkillDataManager : MonoBehaviour
         LoadAllData();
     }
 
+    [ContextMenu("Load")]
     public void LoadAllData()
     {
         string[] configBlocks = configData.Split("#");

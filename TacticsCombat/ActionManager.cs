@@ -44,7 +44,6 @@ public class ActionManager : MonoBehaviour
         {
             actionsLeft.text += " o ";
         }
-        //actionsLeft.text = currentActor.actionsLeft.ToString();
     }
 
     public void ChangeState(int newState)

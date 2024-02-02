@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class SkillMenu : MonoBehaviour
 {
     public Text skillName;
-    public Text skillEnergyCost;
+    public TMP_Text skillEnergyCost;
     public Text skillDetails;
+    public TMP_Text skillActionCost;
     public TacticActiveSkill activeSkill;
     public SkillSelectList skillList;
     public AttackMenu lockOnMenu;
@@ -44,6 +46,7 @@ public class SkillMenu : MonoBehaviour
         string skillDetailsText = "";
         // Need to show the energy and action cost.
         skillName.text = activeSkill.skillName;
+        skillActionCost.text = activeSkill.ReturnActionCostString();
         skillEnergyCost.text = activeSkill.cost.ToString();
         skillDetailsText += activeSkill.flavorText;
         skillDetailsText += "\n"+activeSkill.ReturnEffectDescription();

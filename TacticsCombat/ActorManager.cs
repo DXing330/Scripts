@@ -426,7 +426,7 @@ public class ActorManager : MonoBehaviour
         int defenderBonus = terrainTile.ReturnDefenseBonus(defenderLocationType, defender.movementType);
         attackPower = attackPower*6/defenderBonus;
         int attackDamage = attacker.GenerateAttackDamage(attackAdvantage, attackPower);
-        defender.ReceiveDamage(attackDamage);
+        defender.ReceiveDamage(attackDamage, attacker.currentDirection);
         if (counter)
         {
             int attackerLocationType = terrainMap.terrainInfo[attacker.locationIndex];
@@ -437,7 +437,7 @@ public class ActorManager : MonoBehaviour
             int attackerHealth = attacker.health;
             int attackerDefense = attacker.defense;
             int defenderDamageDealt = defender.GenerateAttackDamage(0, defenderPower);
-            attacker.ReceiveDamage(defenderDamageDealt);
+            attacker.ReceiveDamage(defenderDamageDealt, defender.currentDirection);
             if (defenderDamageDealt - attackerDefense >= attackerHealth || attackerHealth <= 1){return true;}
             else if (attackerHealth <= 1 && defenderDamageDealt > attackerDefense/2){return true;}
         }

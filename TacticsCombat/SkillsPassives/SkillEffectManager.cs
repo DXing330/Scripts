@@ -34,6 +34,9 @@ public class SkillEffectManager : MonoBehaviour
             case "Active":
                 // Add the skill to the temp active lists?
                 return false;
+            case "TempPassive":
+                target.GainTempPassive(skill.effectSpecifics);
+                return false;
             case "Passive":
                 // Add the skill to the temp passive lists?
                 return false;

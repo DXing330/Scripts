@@ -133,7 +133,8 @@ public class TerrainEffectManager : MonoBehaviour
         ActionLog.instance.AddActionLog(actor.typeName+" is surrounded by fire.");
         int multiplier = Mathf.Max(1, actor.size);
         int damage = Random.Range(fireBaseDamage*multiplier/2, fireBaseDamage*multiplier*3/2);
-        actor.ReceiveDamage(damage + actor.defense);
+        // Fire comes from all sides and is damage type 1.
+        actor.ReceiveDamage(damage + actor.defense, -1, 1);
         // Suffocation?
     }
 }
