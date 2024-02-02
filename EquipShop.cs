@@ -5,7 +5,7 @@ using TMPro;
 
 public class EquipShop : MonoBehaviour
 {
-    public EquipmentSprites equipSprites;
+    /*public EquipmentSprites equipSprites;
     public List<string> equips;
     public List<int> prices;
     public int currentViewedPage = 0;
@@ -95,5 +95,5 @@ public class EquipShop : MonoBehaviour
         else{return;}
         // Obtain equipment.
         GameManager.instance.equipInventory.GainEquipment(equips[currentlySelectedEquip]);
-    }
+    }*/
 }

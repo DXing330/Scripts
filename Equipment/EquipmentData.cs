@@ -27,6 +27,7 @@ public class EquipmentData : MonoBehaviour
         LoadAllData();
     }
 
+    [ContextMenu("Load")]
     public void LoadAllData()
     {
         string[] configBlocks = configData.Split("#");
@@ -67,6 +68,6 @@ public class EquipmentData : MonoBehaviour
         loaded.baseInitiative = int.Parse(equipInitiatives[index]);
         loaded.equipType = int.Parse(equipTypes[index]);
         loaded.possibleUsers = possibleUsers[index];
-        loaded.flavorText = flavorTexts[index];
+        //loaded.flavorText = flavorTexts[index];
     }
 }

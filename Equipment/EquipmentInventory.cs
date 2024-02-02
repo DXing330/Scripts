@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class EquipmentInventory : BasicDataManager
 {
+    /*
     private string loadedData;
     public Equipment equipment;
     public List<string> allEquipment;
@@ -184,7 +185,7 @@ public class EquipmentInventory : BasicDataManager
         // One equipment per character.
         int index = allEquipment.IndexOf(equipment.equipName);
         LoseEquipment(index);
-        actorToEquip.UpdateEquipment();
+        //actorToEquip.UpdateEquipment();
         SaveEquipSets();
     }
 
@@ -230,5 +231,5 @@ public class EquipmentInventory : BasicDataManager
                 break;
         }
         SaveEquipSets();
-    }
+    }*/
 }

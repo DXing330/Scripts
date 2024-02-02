@@ -5,11 +5,9 @@ using UnityEngine;
 public class Equipment : AllStats
 {
     // 0 = weapon, 1 = armor, 2 = helmet, 3 = boots, 4 = accessory
-    public int equipType;
-    public int ID;
+    public string allData;
     public string equipName;
+    public int equipType;
     public string possibleUsers;
-    public string flavorText;
-    public string passiveSkills = "";
-    public string activeSkills = "";
+    public string possibleSizes;
 }

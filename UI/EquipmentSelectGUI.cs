@@ -5,6 +5,7 @@ using TMPro;
 
 public class EquipmentSelectGUI : MonoBehaviour
 {
+    /*
     public Animator animator;
     public void ChangePanel(bool inner = true)
     {
@@ -282,5 +283,5 @@ public class EquipmentSelectGUI : MonoBehaviour
         UpdateEquipStatsPanel();
         GetEquipsOfSelectedType();
         UpdateInventoryPanel();
-    }
+    }*/
 }
