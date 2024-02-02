@@ -426,6 +426,7 @@ public class ActorManager : MonoBehaviour
         int defenderBonus = terrainTile.ReturnDefenseBonus(defenderLocationType, defender.movementType);
         attackPower = attackPower*6/defenderBonus;
         int attackDamage = attacker.GenerateAttackDamage(attackAdvantage, attackPower);
+        attackDamage = attacker.ApplyAttackingPassives(attackDamage, defender);
         defender.ReceiveDamage(attackDamage, attacker.currentDirection);
         if (counter)
         {

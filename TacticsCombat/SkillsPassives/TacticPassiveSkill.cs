@@ -60,6 +60,20 @@ public class TacticPassiveSkill : MonoBehaviour
     public bool AttackingConditions(TacticActor passiveHolder, TacticActor defender)
     {
         if (condition == "None"){return true;}
+        if (condition == "Direction")
+        {
+            int cDirection = passiveHolder.currentDirection;
+            int dDirection = defender.currentDirection;
+            switch (conditionSpecifics)
+            {
+                case "Opposing":
+                    return OpposingDirections(cDirection, dDirection);
+                case "Opposite":
+                    return OppositeDirection(cDirection, dDirection);
+                case "Identical":
+                    return SameDirection(cDirection, dDirection);
+            }
+        }
         return false;
     }
 

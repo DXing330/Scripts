@@ -52,6 +52,20 @@ public class TacticActor : AllStats
     public int actionsToAttack = 1;
     public int currentAttackRange;
     public int attackDamage;
+    public int ApplyAttackingPassives(int damage, TacticActor defender)
+    {
+        if (passiveSkillNames.Count <= 0){return damage;}
+        for (int i = 0; i < passiveSkillNames.Count; i++)
+        {
+            terrainMap.actorManager.LoadPassiveData(passiveSkill, passiveSkillNames[i]);
+            if (passiveSkill.timing != 2){continue;}
+            if (passiveSkill.AttackingConditions(this, defender))
+            {
+                damage = passiveSkill.AffectDamage(damage);
+            }
+        }
+        return damage;
+    }
     public int GenerateAttackDamage(int advantage = 0, int attackPower = -1)
     {
         // Most attacks have no advatnage.
