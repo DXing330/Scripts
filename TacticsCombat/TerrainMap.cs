@@ -330,10 +330,18 @@ public class TerrainMap : MonoBehaviour
         }
         if (actors[turnIndex].activeSkill.lockOn == 0)
         {
-            skillCenter = actors[turnIndex].locationIndex;
-            skillSpan = actors[turnIndex].activeSkill.span;
-            SeeSkillRange();
-            SeeSkillSpan();
+            if (actors[turnIndex].activeSkill.targetingShape == "Cone")
+            {
+                SeeSkillRange();
+                SeeSkillSpan();
+            }
+            else
+            {
+                skillCenter = actors[turnIndex].locationIndex;
+                skillSpan = actors[turnIndex].activeSkill.span;
+                SeeSkillRange();
+                SeeSkillSpan();
+            }
         }
         else
         {
@@ -347,6 +355,9 @@ public class TerrainMap : MonoBehaviour
                     break;
                 case "Line":
                     range = LineSkillRange();
+                    break;
+                case "Cone":
+                    range = ConeSkillRange();
                     break;
             }
             SkillTargetableTiles(actors[turnIndex].activeSkill.skillTarget);
@@ -1416,6 +1427,15 @@ public class TerrainMap : MonoBehaviour
         {
             skillRange = Mathf.Max(actors[turnIndex].currentAttackRange, actors[turnIndex].activeSkill.range);
         }
+        switch (actors[turnIndex].activeSkill.targetingShape)
+        {
+            case "Line":
+                highlightedTiles = new List<int>(pathFinder.FindTilesInLineRange(actors[turnIndex], skillRange));
+                return skillRange;
+            case "Cone":
+                highlightedTiles = new List<int>(pathFinder.FindTilesInConeRange(actors[turnIndex].locationIndex, skillRange, actors[turnIndex].currentDirection));
+                return skillRange;
+        }
         highlightedTiles = new List<int>(pathFinder.FindTilesInSkillRange(actors[turnIndex], skillRange));
         highlightedTiles.Add(actors[turnIndex].locationIndex);
         return skillRange;
@@ -1433,9 +1453,17 @@ public class TerrainMap : MonoBehaviour
         return skillRange;
     }
 
+    protected int ConeSkillRange()
+    {
+        int skillRange = actors[turnIndex].activeSkill.range;
+        highlightedTiles = new List<int>(pathFinder.FindTilesInConeRange(actors[turnIndex].locationIndex, skillRange, actors[turnIndex].currentDirection));
+        return skillRange;
+    }
+
     // Move the skill around.
     public void MoveSkill(int direction)
     {
+        if (actors[turnIndex].activeSkill.targetingShape == "Cone"){return;}
         // Check the distance between the actor and the skill and make sure its within range.
         // Move it around.
         int nextTile = skillCenter;
@@ -1453,8 +1481,15 @@ public class TerrainMap : MonoBehaviour
         //UpdateCenterTile(skillCenter);
         // Need to keep track of the skill's center location.
         // Highlight the center location and tiles around it within the span.
-        targetableTiles = new List<int>(pathFinder.FindTilesInSkillSpan(skillCenter, skillSpan));
-        targetableTiles.Add(skillCenter);
+        if (actors[turnIndex].activeSkill.targetingShape == "Cone")
+        {
+            targetableTiles = new List<int>(highlightedTiles);
+        }
+        else
+        {
+            targetableTiles = new List<int>(pathFinder.FindTilesInSkillSpan(skillCenter, skillSpan));
+            targetableTiles.Add(skillCenter);
+        }
         Rehighlight();
     }
 

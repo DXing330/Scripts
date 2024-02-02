@@ -515,22 +515,52 @@ public class TerrainPathfinder : BasicPathfinder
     public List<int> FindTilesInLineRange(TacticActor actor, int range)
     {
         reachableTiles.Clear();
+        int start = actor.locationIndex;
         for (int i = 0; i < 6; i++)
         {
-            // Start wherever the actor is.
-            int start = actor.locationIndex;
-            for (int k = 0; k < range; k++)
+            GetTilesInLineRange(start, range, i);
+        }
+        return reachableTiles;
+    }
+
+    public List<int> FindTilesInConeRange(int start, int range, int direction)
+    {
+        reachableTiles.Clear();
+        if (direction < 0){return reachableTiles;}
+        int dir1 = direction;
+        int dir2 = (direction+1)%6;
+        int dir3 = (direction+5)%6;
+        // Start by adding lines in the facing directions.
+        GetTilesInLineRange(start, range, dir1);
+        GetTilesInLineRange(start, range, dir2);
+        GetTilesInLineRange(start, range, dir3);
+        // Then add the appropriate things inbetween.
+        if (range ==2)
+        {
+            int middleTile = GetDestination(start,direction);
+            if (DirectionCheck(middleTile, dir3))
             {
-                // Check if you can add the tile in the direction.
-                if (DirectionCheck(start, i))
-                {
-                    // If you can then add it and check if you can keep adding.
-                    start = GetDestination(start, i);
-                    reachableTiles.Add(start);
-                }
+                reachableTiles.Add(GetDestination(middleTile, dir3));
+            }
+            if (DirectionCheck(middleTile, dir2))
+            {
+                reachableTiles.Add(GetDestination(middleTile, dir2));
             }
         }
         return reachableTiles;
+        
+    }
+
+    protected void GetTilesInLineRange(int start, int range, int direction)
+    {
+        for (int i = 0; i < range; i++)
+        {
+            if (DirectionCheck(start, direction))
+            {
+                start = GetDestination(start, direction);
+                reachableTiles.Add(start);
+            }
+        }
     }
 
     public List<int> FindTilesInSkillSpan(int center, int span)

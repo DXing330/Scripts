@@ -454,6 +454,8 @@ public class TacticActor : AllStats
         {
             return false;
         }
+        // Need to be facing a direction to use cone skills.
+        if (activeSkill.targetingShape == "Cone" && currentDirection < 0){return false;}
         return true;
     }
 
