@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class EquipmentData : MonoBehaviour
 {
+    /*
     public string configData;
     public List<string> equipmentNames;
     public List<string> equipTypes;
@@ -69,5 +70,5 @@ public class EquipmentData : MonoBehaviour
         loaded.equipType = int.Parse(equipTypes[index]);
         loaded.possibleUsers = possibleUsers[index];
         //loaded.flavorText = flavorTexts[index];
-    }
+    }*/
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EquipmentGenerator : MonoBehaviour
 {
-    public int totalEquipTypes = 5;
+    public int totalEquipTypes = 4;
 
     public string GenerateEquipment(int rarity)
     {

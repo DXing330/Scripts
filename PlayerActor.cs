@@ -25,6 +25,7 @@ public class PlayerActor : AllStats
     public string species = "Undead";
     public List<string> learntPassives;
     public List<string> learntSkills;
+    public EquipmentContainer allEquipment;
 
     public void ResetAllData()
     {
@@ -71,7 +72,6 @@ public class PlayerActor : AllStats
 
     public void UpdateStats()
     {
-        //allEquipment.UpdateStats();
         currentLevel = GameManager.instance.playerLevel;
         playerActor.typeName = typeName;
         playerActor.level = currentLevel;
@@ -99,30 +99,20 @@ public class PlayerActor : AllStats
         {
             playerActor.passiveSkillNames.Add(learntPassives[i]);
         }
+        allEquipment.UpdateActorStats(playerActor);
     }
 
     // Mob characters don't get any level bonuses, just equipment bonuses.
     public void SideCharacterUpdateStats()
     {
-        //allEquipment.UpdateStats();
         GameManager.instance.actorData.LoadActorData(playerActor, typeName);
         CopyAllStats(playerActor);
         playerActor.typeName = typeName;
         if (currentHealth >= 0)
         {
             playerActor.baseHealth = Mathf.Min(currentHealth, playerActor.baseHealth);
+            allEquipment.UpdateActorStats(playerActor);
         }
-        // This is should loop through a list or something.
-        /*
-        playerActor.baseHealth += allEquipment.baseHealth;
-        playerActor.baseAttack += allEquipment.baseAttack;
-        playerActor.baseDefense += allEquipment.baseDefense;
-        playerActor.baseEnergy += allEquipment.baseEnergy;
-        playerActor.baseMovement += allEquipment.baseMovement;
-        playerActor.attackRange += Mathf.Max(attackRange, allEquipment.attackRange);
-        playerActor.baseActions += allEquipment.baseActions;
-        playerActor.size += allEquipment.size;
-        playerActor.baseInitiative += allEquipment.baseInitiative;*/
     }
 
     public void SetName(string newName)

@@ -1,28 +1,79 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EquipmentContainer : AllStats
 {
-    public Equipment weaponSlot;
-    public Equipment armorSlot;
-    public Equipment helmetSlot;
-    public Equipment bootsSlot;
-    public Equipment accessorySlot;
-    public List<string> allPassives;
-    public List<string> allActives;
+    // Two hands, armor set, accessory
+    public int totalEquipmentTypes = 4;
+    public List<string> allEquipment;
+    public List<string> bonusActives;
+    public List<string> bonusPassives;
 
-    public void UpdateStats()
+    public void UnequipAll()
     {
-        baseHealth = armorSlot.baseHealth+helmetSlot.baseHealth;
-        baseAttack = weaponSlot.baseAttack;
-        baseDefense = armorSlot.baseDefense;
-        baseEnergy = 0;
-        baseMovement = bootsSlot.baseMovement+armorSlot.baseMovement;
-        attackRange = weaponSlot.attackRange;
-        baseActions = 0;
-        moveType = bootsSlot.moveType;
-        size = armorSlot.size;
-        baseInitiative = bootsSlot.baseInitiative+helmetSlot.baseInitiative;
+        for (int i = 0; i < allEquipment.Count; i++)
+        {
+            allEquipment[i] = "";
+        }
+    }
+
+    public void LoadEquipSet(List<string> newEquips)
+    {
+        for (int i = 0; i < allEquipment.Count; i++)
+        {
+            allEquipment[i] = newEquips[i];
+        }
+    }
+
+    protected void GetEquipStats()
+    {
+        NullAllStats();
+        bonusActives.Clear();
+        bonusPassives.Clear();
+        for (int i = 0; i < allEquipment.Count; i++)
+        {
+            if (allEquipment[i].Length < 6){continue;}
+            ParseEquipmentString(allEquipment[i]);
+        }
+    }
+
+    protected void ParseEquipmentString(string equip)
+    {
+        // Get the base stats in order.
+        // Equipment stats go like this.
+        // hlth|atk|def|move|actives|passives|slot|species|size|name
+        // Not all equipment have names though.
+        List<string> bonusStats = equip.Split("|").ToList();
+        baseHealth += int.Parse(bonusStats[0]);
+        baseAttack += int.Parse(bonusStats[1]);
+        baseDefense += int.Parse(bonusStats[2]);
+        baseMovement += int.Parse(bonusStats[3]);
+        bonusActives.AddRange(bonusStats[4].Split(",").ToList());
+        bonusPassives.AddRange(bonusStats[5].Split(",").ToList());
+    }
+
+    public void UpdateActorStats(TacticActor actor)
+    {
+        GetEquipStats();
+        actor.baseHealth += baseHealth;
+        actor.baseAttack += baseAttack;
+        actor.baseDefense += baseDefense;
+        actor.baseMovement += baseMovement;
+        if (bonusActives.Count > 0)
+        {
+            for (int i = 0; i < bonusActives.Count; i++)
+            {
+                actor.activeSkillNames.Add(bonusActives[i]);
+            }
+        }
+        if (bonusPassives.Count > 0)
+        {
+            for (int i = 0; i < bonusPassives.Count; i++)
+            {
+                actor.activeSkillNames.Add(bonusPassives[i]);
+            }
+        }
     }
 }

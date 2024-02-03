@@ -52,7 +52,7 @@ public class AllStats : MonoBehaviour
         allStatList.Add(baseDefense);
         allStatList.Add(baseEnergy);
         allStatList.Add(baseMovement);
-        //allStatList.Add(moveType);
+        allStatList.Add(moveType);
         allStatList.Add(attackRange);
         allStatList.Add(baseActions);
         allStatList.Add(size);
@@ -72,5 +72,35 @@ public class AllStats : MonoBehaviour
         baseActions = int.Parse(allStats[7]);
         size = int.Parse(allStats[8]);
         baseInitiative = int.Parse(allStats[9]);
+    }
+
+    public virtual void LoadStatsFromIntList(List<int> allStats)
+    {
+        baseHealth = (allStats[0]);
+        baseAttack = (allStats[1]);
+        baseDefense = (allStats[2]);
+        baseEnergy = (allStats[3]);
+        baseMovement = (allStats[4]);
+        moveType = (allStats[5]);
+        attackRange = (allStats[6]);
+        baseActions = (allStats[7]);
+        size = (allStats[8]);
+        baseInitiative = (allStats[9]);
+    }
+
+    public virtual List<int> ReturnSumOfStatLists(List<string> newStats)
+    {
+        allStatList.Clear();
+        allStatList.Add(baseHealth+int.Parse(newStats[0]));
+        allStatList.Add(baseAttack+int.Parse(newStats[1]));
+        allStatList.Add(baseDefense+int.Parse(newStats[2]));
+        allStatList.Add(baseEnergy+int.Parse(newStats[3]));
+        allStatList.Add(baseMovement+int.Parse(newStats[4]));
+        allStatList.Add(moveType+int.Parse(newStats[5]));
+        allStatList.Add(attackRange+int.Parse(newStats[6]));
+        allStatList.Add(baseActions+int.Parse(newStats[7]));
+        allStatList.Add(size+int.Parse(newStats[8]));
+        allStatList.Add(baseInitiative+int.Parse(newStats[9]));
+        return allStatList;
     }
 }
