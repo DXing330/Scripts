@@ -84,7 +84,7 @@ public class MoveManager : MonoBehaviour
     private void ForceMovement(TacticActor actor, int direction)
     {
         // Structures can't move.
-        if (actor.species == "Structure"){return;}
+        if (actor.species.Contains("Structure")){return;}
         // Check if they're above a pit, if they are and they are not flying them stop force moving them.
         if (pathfinder.CheckCurrentLocationType(actor) == 7)
         {

@@ -11,7 +11,6 @@ public class TacticBuffsStatuses : MonoBehaviour
         effect = newEffect;
     }
 
-    // Don't do this in here, have a central one take in the effects and actors and do the thing there, don't want to make too many gameobjects.
     public void AffectActor(TacticActor actor)
     {
         switch (effect)
@@ -33,6 +32,9 @@ public class TacticBuffsStatuses : MonoBehaviour
                 break;
             case "MOV-":
                 actor.currentMovespeed--;
+                break;
+            case "MOV--":
+                actor.currentMovespeed = 0;
                 break;
             case "ENGY+":
                 actor.GainEnergy(1);

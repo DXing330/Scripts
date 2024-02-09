@@ -11,6 +11,16 @@ public class EquipmentContainer : AllStats
     public List<string> bonusActives;
     public List<string> bonusPassives;
 
+    public void Equip(string equipment, int slot)
+    {
+        if (slot < totalEquipmentTypes)
+        {
+            // -1 is a two handed special case, deal with it later.
+            // Might need to unequip something first.
+            allEquipment[slot] = equipment;
+        }
+    }
+
     public void UnequipAll()
     {
         for (int i = 0; i < allEquipment.Count; i++)
@@ -43,7 +53,7 @@ public class EquipmentContainer : AllStats
     {
         // Get the base stats in order.
         // Equipment stats go like this.
-        // hlth|atk|def|move|actives|passives|slot|species|size|name
+        // hlth|atk|def|move|actives|passives|slot|species|size|type|name
         // Not all equipment have names though.
         List<string> bonusStats = equip.Split("|").ToList();
         baseHealth += int.Parse(bonusStats[0]);

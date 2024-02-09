@@ -58,9 +58,14 @@ public class EquipmentInventory : BasicDataManager
         File.WriteAllText(saveDataPath+"/equipInventoryData.txt", data);
     }
 
-    private void SaveEquipSets()
+    protected void SaveEquipSets()
     {
         // Keep track of who is equipping it and what the equipment is.
+    }
+
+    public void EquipToActor(string equipment, PlayerActor actor, int slot)
+    {
+        actor.allEquipment.Equip(equipment, slot);
     }
 
     public override void Load()

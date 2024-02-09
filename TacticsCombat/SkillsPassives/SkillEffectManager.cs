@@ -76,7 +76,8 @@ public class SkillEffectManager : MonoBehaviour
     protected bool TryToTame(TacticActor tameTarget, TacticActiveSkill skill, TacticActor tamer)
     {
         // Check if you're using the right skill.
-        if (skill.effectSpecifics != tameTarget.species){return false;}
+        if (!tameTarget.species.Contains(skill.effectSpecifics)){return false;}
+        // int catchRate = some number, adjust based on conditions, compare to some number.
         // Check if you're winning.
         if (tameTarget.health >= tamer.health){return false;}
         // Check if you're strong enough.
