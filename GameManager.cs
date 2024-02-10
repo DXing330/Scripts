@@ -144,8 +144,12 @@ public class GameManager : MonoBehaviour
             }
         }
         else{NewGame();}
-        player.UpdateStats();
-        familiar.UpdateStats();
+        // First load the current party.
+        armyData.GetAllPartyMembers();
+        // Then load their equipment.
+        equipInventory.LoadEquipSets();
+        // Then load their stats.
+        armyData.UpdatePartyStats();
         RefreshMaps();
         RefreshBattles();
     }

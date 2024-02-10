@@ -50,8 +50,8 @@ public class AllStats : MonoBehaviour
         allStatList.Add(baseHealth);
         allStatList.Add(baseAttack);
         allStatList.Add(baseDefense);
-        allStatList.Add(baseEnergy);
         allStatList.Add(baseMovement);
+        allStatList.Add(baseEnergy);
         allStatList.Add(moveType);
         allStatList.Add(attackRange);
         allStatList.Add(baseActions);

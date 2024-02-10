@@ -10,7 +10,7 @@ public class ArmyDataManager : BasicDataManager
     private string loadedData;
     public List<PlayerActor> partyMembers;
     public List<PlayerActor> allPartyMembers;
-    protected void GetAllPartyMembers()
+    public void GetAllPartyMembers()
     {
         allPartyMembers.Clear();
         allPartyMembers.Add(GameManager.instance.player);
@@ -20,17 +20,11 @@ public class ArmyDataManager : BasicDataManager
             if (partyMembers[i].typeName.Length <= 0 || partyMembers[i].currentHealth <= 0){continue;}
             allPartyMembers.Add(partyMembers[i]);
         }
-        for (int i = 0; i < allPartyMembers.Count; i++)
-        {
-            if (allPartyMembers[i].typeName == "Player" || allPartyMembers[i].typeName == "Familiar")
-            {
-                allPartyMembers[i].UpdateStats();
-            }
-            else
-            {
-                allPartyMembers[i].SideCharacterUpdateStats();
-            }
-        }
+    }
+    protected void GetPartyMembersAndStats()
+    {
+        GetAllPartyMembers();
+        UpdatePartyStats();
     }
     public void PartyMemberDefeated(string memberName)
     {
@@ -72,6 +66,11 @@ public class ArmyDataManager : BasicDataManager
     }
     public List<string> availableFighters = new List<string>(0);
     public List<string> fighterHealths = new List<string>(0);
+    public PlayerActor viewStatsActor;
+    public void SetViewStatsActor(PlayerActor newActor)
+    {
+        viewStatsActor = newActor;
+    }
     protected void UpdateAvailableHealths()
     {
         availableFighters.Clear();
@@ -85,7 +84,22 @@ public class ArmyDataManager : BasicDataManager
             fighterHealths.Add(currentHealth.ToString());
         }
         LoadAvailableFighters();
-        GetAllPartyMembers();
+        GetPartyMembersAndStats();
+    }
+
+    public void UpdatePartyStats()
+    {
+        for (int i = 0; i < allPartyMembers.Count; i++)
+        {
+            if (allPartyMembers[i].typeName == "Player" || allPartyMembers[i].typeName == "Familiar")
+            {
+                allPartyMembers[i].UpdateStats();
+            }
+            else
+            {
+                allPartyMembers[i].SideCharacterUpdateStats();
+            }
+        }
     }
 
     public override void NewGame()
@@ -121,7 +135,7 @@ public class ArmyDataManager : BasicDataManager
             GameManager.instance.RemoveEmptyListItems(fighterHealths);
         }
         LoadAvailableFighters();
-        GetAllPartyMembers();
+        //GetAllPartyMembers();
     }
 
     public void GainFighter(string fighterName)

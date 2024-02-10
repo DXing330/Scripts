@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class OverworldStatSheet : MonoBehaviour
 {
@@ -12,9 +13,11 @@ public class OverworldStatSheet : MonoBehaviour
     public List<TMP_Text> statTexts;
     public Image actorSprite;
     public ActorSprites spriteDictionary;
+    public PlayerActor statActor;
 
-    public void UpdateStatSheet(PlayerActor actor)
+    public virtual void UpdateStatSheet(PlayerActor actor)
     {
+        statActor = actor;
         actorName.text = actor.typeName;
         List<int> allStats = actor.ReturnStatList();
         healthBarText.text = actor.ReturnCurrentHealth()+"/"+allStats[0];
@@ -25,5 +28,11 @@ public class OverworldStatSheet : MonoBehaviour
             statTexts[i].text = allStats[i+1].ToString();
         }
         actorSprite.sprite = spriteDictionary.SpriteDictionary(actor.typeName);
+    }
+
+    public virtual void ClickOnStatSheet()
+    {
+        GameManager.instance.armyData.SetViewStatsActor(statActor);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("EquipmentSelect");
     }
 }

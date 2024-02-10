@@ -8,7 +8,19 @@ public class EquipmentInventory : BasicDataManager
 {
 
     public string loadedData;
+    public List<string> starterEquipment;
     public List<string> allEquipment;
+    public void GainEquipment(string newEquip)
+    {
+        allEquipment.Add(newEquip);
+    }
+    public void RemoveEquipment(int index)
+    {
+        if (index < allEquipment.Count && index >= 0)
+        {
+            allEquipment.RemoveAt(index);
+        }
+    }
     public List<string> allEquippedEquipment;
     public List<string> allTools;
     public List<string> allArmors;
@@ -43,7 +55,7 @@ public class EquipmentInventory : BasicDataManager
 
     public override void NewGame()
     {
-        allEquipment.Clear();
+        allEquipment = starterEquipment;
         allEquippedEquipment.Clear();
         Save();
         Load();
@@ -61,11 +73,27 @@ public class EquipmentInventory : BasicDataManager
     protected void SaveEquipSets()
     {
         // Keep track of who is equipping it and what the equipment is.
+        allEquippedEquipment.Clear();
+        for (int i = 0; i < GameManager.instance.armyData.allPartyMembers.Count; i++)
+        {
+            allEquippedEquipment.Add(GameManager.instance.armyData.allPartyMembers[i].allEquipment.ReturnEquippedString());
+        }
+    }
+
+    public void LoadEquipSets()
+    {
+        for (int i = 0; i < allEquippedEquipment.Count; i++)
+        {
+            GameManager.instance.armyData.allPartyMembers[i].allEquipment.LoadEquipSet(allEquippedEquipment[i]);
+        }
     }
 
     public void EquipToActor(string equipment, PlayerActor actor, int slot)
     {
+        // if slot = -1, remove any tools and add them back.
         actor.allEquipment.Equip(equipment, slot);
+        SaveEquipSets();
+        GameManager.instance.armyData.UpdatePartyStats();
     }
 
     public override void Load()
@@ -83,5 +111,6 @@ public class EquipmentInventory : BasicDataManager
             allEquipment.Clear();
             allEquippedEquipment.Clear();
         }
+        //LoadEquipSets();
     }
 }

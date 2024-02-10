@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,33 +8,89 @@ using TMPro;
 
 public class EquipmentSelectGUI : MonoBehaviour
 {
-    /*
-    public Animator animator;
-    public void ChangePanel(bool inner = true)
+    public EquipmentInventory equipInventory;
+    public EquipmentSprites equipSprites;
+    public PlayerActor selectedActor;
+    public EquipmentContainer equipped;
+    public MoreStatsSheet statSheet;
+    public List<EquipmentSlot> equipSlots;
+    public List<string> equipStats;
+    public List<TMP_Text> statTexts;
+    protected void ResetStatTexts()
     {
-        if (inner)
+        for (int i = 0; i < statTexts.Count; i++)
         {
-            if (selectedActor < 0 || selectedActor >= playerActors.Count){return;}
-            animator.SetTrigger("ChangeEquip");
-            UpdateEquippedPanel();
-            selectedEquipType = -1;
-            UpdateEquipStatsPanel();
-        }
-        else
-        {
-            animator.SetTrigger("ViewEquip");
-            UpdateStatsPanel();
+            statTexts[i].text = "";
         }
     }
+    protected void UpdateStatTexts(string selectedEquip)
+    {
+        ResetStatTexts();
+        if (selectedEquip.Length < 6){return;}
+        string[] blocks = selectedEquip.Split("|");
+        for (int i = 0; i < 3; i++)
+        {
+            statTexts[i].text = blocks[i+1];
+        }
+        statTexts[3].text = blocks[0];
+        equipStats = blocks[4].Split(",").ToList();
+        for (int i = 0; i < equipStats.Count; i++)
+        {
+            if (equipStats[i].Length <= 1){continue;}
+            statTexts[4].text += equipStats[i]+"\n";
+        }
+        equipStats = blocks[5].Split(",").ToList();
+        for (int i = 0; i < equipStats.Count; i++)
+        {
+            if (equipStats[i].Length <= 1){continue;}
+            statTexts[5].text += equipStats[i]+"\n";
+        }
+    }
+    protected void ResetEquipSlots()
+    {
+        for (int i = 0; i < equipSlots.Count; i++)
+        {
+            equipSlots[i].DisableImage();
+        }
+    }
+    public void UnequipFromSlot(int slot)
+    {
+        equipped.Unequip(slot);
+        UpdateEquipSlots();
+        statSheet.UpdateMoreStats();
+    }
+    public void ViewSlotStats(int slot)
+    {
+        UpdateStatTexts(equipped.SlotStats(slot));
+    }
+    public void UpdateEquipSlots()
+    {
+        ResetEquipSlots();
+        for (int i = 0; i < equipped.allEquipment.Count; i++)
+        {
+            if (equipped.allEquipment[i].Length > 6)
+            {
+                equipSlots[i].EnableImage();
+                // Only handheld things get unique images.
+                if (i <= 1)
+                {
+                    equipStats = equipped.allEquipment[i].Split("|").ToList();
+                    equipSlots[i].UpdateImage(equipSprites.SpriteDictionary(equipStats[^1]));
+                }
+            }
+        }
+    }
+    void Start()
+    {
+        equipInventory = GameManager.instance.equipInventory;
+        selectedActor = GameManager.instance.armyData.viewStatsActor;
+        equipped = selectedActor.allEquipment;
+        UpdateEquipSlots();
+    }
+    /*
     public EquipmentData equipData;
-    public EquipmentInventory equipInventory;
-    public ActorSprites actorSprites;
-    public EquipmentSprites equipSprites;
     public Equipment equippedEquipment;
     public Equipment selectedEquipment;
-    public List<PlayerActor> playerActors;
-    public int currentActorPage = 0;
-    public List<FormationTile> actors;
     public List<string> currentActorEquips;
     public List<FormationTile> equippedTiles;
     public int currentInventoryPage = 0;

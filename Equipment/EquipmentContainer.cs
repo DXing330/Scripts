@@ -11,14 +11,40 @@ public class EquipmentContainer : AllStats
     public List<string> bonusActives;
     public List<string> bonusPassives;
 
+    public string ReturnEquippedString()
+    {
+        return GameManager.instance.ConvertListToString(allEquipment,"@");
+    }
+
     public void Equip(string equipment, int slot)
     {
         if (slot < totalEquipmentTypes)
         {
-            // -1 is a two handed special case, deal with it later.
-            // Might need to unequip something first.
-            allEquipment[slot] = equipment;
+            // -1 is a two handed special case.
+            if (slot < 0)
+            {
+                Unequip(0);
+                Unequip(1);
+                allEquipment[0] = equipment;
+            }
+            else
+            {
+                allEquipment[slot] = equipment;
+            }
         }
+    }
+
+    public string Unequip(int slot)
+    {
+        string equip = allEquipment[slot];
+        allEquipment[slot] = "";
+        return equip;
+    }
+
+    public string SlotStats(int slot)
+    {
+        string equip = allEquipment[slot];
+        return equip;
     }
 
     public void UnequipAll()
@@ -29,8 +55,10 @@ public class EquipmentContainer : AllStats
         }
     }
 
-    public void LoadEquipSet(List<string> newEquips)
+    public void LoadEquipSet(string newSet)
     {
+        List<string> newEquips = newSet.Split("@").ToList();
+        if (newEquips.Count < allEquipment.Count){return;}
         for (int i = 0; i < allEquipment.Count; i++)
         {
             allEquipment[i] = newEquips[i];
@@ -55,6 +83,7 @@ public class EquipmentContainer : AllStats
         // Equipment stats go like this.
         // hlth|atk|def|move|actives|passives|slot|species|size|type|name
         // Not all equipment have names though.
+        if (equip.Length <= 0){return;}
         List<string> bonusStats = equip.Split("|").ToList();
         baseHealth += int.Parse(bonusStats[0]);
         baseAttack += int.Parse(bonusStats[1]);
@@ -85,5 +114,11 @@ public class EquipmentContainer : AllStats
                 actor.activeSkillNames.Add(bonusPassives[i]);
             }
         }
+    }
+
+    public override List<int> ReturnStatList(bool main = true)
+    {
+        GetEquipStats();
+        return base.ReturnStatList();
     }
 }

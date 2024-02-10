@@ -54,6 +54,7 @@ public class PlayerActor : AllStats
         }
         allStatList.Add(baseAttack);
         allStatList.Add(baseDefense);
+        allStatList.Add(baseMovement);
         if (main)
         {
             allStatList.Add(baseEnergy+((currentLevel-1) * energyPerLevel));
@@ -62,7 +63,6 @@ public class PlayerActor : AllStats
         {
             allStatList.Add(baseEnergy);
         }
-        allStatList.Add(baseMovement);
         allStatList.Add(attackRange);
         allStatList.Add(baseActions);
         allStatList.Add(size);

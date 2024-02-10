@@ -232,7 +232,7 @@ public class TacticActor : AllStats
         baseEnergy = actorToCopy.baseEnergy;
         baseActions = actorToCopy.baseActions;
         attackRange = actorToCopy.attackRange;
-        movementType = actorToCopy.movementType;
+        movementType = actorToCopy.moveType;
         activeSkillNames = actorToCopy.activeSkillNames;
         passiveSkillNames = actorToCopy.passiveSkillNames;
         npcMoveSkill = actorToCopy.npcMoveSkill;
