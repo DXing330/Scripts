@@ -13,7 +13,175 @@ public class EquipmentSelectGUI : MonoBehaviour
     public PlayerActor selectedActor;
     public EquipmentContainer equipped;
     public MoreStatsSheet statSheet;
-    public List<EquipmentSlot> equipSlots;
+    public int changeEquipType = -1;
+    public void ChangeEquipType(int newType)
+    {
+        currentInventoryPage = 0;
+        selectedEquipIndex = -1;
+        if (changeEquipType == newType)
+        {
+            changeEquipType = -1;
+            inventoryObject.SetActive(false);
+        }
+        else
+        {
+            changeEquipType = newType;
+            inventoryObject.SetActive(true);
+            GetPossibleEquips(newType);
+            if (possibleEquips.Count <= 0)
+            {
+                // No possible equips, just hide it.
+                ChangeEquipType(newType);
+                return;
+            }
+            UpdateInventoryTiles();
+        }
+    }
+    public List<string> possibleEquips;
+    public List<string> possibleEquipTypes;
+    protected void GetPossibleEquips(int slot)
+    {
+        possibleEquips.Clear();
+        possibleEquipTypes.Clear();
+        switch (slot)
+        {
+            case 0:
+                for (int i = 0; i < equipInventory.allTools.Count; i++)
+                {
+                    equipStats = equipInventory.allTools[i].Split("|").ToList();
+                    if (equipStats.Count < 6){continue;}
+                    if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
+                    {
+                        possibleEquips.Add(equipInventory.allTools[i]);
+                        // Keep track of the name for easier image lookup.
+                        possibleEquipTypes.Add(equipStats[9]);
+                    }
+                }
+                break;
+            case 1:
+                for (int i = 0; i < equipInventory.allTools.Count; i++)
+                {
+                    equipStats = equipInventory.allTools[i].Split("|").ToList();
+                    if (equipStats.Count < 6){continue;}
+                    if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
+                    {
+                        possibleEquips.Add(equipInventory.allTools[i]);
+                        possibleEquipTypes.Add(equipStats[9]);
+                    }
+                }
+                break;
+            case 2:
+                for (int i = 0; i < equipInventory.allArmors.Count; i++)
+                {
+                    equipStats = equipInventory.allArmors[i].Split("|").ToList();
+                    if (equipStats.Count < 6){continue;}
+                    if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
+                    {
+                        possibleEquips.Add(equipInventory.allArmors[i]);
+                        possibleEquipTypes.Add(equipStats[9]);
+                    }
+                }
+                break;
+            case 3:
+                for (int i = 0; i < equipInventory.allAccessories.Count; i++)
+                {
+                    equipStats = equipInventory.allAccessories[i].Split("|").ToList();
+                    if (equipStats.Count < 6){continue;}
+                    if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
+                    {
+                        possibleEquips.Add(equipInventory.allAccessories[i]);
+                        possibleEquipTypes.Add(equipStats[9]);
+                    }
+                }
+                break;
+        }
+    }
+    protected bool CheckIfEquipable(string bodyType, int size)
+    {
+        // Need to be the right size and body type to equip something.
+        if (size != selectedActor.size){return false;}
+        if (!selectedActor.species.Contains(bodyType)){return false;}
+        return true;
+    }
+    public int currentInventoryPage = 0;
+    public void ChangeInventoryPage(bool right = true)
+    {
+        int lastPage = (possibleEquips.Count/inventoryTiles.Count)-1;
+        if (right)
+        {
+            if (currentInventoryPage < lastPage)
+            {
+                currentInventoryPage++;
+            }
+            else
+            {
+                currentInventoryPage = 0;
+            }
+        }
+        else
+        {
+            if (currentInventoryPage > 0)
+            {
+                currentInventoryPage--;
+            }
+            else
+            {
+                currentInventoryPage = lastPage;
+            }
+        }
+        selectedEquipIndex = -1;
+        UpdateInventoryTiles();
+    }
+    public int selectedEquipIndex = -1;
+    public void SelectEquipInInventory(int index)
+    {
+        selectedEquipIndex = index;
+        UpdateSelectedHighlight();
+        UpdateStatTexts(possibleEquips[index + currentInventoryPage*inventoryTiles.Count]);
+    }
+    public void EquipSelectedEquip()
+    {
+        if (selectedEquipIndex < 0){return;}
+        string equip = possibleEquips[selectedEquipIndex+(currentInventoryPage*inventoryTiles.Count)];
+        equipInventory.EquipToActor(equip, selectedActor, changeEquipType);
+        statSheet.UpdateMoreStats();
+        UpdateEquipSlots();
+    }
+    public GameObject inventoryObject;
+    public List<FormationTile> inventoryTiles;
+    public List<GameObject> inventoryTileObjects;
+    protected void ResetInventoryTileObjects()
+    {
+        for (int i = 0; i < inventoryTileObjects.Count; i++)
+        {
+            inventoryTileObjects[i].SetActive(false);
+        }
+    }
+    protected void ResetInventoryHighlights()
+    {
+        for (int i = 0; i < inventoryTiles.Count; i++)
+        {
+            inventoryTiles[i].ResetHighlight();
+        }
+    }
+    protected void UpdateSelectedHighlight()
+    {
+        ResetInventoryHighlights();
+        if (selectedEquipIndex < 0){return;}
+        inventoryTiles[selectedEquipIndex].Highlight();
+    }
+    protected void UpdateInventoryTiles()
+    {
+        ResetInventoryTileObjects();
+        ResetInventoryHighlights();
+        int startIndex = currentInventoryPage*inventoryTiles.Count;
+        int endIndex = Mathf.Min(startIndex + inventoryTiles.Count, possibleEquips.Count);
+        for (int i = startIndex; i < endIndex; i++)
+        {
+            inventoryTileObjects[i].SetActive(true);
+            inventoryTiles[i - startIndex].UpdateActorSprite(equipSprites.SpriteDictionary(possibleEquipTypes[i]));
+        }
+    }
     public List<string> equipStats;
     public List<TMP_Text> statTexts;
     protected void ResetStatTexts()
@@ -46,6 +214,7 @@ public class EquipmentSelectGUI : MonoBehaviour
             statTexts[5].text += equipStats[i]+"\n";
         }
     }
+    public List<EquipmentSlot> equipSlots;
     protected void ResetEquipSlots()
     {
         for (int i = 0; i < equipSlots.Count; i++)
@@ -88,10 +257,6 @@ public class EquipmentSelectGUI : MonoBehaviour
         UpdateEquipSlots();
     }
     /*
-    public EquipmentData equipData;
-    public Equipment equippedEquipment;
-    public Equipment selectedEquipment;
-    public List<string> currentActorEquips;
     public List<FormationTile> equippedTiles;
     public int currentInventoryPage = 0;
     public List<string> currentInventory;

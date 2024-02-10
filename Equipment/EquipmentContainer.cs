@@ -104,6 +104,7 @@ public class EquipmentContainer : AllStats
         {
             for (int i = 0; i < bonusActives.Count; i++)
             {
+                if (bonusActives[i].Length <= 1){continue;}
                 actor.activeSkillNames.Add(bonusActives[i]);
             }
         }
@@ -111,6 +112,7 @@ public class EquipmentContainer : AllStats
         {
             for (int i = 0; i < bonusPassives.Count; i++)
             {
+                if (bonusPassives[i].Length <= 1){continue;}
                 actor.activeSkillNames.Add(bonusPassives[i]);
             }
         }

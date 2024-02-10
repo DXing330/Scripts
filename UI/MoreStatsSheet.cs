@@ -16,17 +16,22 @@ public class MoreStatsSheet : OverworldStatSheet
 
     public void UpdateMoreStats()
     {
-        UpdateStatSheet(statActor);
+        UpdateEquipStats();
     }
 
-    public override void UpdateStatSheet(PlayerActor actor)
+    protected void UpdateEquipStats()
     {
-        base.UpdateStatSheet(actor);
-        List<int> equipStats = actor.allEquipment.ReturnStatList();
+        List<int> equipStats = statActor.allEquipment.ReturnStatList();
         for (int i = 0; i < equipStatTexts.Count - 1; i++)
         {
             equipStatTexts[i].text = equipStats[i+1].ToString();
         }
         equipStatTexts[equipStatTexts.Count - 1].text = equipStats[0].ToString();
+    }
+
+    public override void UpdateStatSheet(PlayerActor actor)
+    {
+        base.UpdateStatSheet(actor);
+        UpdateEquipStats();
     }
 }

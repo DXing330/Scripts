@@ -13,6 +13,7 @@ public class EquipmentInventory : BasicDataManager
     public void GainEquipment(string newEquip)
     {
         allEquipment.Add(newEquip);
+        SortEquipmentIntoLists();
     }
     public void RemoveEquipment(int index)
     {
@@ -20,6 +21,7 @@ public class EquipmentInventory : BasicDataManager
         {
             allEquipment.RemoveAt(index);
         }
+        SortEquipmentIntoLists();
     }
     public List<string> allEquippedEquipment;
     public List<string> allTools;
@@ -111,6 +113,6 @@ public class EquipmentInventory : BasicDataManager
             allEquipment.Clear();
             allEquippedEquipment.Clear();
         }
-        //LoadEquipSets();
+        SortEquipmentIntoLists();
     }
 }
