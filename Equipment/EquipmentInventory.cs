@@ -72,7 +72,7 @@ public class EquipmentInventory : BasicDataManager
         File.WriteAllText(saveDataPath+"/equipInventoryData.txt", data);
     }
 
-    protected void SaveEquipSets()
+    public void SaveEquipSets()
     {
         // Keep track of who is equipping it and what the equipment is.
         allEquippedEquipment.Clear();
@@ -94,6 +94,13 @@ public class EquipmentInventory : BasicDataManager
     {
         // if slot = -1, remove any tools and add them back.
         actor.allEquipment.Equip(equipment, slot);
+        SaveEquipSets();
+        GameManager.instance.armyData.UpdatePartyStats();
+    }
+
+    public void UnequipFromActor(PlayerActor actor, int slot)
+    {
+        actor.allEquipment.Unequip(slot);
         SaveEquipSets();
         GameManager.instance.armyData.UpdatePartyStats();
     }

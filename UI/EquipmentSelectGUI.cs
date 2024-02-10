@@ -146,6 +146,8 @@ public class EquipmentSelectGUI : MonoBehaviour
         equipInventory.EquipToActor(equip, selectedActor, changeEquipType);
         statSheet.UpdateMoreStats();
         UpdateEquipSlots();
+        selectedEquipIndex = -1;
+        ResetInventoryHighlights();
     }
     public GameObject inventoryObject;
     public List<FormationTile> inventoryTiles;
@@ -179,7 +181,19 @@ public class EquipmentSelectGUI : MonoBehaviour
         for (int i = startIndex; i < endIndex; i++)
         {
             inventoryTileObjects[i].SetActive(true);
-            inventoryTiles[i - startIndex].UpdateActorSprite(equipSprites.SpriteDictionary(possibleEquipTypes[i]));
+            if (changeEquipType <= 1)
+            {
+                inventoryTiles[i - startIndex].UpdateActorSprite(equipSprites.SpriteDictionary(possibleEquipTypes[i]));
+            }
+            // Hardcoded for now until more/better sprites are obtained.
+            else if (changeEquipType == 2)
+            {
+                inventoryTiles[i - startIndex].UpdateActorSprite(equipSprites.SpriteDictionary("ArmorIcon"));
+            }
+            else if (changeEquipType == 3)
+            {
+                inventoryTiles[i - startIndex].UpdateActorSprite(equipSprites.SpriteDictionary("RingIcon"));
+            }
         }
     }
     public List<string> equipStats;
@@ -224,7 +238,7 @@ public class EquipmentSelectGUI : MonoBehaviour
     }
     public void UnequipFromSlot(int slot)
     {
-        equipped.Unequip(slot);
+        equipInventory.UnequipFromActor(selectedActor, slot);
         UpdateEquipSlots();
         statSheet.UpdateMoreStats();
     }
