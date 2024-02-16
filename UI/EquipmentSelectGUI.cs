@@ -46,10 +46,12 @@ public class EquipmentSelectGUI : MonoBehaviour
         }
     }
     public List<string> possibleEquips;
+    public List<int> possibleEquipRarities;
     public List<string> possibleEquipTypes;
     protected void GetPossibleEquips(int slot)
     {
         possibleEquips.Clear();
+        possibleEquipRarities.Clear();
         possibleEquipTypes.Clear();
         switch (slot)
         {
@@ -61,6 +63,7 @@ public class EquipmentSelectGUI : MonoBehaviour
                     if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
                     {
                         possibleEquips.Add(equipInventory.allTools[i]);
+                        possibleEquipRarities.Add(int.Parse(equipStats[equipStats.Count-2]));
                         // Keep track of the name for easier image lookup.
                         possibleEquipTypes.Add(equipStats[^1]);
                     }
@@ -74,6 +77,7 @@ public class EquipmentSelectGUI : MonoBehaviour
                     if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
                     {
                         possibleEquips.Add(equipInventory.allTools[i]);
+                        possibleEquipRarities.Add(int.Parse(equipStats[equipStats.Count-2]));
                         possibleEquipTypes.Add(equipStats[^1]);
                     }
                 }
@@ -86,6 +90,7 @@ public class EquipmentSelectGUI : MonoBehaviour
                     if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
                     {
                         possibleEquips.Add(equipInventory.allArmors[i]);
+                        possibleEquipRarities.Add(int.Parse(equipStats[equipStats.Count-2]));
                         possibleEquipTypes.Add(equipStats[^1]);
                     }
                 }
@@ -98,6 +103,7 @@ public class EquipmentSelectGUI : MonoBehaviour
                     if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
                     {
                         possibleEquips.Add(equipInventory.allAccessories[i]);
+                        possibleEquipRarities.Add(int.Parse(equipStats[equipStats.Count-2]));
                         possibleEquipTypes.Add(equipStats[^1]);
                     }
                 }
@@ -114,7 +120,7 @@ public class EquipmentSelectGUI : MonoBehaviour
     public int currentInventoryPage = 0;
     public void ChangeInventoryPage(bool right = true)
     {
-        int lastPage = (possibleEquips.Count/inventoryTiles.Count)-1;
+        int lastPage = (possibleEquips.Count/inventoryTiles.Count);
         if (right)
         {
             if (currentInventoryPage < lastPage)
@@ -188,7 +194,7 @@ public class EquipmentSelectGUI : MonoBehaviour
         int endIndex = Mathf.Min(startIndex + inventoryTiles.Count, possibleEquips.Count);
         for (int i = startIndex; i < endIndex; i++)
         {
-            inventoryTileObjects[i].SetActive(true);
+            inventoryTileObjects[i - startIndex].SetActive(true);
             if (changeEquipType <= 1)
             {
                 inventoryTiles[i - startIndex].UpdateActorSprite(equipSprites.SpriteDictionary(possibleEquipTypes[i]));
@@ -202,6 +208,8 @@ public class EquipmentSelectGUI : MonoBehaviour
             {
                 inventoryTiles[i - startIndex].UpdateActorSprite(equipSprites.SpriteDictionary("RingIcon"));
             }
+            Color tempColor = equipSlots[0].ReturnColorBasedOnRarity(possibleEquipRarities[i]);
+            inventoryTiles[i - startIndex].UpdateActorColor(tempColor);
         }
     }
     public List<string> equipStats;
@@ -308,31 +316,6 @@ public class EquipmentSelectGUI : MonoBehaviour
         else {selectedActor = index;}
         UpdateActorPanels();
         UpdateStatsPanel();
-    }
-
-    private void ResetActorPanels()
-    {
-        for (int i = 0; i < actors.Count; i++)
-        {
-            actors[i].ResetActorSprite();
-            actors[i].ResetHighlight();
-        }
-    }
-
-    // The actors that can have equipment.
-    private void UpdateActorPanels()
-    {
-        ResetActorPanels();
-        int startIndex = currentActorPage * actors.Count;
-        int endIndex = Mathf.Min(playerActors.Count, startIndex + actors.Count);
-        for (int i = startIndex; i < endIndex; i++)
-        {
-            actors[i - startIndex].UpdateActorSprite(actorSprites.SpriteDictionary(playerActors[i].typeName));
-            if (selectedActor == i - startIndex)
-            {
-                actors[i].Highlight();
-            }
-        }
     }
 
     private void ResetStatsPanel()

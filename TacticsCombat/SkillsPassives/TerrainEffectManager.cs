@@ -98,7 +98,7 @@ public class TerrainEffectManager : MonoBehaviour
 
     protected void ChasmTerrain(TacticActor actor)
     {
-        ActionLog.instance.AddActionLog(actor.typeName+" is over a chasm.");
+        ActionLog.instance.AddActionLog(actor.ReturnName()+" is over a chasm.");
         // Fly or die.
         if (actor.movementType == 1)
         {
@@ -130,7 +130,7 @@ public class TerrainEffectManager : MonoBehaviour
     protected void FireEffect(TacticActor actor)
     {
         // Bigger things get more burns?
-        ActionLog.instance.AddActionLog(actor.typeName+" is surrounded by fire.");
+        ActionLog.instance.AddActionLog(actor.ReturnName()+" is surrounded by fire.");
         int multiplier = Mathf.Max(1, actor.size);
         int damage = Random.Range(fireBaseDamage*multiplier/2, fireBaseDamage*multiplier*3/2);
         // Fire comes from all sides and is damage type 1.

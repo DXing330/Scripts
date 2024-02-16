@@ -396,7 +396,6 @@ public class BattleSimulator : MonoBehaviour
         {
             TacticActor skillTarget = ReturnActorOnTile(skillTargetLocation);
             if (skillTarget == null){return;}
-            string targetName = skillTarget.typeName;
             bool specialEffect = false;
             actionLog.AddSkillAction(actors[turnIndex], skillTarget);
             specialEffect = skillManager.ApplySkillEffect(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);

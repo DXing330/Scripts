@@ -34,4 +34,16 @@ public class FormationTile : MonoBehaviour
         tempColor.a = 1f;
         image.color = tempColor;
     }
+
+    public void ResetActorColor()
+    {
+        Color tempColor = Color.white;
+        tempColor.a = 1f;
+        image.color = tempColor;
+    }
+
+    public void UpdateActorColor(Color newColor)
+    {
+        image.color = newColor;
+    }
 }

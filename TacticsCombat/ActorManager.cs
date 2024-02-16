@@ -416,10 +416,6 @@ public class ActorManager : MonoBehaviour
         // Encourage attacking.
         int attackAdvantage = 1;
         int attackPower = attacker.attackDamage;
-        if (skillPowerMultipler > 10)
-        {
-            attackPower += attacker.attackDamage*skillPowerMultipler/10 - attacker.attackDamage;
-        }
         // Check for flanking/ally support.
         if (flanked){attackAdvantage++;}
         // Calculate terrain bonuses at the end then damage each other.
@@ -427,6 +423,11 @@ public class ActorManager : MonoBehaviour
         attackPower = attackPower*6/defenderBonus;
         int attackDamage = attacker.GenerateAttackDamage(attackAdvantage, attackPower);
         attackDamage = attacker.ApplyAttackingPassives(attackDamage, defender);
+        // Skill damage happens at the very end, making it the most powerful.
+        if (skillPowerMultipler > 10)
+        {
+            attackDamage += attackDamage*skillPowerMultipler/10 - attackDamage;
+        }
         defender.ReceiveDamage(attackDamage, attacker.currentDirection);
         if (counter)
         {

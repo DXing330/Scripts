@@ -394,7 +394,6 @@ public class TerrainMap : MonoBehaviour
         {
             TacticActor skillTarget = ReturnActorOnTile(skillTargetLocation);
             if (skillTarget == null){return;}
-            string targetName = skillTarget.typeName;
             actionLog.AddSkillAction(actors[turnIndex], skillTarget);
             ApplySkillEffects(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);
         }
@@ -465,6 +464,7 @@ public class TerrainMap : MonoBehaviour
 
     private void LockOnSkillActivate()
     {
+        actionLog.AddSkillAction(actors[turnIndex], ReturnCurrentTarget());
         ApplySkillEffects(ReturnCurrentTarget(), actors[turnIndex].activeSkill, actors[turnIndex]);
         actors[turnIndex].ActivateSkill();
         actorInfo.UpdateInfo(actors[turnIndex]);
@@ -473,6 +473,7 @@ public class TerrainMap : MonoBehaviour
 
     private void NonLockOnSkillActivate()
     {
+        actionLog.AddNonLockOnSkill(actors[turnIndex]);
         int tileNumber = 0;
         int targetsType = actors[turnIndex].activeSkill.skillTarget;
         TacticActor target = null;
@@ -593,6 +594,10 @@ public class TerrainMap : MonoBehaviour
         {
             return null;
         }
+        if (currentTarget >= targetableTiles.Count)
+        {
+            return null;
+        }
         int targetLocation = targetableTiles[currentTarget];
         return ReturnActorOnTile(targetLocation);
     }
@@ -658,7 +663,7 @@ public class TerrainMap : MonoBehaviour
     {
         if (actionText)
         {
-            actionLog.AddActionLog(attacker.typeName+" attacks "+defender.typeName+".");
+            actionLog.AddActionLog(attacker.ReturnName()+" attacks "+defender.ReturnName()+".");
         }
         // Rotate the attacker to face the defender if possible.
         int newDirection = pathFinder.DirectionBetweenLocations(attacker.locationIndex, defender.locationIndex);
@@ -694,7 +699,7 @@ public class TerrainMap : MonoBehaviour
         }
         actors[turnIndex].actionsLeft--;
         TacticActor target = ReturnCurrentTarget();
-        BattleBetweenActors(actors[turnIndex], target, 0, false);
+        BattleBetweenActors(actors[turnIndex], target, 0);
         CheckWinners();
         if (battleStarted)
         {

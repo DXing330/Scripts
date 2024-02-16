@@ -30,15 +30,31 @@ public class EquipmentSlot : BasicImagePanel
     {
         if (rarity <= 0)
         {
-            UpdateFrameColor(rarityColors[0]);
+            UpdateColor(rarityColors[0]);
         }
         else if (rarity >= rarityColors.Count)
         {
-            UpdateFrameColor(rarityColors[rarityColors.Count-1]);
+            UpdateColor(rarityColors[rarityColors.Count-1]);
         }
         else
         {
-            UpdateFrameColor(rarityColors[rarity]);
+            UpdateColor(rarityColors[rarity]);
+        }
+    }
+
+    public Color ReturnColorBasedOnRarity(int rarity)
+    {
+        if (rarity <= 0)
+        {
+            return (rarityColors[0]);
+        }
+        else if (rarity >= rarityColors.Count)
+        {
+            return (rarityColors[rarityColors.Count-1]);
+        }
+        else
+        {
+            return (rarityColors[rarity]);
         }
     }
 }

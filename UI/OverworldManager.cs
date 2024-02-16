@@ -42,6 +42,7 @@ public class OverworldManager : Map
         if (previousLevel >= 0)
         {
             SpawnNearPreviousEntrance(previousLevel);
+            GameManager.instance.UpdateLocation(currentLocation, currentLevel);
         }
         pathfinder.SetTotalRowsColumns(totalRows, totalColumns);
         pathfinder.SetAllTiles(allTiles);

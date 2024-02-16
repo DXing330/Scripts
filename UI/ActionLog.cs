@@ -95,12 +95,19 @@ public class ActionLog : MonoBehaviour
         string newAction = "";
         if (skillUser != skillTarget)
         {
-            newAction = skillUser.typeName+" used "+skillUser.activeSkill.skillName+" on "+skillTarget.typeName+".";
+            newAction = skillUser.ReturnName()+" used "+skillUser.activeSkill.skillName+" on "+skillTarget.ReturnName()+".";
         }
         else
         {
-            newAction = skillUser.typeName+" used "+skillUser.activeSkill.skillName+".";
+            newAction = skillUser.ReturnName()+" used "+skillUser.activeSkill.skillName+".";
         }
+        AddActionLog(newAction);
+    }
+
+    public void AddNonLockOnSkill(TacticActor skillUser)
+    {
+        string newAction = "";
+        newAction = skillUser.ReturnName()+" used "+skillUser.activeSkill.skillName+".";
         AddActionLog(newAction);
     }
 }

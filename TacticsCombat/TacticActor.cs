@@ -10,7 +10,16 @@ public class TacticActor : AllStats
     public bool delayed = false;
     public bool delayable = true;
     // Race/class/etc.
+    public string realName = "";
     public string typeName;
+    public string ReturnName()
+    {
+        if (realName.Length > 1)
+        {
+            return realName;
+        }
+        return typeName;
+    }
     public int weight;
     public string species;
     public int locationIndex;
@@ -456,6 +465,15 @@ public class TacticActor : AllStats
         }
         // Need to be facing a direction to use cone skills.
         if (activeSkill.targetingShape == "Cone" && currentDirection < 0){return false;}
+        // Can't gain a skill/passive you already have.
+        if (activeSkill.effect == "TempPassive" && passiveSkillNames.Contains(activeSkill.effectSpecifics))
+        {
+            return false;
+        }
+        else if (activeSkill.effect == "TempActive" && activeSkillNames.Contains(activeSkill.effectSpecifics))
+        {
+            return false;
+        }
         return true;
     }
 
