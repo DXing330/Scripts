@@ -36,6 +36,14 @@ public class EquipmentSelectGUI : MonoBehaviour
             }
             UpdateInventoryTiles();
         }
+        for (int i = 0; i < equipSlots.Count; i++)
+        {
+            equipSlots[i].ResetTitleColor();
+            if (i == changeEquipType)
+            {
+                equipSlots[i].HighlightTitle();
+            }
+        }
     }
     public List<string> possibleEquips;
     public List<string> possibleEquipTypes;
@@ -54,7 +62,7 @@ public class EquipmentSelectGUI : MonoBehaviour
                     {
                         possibleEquips.Add(equipInventory.allTools[i]);
                         // Keep track of the name for easier image lookup.
-                        possibleEquipTypes.Add(equipStats[9]);
+                        possibleEquipTypes.Add(equipStats[^1]);
                     }
                 }
                 break;
@@ -66,7 +74,7 @@ public class EquipmentSelectGUI : MonoBehaviour
                     if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
                     {
                         possibleEquips.Add(equipInventory.allTools[i]);
-                        possibleEquipTypes.Add(equipStats[9]);
+                        possibleEquipTypes.Add(equipStats[^1]);
                     }
                 }
                 break;
@@ -78,7 +86,7 @@ public class EquipmentSelectGUI : MonoBehaviour
                     if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
                     {
                         possibleEquips.Add(equipInventory.allArmors[i]);
-                        possibleEquipTypes.Add(equipStats[9]);
+                        possibleEquipTypes.Add(equipStats[^1]);
                     }
                 }
                 break;
@@ -90,7 +98,7 @@ public class EquipmentSelectGUI : MonoBehaviour
                     if (CheckIfEquipable(equipStats[7], int.Parse(equipStats[8])))
                     {
                         possibleEquips.Add(equipInventory.allAccessories[i]);
-                        possibleEquipTypes.Add(equipStats[9]);
+                        possibleEquipTypes.Add(equipStats[^1]);
                     }
                 }
                 break;
@@ -260,6 +268,8 @@ public class EquipmentSelectGUI : MonoBehaviour
                     equipStats = equipped.allEquipment[i].Split("|").ToList();
                     equipSlots[i].UpdateImage(equipSprites.SpriteDictionary(equipStats[^1]));
                 }
+                // Pass the rarity to the equip slot and let them determine what color it should be.
+                equipSlots[i].UpdateColorBasedOnRarity(int.Parse(equipStats[equipStats.Count - 2]));
             }
         }
     }

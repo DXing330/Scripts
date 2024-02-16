@@ -170,49 +170,21 @@ public class GameManager : MonoBehaviour
     public void RefreshMaps()
     {
         forestFixedTerrains = fixedTerrainString.Split("#").ToList();
-        /*
-        if (File.Exists(saveDataPath+"/Maps_1.txt"))
-        {
-            forestFixedTerrains = File.ReadAllText(saveDataPath+"/Maps_1.txt").Split("#").ToList();
-        }
-        else
-        {
-            forestFixedTerrains = fixedTerrainString.Split("#").ToList();
-        }
-        for (int i = 0; i < forestFixedTerrains.Count; i++)
-        {
-            if (forestFixedTerrains[i].Length < 9)
-            {
-                forestFixedTerrains.RemoveAt(i);
-            }
-        }*/
     }
 
     public void RefreshBattles()
     {
         fixedBattles = fixedBattleString.Split("#").ToList();
-        /*
-        if (File.Exists(saveDataPath+"/BattleMaps_1.txt"))
-        {
-            fixedBattles = File.ReadAllText(saveDataPath+"/BattleMaps_1.txt").Split("#").ToList();
-        }
-        else
-        {
-            fixedBattles = fixedBattleString.Split("#").ToList();
-        }
-        for (int i = 0; i < fixedBattles.Count; i++)
-        {
-            if (fixedBattles[i].Length < 9)
-            {
-                fixedBattles.RemoveAt(i);
-            }
-        }*/
     }
 
     [ContextMenu("New Game")]
     public void NewGame()
     {
         saveDataPath = Application.persistentDataPath;
+        if (File.Exists(saveDataPath+"/saveData.txt"))
+        {
+            File.Delete (saveDataPath+"/saveData.txt");
+        }
         if (newGameData.Length > 0)
         {
             loadedData = newGameData;

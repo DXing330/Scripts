@@ -41,6 +41,7 @@ public class LevelDataManager : BasicDataManager
 
     public override void Save()
     {
+        saveDataPath = Application.persistentDataPath;
         File.WriteAllText(saveDataPath+"/currentLevels.txt", allLevels);
     }
 }

@@ -104,6 +104,10 @@ public class ArmyDataManager : BasicDataManager
 
     public override void NewGame()
     {
+        if (File.Exists(saveDataPath+"/fighters.txt"))
+        {
+            File.Delete (saveDataPath+"/fighters.txt");
+        }
         availableFighters.Clear();
         fighterHealths.Clear();
         LoadAvailableFighters();

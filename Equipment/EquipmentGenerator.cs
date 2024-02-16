@@ -25,7 +25,7 @@ public class EquipmentGenerator : MonoBehaviour
         newEquip += baseStats[8]+"|";
         newEquip += baseStats[9]+"|";
         newEquip += baseStats[10]+"|";
-        newEquip += type;
+        newEquip += rarity+"|"+type;
         return newEquip;
     }
 

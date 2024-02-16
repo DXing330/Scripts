@@ -20,16 +20,35 @@ public class EquipmentContainer : AllStats
     {
         if (slot < totalEquipmentTypes)
         {
-            // -1 is a two handed special case.
-            if (slot < 0)
+            if (slot > 1)
             {
-                Unequip(0);
-                Unequip(1);
-                allEquipment[0] = equipment;
+                allEquipment[slot] = equipment;
             }
             else
             {
-                allEquipment[slot] = equipment;
+                // Need to check if its the special case.
+                string[] data = equipment.Split("|");
+                int trueSlot = int.Parse(data[6]);
+                if (trueSlot < 0)
+                {
+                    Unequip(0);
+                    Unequip(1);
+                    allEquipment[0] = equipment;
+                }
+                else
+                {
+                    allEquipment[slot] = equipment;
+                }
+            }
+        }
+        // Can't equip something else if you have a two hander.
+        if (slot == 1 && allEquipment[0].Length > 6)
+        {
+            string[] data = allEquipment[0].Split("|");
+            int trueSlot = int.Parse(data[6]);
+            if (trueSlot < 0)
+            {
+                Unequip(1);
             }
         }
     }
@@ -81,7 +100,7 @@ public class EquipmentContainer : AllStats
     {
         // Get the base stats in order.
         // Equipment stats go like this.
-        // hlth|atk|def|move|actives|passives|slot|species|size|type|name
+        // hlth|atk|def|move|actives|passives|slot|species|size|rarity|type|name
         // Not all equipment have names though.
         if (equip.Length <= 0){return;}
         List<string> bonusStats = equip.Split("|").ToList();

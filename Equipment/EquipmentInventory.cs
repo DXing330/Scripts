@@ -57,6 +57,10 @@ public class EquipmentInventory : BasicDataManager
 
     public override void NewGame()
     {
+        if (File.Exists(saveDataPath+"/equipInventoryData.txt"))
+        {
+            File.Delete (saveDataPath+"/equipInventoryData.txt");
+        }
         allEquipment = starterEquipment;
         allEquippedEquipment.Clear();
         Save();
@@ -67,8 +71,8 @@ public class EquipmentInventory : BasicDataManager
     {
         saveDataPath = Application.persistentDataPath;
         string data = "";
-        data += GameManager.instance.ConvertListToString(allEquipment, "-")+"#";
-        data += GameManager.instance.ConvertListToString(allEquippedEquipment, "-");
+        data += GameManager.instance.ConvertListToString(allEquipment, "+")+"#";
+        data += GameManager.instance.ConvertListToString(allEquippedEquipment, "+");
         File.WriteAllText(saveDataPath+"/equipInventoryData.txt", data);
     }
 
@@ -112,8 +116,10 @@ public class EquipmentInventory : BasicDataManager
         {
             loadedData = File.ReadAllText(saveDataPath+"/equipInventoryData.txt");
             string[] blocks = loadedData.Split("#");
-            allEquipment = blocks[0].Split("-").ToList();
-            allEquippedEquipment = blocks[1].Split("-").ToList();
+            // Can't use minus sign as delimiter since -1 can be a slot.
+            // Can't use | or # obviously.
+            allEquipment = blocks[0].Split("+").ToList();
+            allEquippedEquipment = blocks[1].Split("+").ToList();
         }
         else
         {
