@@ -105,7 +105,7 @@ public class TerrainPathfinder : BasicPathfinder
         actualPath.Clear();
         int pathIndex = destIndex;
         int maxMovement = actor.MaxMovePerTurn();
-        for (int i = 0; i < maxMovement * 2; i++)
+        for (int i = 0; i < maxMovement * maxMovement; i++)
         {
             actualPath.Add(pathIndex);
             pathIndex = savedPathList[pathIndex];
