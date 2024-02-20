@@ -43,7 +43,16 @@ public class TacticActor : AllStats
         {
             return 999;
         }
-        // Can adjust the cost depending on passives here.
+        if (passiveSkillNames.Count <= 0){return cost;}
+        for (int i = 0; i < passiveSkillNames.Count; i++)
+        {
+            terrainMap.actorManager.LoadPassiveData(passiveSkill, passiveSkillNames[i]);
+            if (passiveSkill.timing != 5){continue;}
+            if (passiveSkill.MovingConditions(tileType))
+            {
+                cost = passiveSkill.AffectMoveCost(cost);
+            }
+        }
         return cost;
     }
     public int health;
@@ -767,6 +776,7 @@ public class TacticActor : AllStats
 
     public bool CheckDistance(int index)
     {
+        // Might need direction calcs here too.
         int distance = ReturnMoveCostForTile(terrainMap.pathFinder.terrainInfo[index]);
         if (distance > movement)
         {

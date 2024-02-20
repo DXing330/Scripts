@@ -12,6 +12,22 @@ public class TacticPassiveSkill : MonoBehaviour
     public string effect;
     public string effectSpecifics;
 
+    public int AffectMoveCost(int cost)
+    {
+        int amount = int.Parse(effectSpecifics);
+        switch (effect)
+        {
+            case "Increase":
+                cost += amount;
+                break;
+            case "Decrease":
+                cost -= amount;
+                break;
+        }
+        if (cost < 1){return 1;}
+        return cost;
+    }
+
     public void AffectActor(TacticActor actor)
     {
         int amount = int.Parse(effectSpecifics);
@@ -57,6 +73,16 @@ public class TacticPassiveSkill : MonoBehaviour
         return false;
     }
 
+    public bool MovingConditions(int tileType)
+    {
+        if (condition == "None"){return true;}
+        if (condition == "Type")
+        {
+            if (tileType == int.Parse(conditionSpecifics)){return true;}
+        }
+        return false;
+    }
+    
     public bool AttackingConditions(TacticActor passiveHolder, TacticActor defender)
     {
         if (condition == "None"){return true;}
