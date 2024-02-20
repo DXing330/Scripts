@@ -23,6 +23,7 @@ public class PlayerActor : AllStats
     public int healthPerLevel = 3;
     public int energyPerLevel = 1;
     public string species = "Undead";
+    public List<string> movementCosts;
     public List<string> learntPassives;
     public List<string> learntSkills;
     public EquipmentContainer allEquipment;
@@ -76,6 +77,7 @@ public class PlayerActor : AllStats
         playerActor.typeName = typeName;
         playerActor.level = currentLevel;
         playerActor.CopyAllStats(this);
+        playerActor.movementCosts = movementCosts;
         if (currentHealth < 0 || currentHealth >= baseHealth)
         {
             playerActor.baseHealth = baseHealth+((currentLevel-1) * healthPerLevel);

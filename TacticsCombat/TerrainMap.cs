@@ -833,9 +833,11 @@ public class TerrainMap : MonoBehaviour
     {
         if (actors[turnIndex].team == 0)
         {
-            actors[turnIndex].ChangeDirection(direction);
-            moveManager.MoveInDirection(actors[turnIndex], direction);
-            UpdateAfterMovingActor();
+            if (moveManager.MoveInDirection(actors[turnIndex], direction))
+            {
+                actors[turnIndex].ChangeDirection(direction);
+                UpdateAfterMovingActor();
+            }
         }
     }
 
@@ -861,30 +863,6 @@ public class TerrainMap : MonoBehaviour
         pathFinder.UpdateOccupiedTiles(occupiedTiles);
         UpdateCenterTile();
         UpdateMap();
-    }
-
-    public int ReturnMoveCost(int index, int moveType = 0)
-    {
-        int distance = 1;
-        switch (moveType)
-        {
-            case 0:
-                distance = pathFinder.terrainTile.ReturnMoveCost(terrainInfo[index], occupiedTiles[index]);
-                break;
-            case 1:
-                distance = pathFinder.terrainTile.ReturnFlyingMoveCost(terrainInfo[index], occupiedTiles[index]);
-                break;
-            case 2:
-                distance = pathFinder.terrainTile.ReturnRidingMoveCost(terrainInfo[index], occupiedTiles[index]);
-                break;
-            case 3:
-                distance = pathFinder.terrainTile.ReturnSwimmingMoveCost(terrainInfo[index], occupiedTiles[index]);
-                break;
-            case 4:
-                distance = pathFinder.terrainTile.ReturnScoutingMoveCost(terrainInfo[index], occupiedTiles[index]);
-                break;
-        }
-        return distance;   
     }
 
     public int RandomDestination(int currentLocation)

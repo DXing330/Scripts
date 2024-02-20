@@ -10,15 +10,9 @@ public class TerrainPathfinder : BasicPathfinder
     public bool square = true;
     public TerrainTile terrainTile;
     // Raw terrain types.
-    private List<int> terrainInfo;
+    public List<int> terrainInfo;
     // The actual path to the tile.
     public List<int> actualPath;
-    // Stores the move cost for each tile.
-    public List<int> moveCostList;
-    public List<int> flyingMoveCosts;
-    public List<int> ridingMoveCosts;
-    public List<int> swimmingMoveCosts;
-    public List<int> scoutingMoveCosts;
     // Occupied tiles adjust move cost.
     public List<int> occupiedTiles;
     // Fullsize is used for square maps where #rows = #columns
@@ -53,11 +47,7 @@ public class TerrainPathfinder : BasicPathfinder
             {
                 // Starting tile is always distance zero.
                 distances.Add(0);
-                if (startDirection < 0)
-                {
-                    heap.AddNodeWeight(startIndex, 0);
-                }
-                else{heap.AddNodeWeight(startIndex, 0, startDirection);}
+                heap.AddNodeWeight(startIndex, 0, startDirection);
                 continue;
             }
             // Other tiles are considered far away.
@@ -68,20 +58,6 @@ public class TerrainPathfinder : BasicPathfinder
     public void UpdateOccupiedTiles(List<int> newOccupied)
     {
         occupiedTiles = newOccupied;
-        moveCostList.Clear();
-        moveCostList.Clear();
-        flyingMoveCosts.Clear();
-        ridingMoveCosts.Clear();
-        swimmingMoveCosts.Clear();
-        scoutingMoveCosts.Clear();
-        for (int i = 0; i < totalRows * totalColumns; i++)
-        {
-            moveCostList.Add(terrainTile.ReturnMoveCost(terrainInfo[i], newOccupied[i]));
-            flyingMoveCosts.Add(terrainTile.ReturnFlyingMoveCost(terrainInfo[i], newOccupied[i]));
-            ridingMoveCosts.Add(terrainTile.ReturnRidingMoveCost(terrainInfo[i], newOccupied[i]));
-            swimmingMoveCosts.Add(terrainTile.ReturnSwimmingMoveCost(terrainInfo[i], newOccupied[i]));
-            scoutingMoveCosts.Add(terrainTile.ReturnScoutingMoveCost(terrainInfo[i], newOccupied[i]));
-        }
     }
 
     public bool CheckTileMoveable(TacticActor actor, int location)
@@ -105,16 +81,21 @@ public class TerrainPathfinder : BasicPathfinder
     }
     
     // Returns a list of tiles to pass through, not including the start or end points, so you will end up adjacent to the destination.
-    public List<int> FindPathIndex(int startIndex, int destIndex, int moveType, int startDirection = -1)
+    public List<int> FindPathIndex(TacticActor actor, int destIndex)
     {
+        int startIndex = actor.locationIndex;
+        int moveType = actor.movementType;
+        int startDirection = actor.currentDirection;
         checkedTiles.Clear();
         savedPathList.Clear();
         // Initialize distances and previous tiles.
         ResetDistances(startIndex, startDirection);
         // Each loop checks one tile.
+        // O(n^2)
         for (int i = 0; i < bigInt; i++)
         {
-            CheckClosestTile(true, moveType);
+            ActorChecksClosestTile(actor, destIndex);
+            // O(n)
             if (checkedTiles.Contains(destIndex))
             {
                 break;
@@ -123,44 +104,44 @@ public class TerrainPathfinder : BasicPathfinder
         // Get the actual path to the tile.
         actualPath.Clear();
         int pathIndex = destIndex;
-        while (pathIndex != startIndex)
+        int maxMovement = actor.MaxMovePerTurn();
+        for (int i = 0; i < maxMovement * 2; i++)
         {
             actualPath.Add(pathIndex);
             pathIndex = savedPathList[pathIndex];
+            if (pathIndex == startIndex)
+            {
+                break;
+            }
+        }
+        // Can't reach destination.
+        if (pathIndex != startIndex)
+        {
+            actualPath.Clear();
         }
         return actualPath;
     }
 
-    private int DetermineMovementCost(int tile, int moveType, int directionChange = -1)
+    protected int AdjustMoveCostOnDirectionChange(int moveCost, int directionChange = -1)
     {
-        int moveCost = 0;
-        switch (moveType)
-        {
-            case -1:
-                moveCost = 1;
-                break;
-            case 0:
-                moveCost = moveCostList[tile];
-                break;
-            case 1:
-                moveCost = flyingMoveCosts[tile];
-                break;
-            case 2:
-                moveCost = ridingMoveCosts[tile];
-                break;
-            case 3:
-                moveCost = swimmingMoveCosts[tile];
-                break;
-            case 4:
-                moveCost = scoutingMoveCosts[tile];
-                break;
-        }
-        if (directionChange >= 0 && moveType != 1)
+        if (directionChange >= 0)
         {
             moveCost = moveCost - 1 + directionChange;
             if (moveCost < 1){moveCost = 1;}
         }
         return moveCost;
+    }
+
+    public int AdjustActorMoveCostOnDirection(TacticActor actor, int moveCost, int destination)
+    {
+        if (actor.movementType == 1)
+        {
+            return moveCost;
+        }
+        int currentDirection = actor.currentDirection;
+        int newDirection = DirectionBetweenLocations(actor.locationIndex, destination);
+        int directionChange = ReturnDirectionChange(currentDirection, newDirection);
+        return AdjustMoveCostOnDirectionChange(moveCost, directionChange);
     }
 
     private int ReturnDirectionChange(int directionOne, int directionTwo)
@@ -172,30 +153,54 @@ public class TerrainPathfinder : BasicPathfinder
         return change;
     }
 
-    protected void CheckClosestTile(bool path = true, int type = 0)
+    protected void CheckClosestTile()
     {
         // Find the closest tile.
         // This part is where the heap is used making it O(nlgn) instead of O(n^2).
-        int newDirection = -1;
-        int directionChange = -1;
-        int closestDirection = heap.PeekDirection();
         int closestTile = heap.Pull();
-        if (path)
-        {
-            checkedTiles.Add(closestTile);
-        }
-        else
-        {
-            reachableTiles.Add(closestTile);
-        }
+        reachableTiles.Add(closestTile);
         RecurviseAdjacency(closestTile);
         for (int i = 0; i < adjacentTiles.Count; i++)
         {
-            // If the cost to move to the path from this tile is less than what we've already recorded;
-            newDirection = DirectionBetweenLocations(closestTile, adjacentTiles[i]);
-            directionChange = ReturnDirectionChange(closestDirection, newDirection);
-            // Based on movement type check a different list.
-            int moveCost = DetermineMovementCost(adjacentTiles[i], type, directionChange);
+            int moveCost = 1;
+            if (distances[closestTile]+moveCost < distances[adjacentTiles[i]])
+            {
+                // Then update the distance and the previous tile.
+                distances[adjacentTiles[i]] = distances[closestTile]+moveCost;
+                savedPathList[adjacentTiles[i]] = closestTile;
+                heap.AddNodeWeight(adjacentTiles[i], distances[adjacentTiles[i]]);
+            }
+        }
+    }
+
+    protected void ActorChecksClosestTile(TacticActor actor, int destination = -1, bool path = true)
+    {
+        int newDirection = -1;
+        int directionChange = -1;
+        int moveCost = 1;
+        int closestDirection = heap.PeekDirection();
+        int closestTile = heap.Pull();
+        if (closestTile < 0){return;}
+        if (path){checkedTiles.Add(closestTile);}
+        else{reachableTiles.Add(closestTile);}
+        RecurviseAdjacency(closestTile);
+        for (int i = 0; i < adjacentTiles.Count; i++)
+        {
+            // Need an extra check for occupied tiles.
+            if (occupiedTiles[adjacentTiles[i]] > 0 && adjacentTiles[i] != destination)
+            {
+                moveCost = bigInt;
+            }
+            else
+            {
+                newDirection = DirectionBetweenLocations(closestTile, adjacentTiles[i]);
+                directionChange = ReturnDirectionChange(closestDirection, newDirection);
+                moveCost = actor.ReturnMoveCostForTile(terrainInfo[adjacentTiles[i]]);
+                if (actor.movementType != 1)
+                {
+                    moveCost = AdjustMoveCostOnDirectionChange(moveCost, directionChange);
+                }
+            }
             if (distances[closestTile]+moveCost < distances[adjacentTiles[i]])
             {
                 // Then update the distance and the previous tile.
@@ -447,7 +452,7 @@ public class TerrainPathfinder : BasicPathfinder
             {
                 break;
             }
-            CheckClosestTile(false, moveType);
+            CheckClosestTile();
         }
         // Don't include your own tile in the reachable tiles.
         reachableTiles.RemoveAt(0);
@@ -461,7 +466,20 @@ public class TerrainPathfinder : BasicPathfinder
         if (range <= 0){return reachableTiles;}
         int startIndex = actor.locationIndex;
         int moveType = actor.movementType;
-        return FindTilesInRange(startIndex, range, moveType, actor.currentDirection);
+        ResetDistances(startIndex, actor.currentDirection);
+        int distance = 0;
+        while (distance <= range && reachableTiles.Count < totalColumns * totalRows)
+        {
+            distance = heap.PeekWeight();
+            if (distance > range)
+            {
+                break;
+            }
+            ActorChecksClosestTile(actor, -1, false);
+        }
+        // Don't include your own tile in the reachable tiles.
+        reachableTiles.RemoveAt(0);
+        return reachableTiles;
     }
 
     public List<int> FindTilesInAttackRange(TacticActor currentActor, bool currentTurn = true)
@@ -486,7 +504,7 @@ public class TerrainPathfinder : BasicPathfinder
             {
                 break;
             }
-            CheckClosestTile(false, moveType);
+            ActorChecksClosestTile(currentActor, -1, false);
         }
         // Check what tiles you can attack based on the tiles you can move to.
         // O(n).
@@ -598,7 +616,7 @@ public class TerrainPathfinder : BasicPathfinder
         int directionChange = -1;
         List<int> directionsBetweenLocation = new List<int>();
         directionsBetweenLocation.Add(actor.currentDirection);
-        FindPathIndex(actor.locationIndex, destination, actor.movementType, actor.currentDirection);
+        FindPathIndex(actor, destination);
         for (int i = 0; i < actualPath.Count; i++)
         {
             // Add direction change to the calculations.
@@ -611,7 +629,11 @@ public class TerrainPathfinder : BasicPathfinder
                 directionsBetweenLocation.Add(DirectionBetweenLocations(actualPath[i-1], actualPath[i]));
             }
             directionChange = ReturnDirectionChange(directionsBetweenLocation[i], directionsBetweenLocation[i+1]);
-            addedDist = DetermineMovementCost(actualPath[i], actor.movementType, directionChange);
+            addedDist = actor.ReturnMoveCostForTile(terrainInfo[actualPath[i]]);
+            if (actor.movementType != 1)
+            {
+                addedDist = AdjustMoveCostOnDirectionChange(addedDist, directionChange);
+            }
             distance += addedDist;
         }
         return distance;
@@ -619,7 +641,7 @@ public class TerrainPathfinder : BasicPathfinder
 
     public int CalculateDirectionToLocation(TacticActor actor, int destination)
     {
-        FindPathIndex(actor.locationIndex, destination, actor.movementType, actor.currentDirection);
+        FindPathIndex(actor, destination);
         if (actualPath.Count == 1)
         {
             return DirectionBetweenLocations(actor.locationIndex, destination);

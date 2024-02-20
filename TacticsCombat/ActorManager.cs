@@ -31,7 +31,6 @@ public class ActorManager : MonoBehaviour
     private int teamZeroCount = 0;
     public TerrainTile terrainTile;
     public ActorDataManager actorData;
-    public EnemyGroupsData groupsData;
     public SkillDataManager skillData;
     public PassiveSkillDataManager passiveData;
     private int tries = 0;
@@ -76,26 +75,6 @@ public class ActorManager : MonoBehaviour
     protected void LoadPlayerTeamMember(int index, int location)
     {
         LoadActor(GameManager.instance.armyData.allPartyMembers[index].playerActor, location);
-    }
-
-    public void LoadEnemyTeam()
-    {
-        int type = GameManager.instance.battleLocationType;
-        int difficulty = GameManager.instance.battleDifficulty;
-        string enemyGroup = groupsData.ReturnEnemyGroup(type, difficulty);
-        string[] enemies = enemyGroup.Split(",");
-        tries = 0;
-        usedTiles.Clear();
-        unusableTiles.Clear();
-        FindUnusableTiles();
-        for (int i = 0; i < enemies.Length; i++)
-        {
-            GenerateRandomLocation();
-        }
-        for (int i = 0; i < Mathf.Min(usedTiles.Count, enemies.Length); i++)
-        {
-            GenerateActor(usedTiles[i], enemies[i], 1);
-        }
     }
 
     public void LoadFixedEnemyTeam()

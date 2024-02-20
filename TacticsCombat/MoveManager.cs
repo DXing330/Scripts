@@ -12,38 +12,13 @@ public class MoveManager : MonoBehaviour
         moveMenu.UpdateMovementText();
     }
 
-    protected int DetermineMoveCost(int moveType, int destination)
-    {
-        int cost = 1;
-        switch (moveType)
-        {
-            case 0:
-                cost = pathfinder.moveCostList[destination];
-                break;
-            case 1:
-                cost = pathfinder.flyingMoveCosts[destination];
-                break;
-            case 2:
-                cost = pathfinder.ridingMoveCosts[destination];
-                break;
-            case 3:
-                cost = pathfinder.swimmingMoveCosts[destination];
-                break;
-            case 4:
-                cost = pathfinder.scoutingMoveCosts[destination];
-                break;
-        }
-        return cost;
-    }
-
-    private bool Moveable(TacticActor actor, int dest)
+    private bool Moveable(TacticActor actor, int dest, int distance)
     {
         pathfinder.RecurviseAdjacency(actor.locationIndex);
-        if (!pathfinder.adjacentTiles.Contains(dest))
+        if (!pathfinder.adjacentTiles.Contains(dest) || pathfinder.occupiedTiles[dest] > 0)
         {
             return false;
         }
-        int distance = DetermineMoveCost(actor.movementType, dest);
         if (distance > actor.movement)
         {
             return actor.CheckIfDistanceIsCoverable(distance);
@@ -71,14 +46,18 @@ public class MoveManager : MonoBehaviour
         return pathfinder.GetDestination(location, direction);
     }
 
-    public void MoveInDirection(TacticActor actor, int direction)
+    public bool MoveInDirection(TacticActor actor, int direction)
     {
         int destination = GetDestination(actor.locationIndex, direction);
-        if (Moveable(actor, destination))
+        int moveCost = actor.ReturnMoveCostForTile(pathfinder.terrainInfo[destination]);
+        moveCost = pathfinder.AdjustActorMoveCostOnDirection(actor, moveCost, destination);
+        if (Moveable(actor, destination, moveCost))
         {
             actor.locationIndex = destination;
-            actor.movement -= DetermineMoveCost(actor.movementType, destination);
+            actor.movement -= moveCost;
+            return true;
         }
+        return false;
     }
 
     private void ForceMovement(TacticActor actor, int direction)

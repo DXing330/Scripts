@@ -25,6 +25,27 @@ public class TacticActor : AllStats
     public int locationIndex;
     public int level;
     public int movementType = 0;
+    public List<string> movementCosts;
+    public void SetMoveCosts(List<string> moveCosts)
+    {
+        movementCosts = moveCosts;
+    }
+    public int ReturnMoveCostForTile(int tileType)
+    {
+        if (tileType >= movementCosts.Count || tileType < 0)
+        {
+            // Out of bounds error.
+            return 999;
+        }
+        int cost = int.Parse(movementCosts[tileType]);
+        //If base cost is less than 0 its impassable.
+        if (cost < 0)
+        {
+            return 999;
+        }
+        // Can adjust the cost depending on passives here.
+        return cost;
+    }
     public int health;
     protected int ReceiveDamagePassives(int amount, int direction = -1, int type = 0)
     {
@@ -242,6 +263,7 @@ public class TacticActor : AllStats
         baseActions = actorToCopy.baseActions;
         attackRange = actorToCopy.attackRange;
         movementType = actorToCopy.moveType;
+        movementCosts = actorToCopy.movementCosts;
         activeSkillNames = actorToCopy.activeSkillNames;
         passiveSkillNames = actorToCopy.passiveSkillNames;
         npcMoveSkill = actorToCopy.npcMoveSkill;
@@ -574,7 +596,7 @@ public class TacticActor : AllStats
 
     public void GetPath()
     {
-        currentPath = terrainMap.pathFinder.FindPathIndex(locationIndex, destinationIndex, movementType, currentDirection);
+        currentPath = terrainMap.pathFinder.FindPathIndex(this, destinationIndex);
         turnPath.Clear();
     }
 
@@ -745,7 +767,7 @@ public class TacticActor : AllStats
 
     public bool CheckDistance(int index)
     {
-        int distance = terrainMap.ReturnMoveCost(index, movementType);
+        int distance = ReturnMoveCostForTile(terrainMap.pathFinder.terrainInfo[index]);
         if (distance > movement)
         {
             CheckIfDistanceIsCoverable(distance);
@@ -770,11 +792,6 @@ public class TacticActor : AllStats
             return true;
         }
         return false;
-    }
-
-    public int ReturnMoveCostForTile(int baseCost, int tileType, int direction)
-    {
-        return baseCost;
     }
 
     public int ReturnMaxPossibleDistance(bool current = false)

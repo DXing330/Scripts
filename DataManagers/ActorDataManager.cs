@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class ActorDataManager : MonoBehaviour
 {
+    public string moveConfigData;
+    public List<string> moveTypeTerrainData;
     public string configData;
     public List<string> actorClasses;
     public List<string> actorMovetypes;
@@ -26,7 +28,8 @@ public class ActorDataManager : MonoBehaviour
     public List<string> actorSpecies;
     public List<string> actorInitiatives;
 
-    void Start()
+    [ContextMenu("Load")]
+    public void LoadConfigData()
     {
         string[] configBlocks = configData.Split("#");
         actorClasses = configBlocks[0].Split("|").ToList();
@@ -48,6 +51,12 @@ public class ActorDataManager : MonoBehaviour
         actorSizes = configBlocks[16].Split("|").ToList();
         actorSpecies = configBlocks[17].Split("|").ToList();
         actorInitiatives = configBlocks[18].Split("|").ToList();
+        moveTypeTerrainData = moveConfigData.Split("#").ToList();
+    }
+
+    void Start()
+    {
+        LoadConfigData();
     }
 
     public void LoadActorData(TacticActor actor, string newName)
@@ -74,6 +83,7 @@ public class ActorDataManager : MonoBehaviour
         actor.size = int.Parse(actorSizes[index]);
         actor.species = actorSpecies[index];
         actor.baseInitiative = int.Parse(actorInitiatives[index]);
+        UpdateActorMoveCosts(actor);
     }
 
     public void LoadPlayerActorData(PlayerActor actor, string newName)
@@ -91,8 +101,10 @@ public class ActorDataManager : MonoBehaviour
         actor.baseActions = int.Parse(actorActions[index]);
         actor.attackRange = int.Parse(actorRanges[index]);
         actor.moveType = int.Parse(actorMovetypes[index]);
+        actor.playerActor.movementType = int.Parse(actorMovetypes[index]);
         actor.size = int.Parse(actorSizes[index]);
         actor.baseInitiative = int.Parse(actorInitiatives[index]);
+        UpdateActorMoveCosts(actor.playerActor);
     }
 
     public string ReturnActorBaseStats(string actorName)
@@ -108,5 +120,24 @@ public class ActorDataManager : MonoBehaviour
         baseStats += (actorDefenses[index])+"|";
         return baseStats;
     }
+
+    protected void UpdateActorMoveCosts(TacticActor actor)
+    {
+        string costs = ReturnActorMoveCosts(actor.movementType);
+        actor.SetMoveCosts(ReturnActorMoveCostsList(costs));
+    }
     
+    protected string ReturnActorMoveCosts(int moveType)
+    {
+        if (moveType < 0 || moveType >= moveTypeTerrainData.Count)
+        {
+            return "";
+        }
+        return moveTypeTerrainData[moveType];
+    }
+
+    protected List<string> ReturnActorMoveCostsList(string moveCosts)
+    {
+        return moveCosts.Split("|").ToList();
+    }
 }

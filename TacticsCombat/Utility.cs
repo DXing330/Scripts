@@ -23,7 +23,6 @@ public class Utility : MonoBehaviour
 
     public void InitialCapacity(int capacity)
     {
-        size = capacity;
         nodes = new List<int>(new int[capacity]);
         weights = new List<int>(new int[capacity]);
         directions = new List<int>(new int[capacity]);
@@ -33,6 +32,20 @@ public class Utility : MonoBehaviour
             weights[i] = bigInt;
         }
     }
+
+    private void EnsureCapacity()
+    {
+        if (weights.Count < size + 1)
+        {
+            for (int i = 0; i < size; i++)
+            {
+                nodes.Add(-1);
+                directions.Add(-1);
+                weights.Add(bigInt);
+            }
+        }
+    }
+
 
     private int getLeftChildIndex(int parentIndex)
     {
@@ -96,19 +109,6 @@ public class Utility : MonoBehaviour
         int temp3 = directions[indexOne];
         directions[indexOne] = directions[indexTwo];
         directions[indexTwo] = temp3;
-    }
-
-    private void EnsureCapacity()
-    {
-        if (weights.Count < size + 1)
-        {
-            for (int i = 0; i < size; i++)
-            {
-                nodes.Add(-1);
-                directions.Add(-1);
-                weights.Add(bigInt);
-            }
-        }
     }
 
     // When looking/pulling you care about the actual tile not the move cost.
