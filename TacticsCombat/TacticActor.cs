@@ -705,6 +705,7 @@ public class TacticActor : AllStats
                     ChangeDirection(terrainMap.pathFinder.DirectionBetweenLocations(turnPath[turnPath.Count - 2], turnPath[^1]));
                 }
                 locationIndex = turnPath[^1];
+                terrainMap.TriggerMovingEffects(this, locationIndex);
                 return;
             }
             StartCoroutine(ShowMovementPath());

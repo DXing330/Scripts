@@ -37,6 +37,11 @@ public class TerrainMap : MonoBehaviour
         terrainEffects[location] = int.Parse(newEffect);
         UpdateMap();
     }
+    public void TriggerMovingEffects(TacticActor actor, int locationIndex)
+    {
+        int effect = terrainEffects[locationIndex];
+        terrainEffectManager.MovingTerrainEffect(actor, effect);
+    }
     public List<int> terrainEffectDurations;
     public List<int> allUnoccupied;
     public List<int> occupiedTiles;
@@ -836,6 +841,7 @@ public class TerrainMap : MonoBehaviour
             if (moveManager.MoveInDirection(actors[turnIndex], direction))
             {
                 actors[turnIndex].ChangeDirection(direction);
+                TriggerMovingEffects(actors[turnIndex], actors[turnIndex].locationIndex);
                 UpdateAfterMovingActor();
             }
         }
@@ -1525,6 +1531,15 @@ public class TerrainMap : MonoBehaviour
             case 1:
                 if (highlightedTiles.Contains(currentTiles[tileNumber]))
                 {
+                    // Need to get the path to the tile so you can trigger moving effects over the path.
+                    List<int> movePath = pathFinder.FindPathIndex(actors[turnIndex], currentTiles[tileNumber]);
+                    int location = actors[turnIndex].locationIndex;
+                    for (int i = 0; i < movePath.Count; i++)
+                    {
+                        location = movePath[movePath.Count - 1 - i];
+                        TriggerMovingEffects(actors[turnIndex], location);
+                    }
+                    // Then move them onto the tile.
                     moveManager.MoveActorToTile(actors[turnIndex], currentTiles[tileNumber], pathFinder.CalculateDistanceToLocation(actors[turnIndex], currentTiles[tileNumber]));
                     UpdateAfterMovingActor();
                 }

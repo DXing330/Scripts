@@ -137,4 +137,25 @@ public class TerrainEffectManager : MonoBehaviour
         actor.ReceiveDamage(damage + actor.defense, -1, 1);
         // Suffocation?
     }
+
+    public void MovingTerrainEffect(TacticActor actor, int effect)
+    {
+        // Check on both base and special terrain effects.
+        if (effect < 0){return;}
+        switch (effect)
+        {
+            case 0:
+                MovingFireEffect(actor);
+                break;
+        }
+    }
+
+    protected void MovingFireEffect(TacticActor actor)
+    {
+        ActionLog.instance.AddActionLog(actor.ReturnName()+" is moving through flames.");
+        int multiplier = Mathf.Max(1, actor.size);
+        // When moving through them take less damage.
+        int damage = Random.Range(0, fireBaseDamage*multiplier/2);
+        actor.ReceiveDamage(damage + actor.defense, -1, 1);
+    }
 }
