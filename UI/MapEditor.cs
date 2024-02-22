@@ -202,7 +202,7 @@ public class MapEditor : Map
         {
             int type = int.Parse(baseTerrains[j + pageShift]);
             possibleTerrainTiles[j].UpdateColor(type);
-            possibleTerrainTiles[j].UpdateImage(tileSprites[type]);
+            possibleTerrainTiles[j].UpdateImage(tileSprites.allSprites[type]);
         }
     }
 

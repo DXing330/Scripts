@@ -62,13 +62,13 @@ public class OverworldMap : Map
         {
             // Make the edges of the map deep water.
             terrainTiles[imageIndex].UpdateColor(4);
-            terrainTiles[imageIndex].UpdateTileImage(tileSprites[4]);
+            terrainTiles[imageIndex].UpdateTileImage(tileSprites.allSprites[4]);
         }
         else
         {
             int tileType = int.Parse(allTiles[tileIndex]);
             terrainTiles[imageIndex].UpdateColor(tileType);
-            terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
+            terrainTiles[imageIndex].UpdateTileImage(tileSprites.allSprites[tileType]);
         }
     }
 

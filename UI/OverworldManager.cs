@@ -113,12 +113,12 @@ public class OverworldManager : Map
             if (tileType == 7)
             {
                 terrainTiles[imageIndex].UpdateColor(0);
-                terrainTiles[imageIndex].UpdateTileImage(tileSprites[0]);
-                terrainTiles[imageIndex].UpdateLocationImage(tileSprites[tileType]);
+                terrainTiles[imageIndex].UpdateTileImage(tileSprites.allSprites[0]);
+                terrainTiles[imageIndex].UpdateLocationImage(tileSprites.allSprites[tileType]);
                 return;
             }
             terrainTiles[imageIndex].UpdateColor(tileType);
-            terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
+            terrainTiles[imageIndex].UpdateTileImage(tileSprites.allSprites[tileType]);
         }
     }
 

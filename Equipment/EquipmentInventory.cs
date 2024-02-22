@@ -6,8 +6,6 @@ using UnityEngine;
 
 public class EquipmentInventory : BasicDataManager
 {
-
-    public string loadedData;
     public List<string> starterEquipment;
     public List<string> allEquipment;
     public void GainEquipment(string newEquip)
@@ -57,6 +55,7 @@ public class EquipmentInventory : BasicDataManager
 
     public override void NewGame()
     {
+        saveDataPath = Application.persistentDataPath;
         if (File.Exists(saveDataPath+"/equipInventoryData.txt"))
         {
             File.Delete (saveDataPath+"/equipInventoryData.txt");

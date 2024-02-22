@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class ArmyDataManager : BasicDataManager
 {
-    private string loadedData;
     public List<PlayerActor> partyMembers;
     public List<PlayerActor> allPartyMembers;
     public void GetAllPartyMembers()
@@ -104,6 +103,7 @@ public class ArmyDataManager : BasicDataManager
 
     public override void NewGame()
     {
+        saveDataPath = Application.persistentDataPath;
         if (File.Exists(saveDataPath+"/fighters.txt"))
         {
             File.Delete (saveDataPath+"/fighters.txt");

@@ -57,9 +57,9 @@ public class TerrainMap : MonoBehaviour
     private int skillSpan;
     public TerrainMaker terrainMaker;
     public TerrainPathfinder pathFinder;
-    public List<Sprite> tileSprites;
-    public List<Sprite> hexTileSprites;
-    public List<Sprite> tileEffectSprites;
+    public BasicSpriteManager tileSprites;
+    public BasicSpriteManager featureSprites;
+    public BasicSpriteManager tileEffectSprites;
     public List<TacticActor> actors;
     public List<TacticActor> allActors;
     public List<TacticActor> aliveActors;
@@ -1056,17 +1056,17 @@ public class TerrainMap : MonoBehaviour
         {
             int tileType = terrainInfo[tileIndex];
             terrainTiles[imageIndex].UpdateColor(tileType);
-            if (tileType == 7)
+            if (tileType >= 7)
             {
-                terrainTiles[imageIndex].UpdateLocationImage(hexTileSprites[tileType]);
-                terrainTiles[imageIndex].UpdateTileImage(hexTileSprites[0]);
+                terrainTiles[imageIndex].UpdateLocationImage(tileSprites.allSprites[tileType]);
+                terrainTiles[imageIndex].UpdateTileImage(tileSprites.allSprites[0]);
                 return;
             }
-            terrainTiles[imageIndex].UpdateTileImage(hexTileSprites[tileType]);
+            terrainTiles[imageIndex].UpdateTileImage(tileSprites.allSprites[tileType]);
             int effectType = terrainEffects[tileIndex];
-            if (effectType >= 0 && effectType < tileEffectSprites.Count)
+            if (effectType >= 0 && effectType < tileEffectSprites.allSprites.Count)
             {
-                terrainTiles[imageIndex].UpdateLocationEffect(tileEffectSprites[effectType]);
+                terrainTiles[imageIndex].UpdateLocationEffect(tileEffectSprites.allSprites[effectType]);
             }
         }
     }

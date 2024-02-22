@@ -5,6 +5,7 @@ using UnityEngine;
 public class BasicDataManager : MonoBehaviour
 {
     protected string saveDataPath;
+    protected string loadedData;
     
     protected virtual void Start()
     {

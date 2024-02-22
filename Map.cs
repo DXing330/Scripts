@@ -15,7 +15,7 @@ public class Map : MonoBehaviour
     public int totalColumns;
     public int cornerColumn;
     public int cornerRow;
-    public List<Sprite> tileSprites;
+    public BasicSpriteManager tileSprites;
     public List<string> allTiles;
     public List<int> currentTiles;
     public List<string> tempTiles;
@@ -119,15 +119,15 @@ public class Map : MonoBehaviour
         else
         {
             int tileType = int.Parse(allTiles[tileIndex]);
-            if (tileType == 7)
+            if (tileType >= 7)
             {
                 terrainTiles[imageIndex].UpdateColor(0);
-                terrainTiles[imageIndex].UpdateTileImage(tileSprites[0]);
-                terrainTiles[imageIndex].UpdateLocationImage(tileSprites[tileType]);
+                terrainTiles[imageIndex].UpdateTileImage(tileSprites.allSprites[0]);
+                terrainTiles[imageIndex].UpdateLocationImage(tileSprites.allSprites[tileType]);
                 return;
             }
             terrainTiles[imageIndex].UpdateColor(tileType);
-            terrainTiles[imageIndex].UpdateTileImage(tileSprites[tileType]);
+            terrainTiles[imageIndex].UpdateTileImage(tileSprites.allSprites[tileType]);
         }
     }
 

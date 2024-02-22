@@ -132,7 +132,7 @@ public class LevelEditor : Map
     protected void UpdateAllTerrains()
     {
         allTerrains.Clear();
-        for (int i = 0; i < tileSprites.Count; i++)
+        for (int i = 0; i < tileSprites.allSprites.Count; i++)
         {
             allTerrains.Add(i);
         }
@@ -201,7 +201,7 @@ public class LevelEditor : Map
         {
             int type = allTerrains[j + pageShift];
             terrainEditButtons[j].UpdateColor(type);
-            terrainEditButtons[j].UpdateImage(tileSprites[type]);
+            terrainEditButtons[j].UpdateImage(tileSprites.allSprites[type]);
         }
         HighlightSelectedTerrain();
     }
