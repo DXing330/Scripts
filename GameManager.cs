@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
         return playerSettings.ReturnSetting(settingIndex);
     }
     public List<BasicDataManager> gameData;
+    public VillageDataManager villageData;
     public LevelDataManager levelData;
     public ArmyDataManager armyData;
     public EquipmentInventory equipInventory;

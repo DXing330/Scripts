@@ -12,11 +12,10 @@ public class Test : MonoBehaviour
     void Start()
     {
         //RecurviseAdjacency(0, 2);
-        string test1 = "TerrainChange";
-        string test2 = "TerrainChange+1";
-        string test3 = "1+TerrainChange";
-        Debug.Log(test2.Contains(test1));
-        Debug.Log(test3.Contains(test1));
+        int test1 = 1;
+        string test2 = "1";
+        Debug.Log(test1.ToString().StartsWith(test2));
+        Debug.Log(test2.StartsWith(test1.ToString()));
         //Debug.Log(string.Join(", ", adjacentTiles.Select(x => x.ToString())));
     }
 
