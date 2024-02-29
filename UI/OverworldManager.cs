@@ -18,6 +18,7 @@ public class OverworldManager : Map
     // UI.
     // Could be a list later.
     public Sprite playerSprite;
+    public BasicSpriteManager locationSprites;
 
     protected override void Start()
     {
@@ -103,14 +104,11 @@ public class OverworldManager : Map
         {
             // Black tiles for out of bounds.
             terrainTiles[imageIndex].UpdateColor(-1);
-            // Deep water tiles for out of bounds.
-            //terrainTiles[imageIndex].UpdateColor(4);
-            //terrainTiles[imageIndex].UpdateTileImage(tileSprites[4]);
         }
         else
         {
             int tileType = int.Parse(allTiles[tileIndex]);
-            if (tileType == 7)
+            if (tileType >= 7)
             {
                 terrainTiles[imageIndex].UpdateColor(0);
                 terrainTiles[imageIndex].UpdateTileImage(tileSprites.allSprites[0]);

@@ -7,6 +7,7 @@ using TMPro;
 public class WorkerStatSheet : MonoBehaviour
 {
     public VillageDataManager villageData;
+    public BuildingDataManager buildingData;
     public int currentIndex = 0;
     public void ChangeIndex(bool right = true)
     {
@@ -26,10 +27,27 @@ public class WorkerStatSheet : MonoBehaviour
     public TMP_Text nameStat;
     public TMP_Text currentWorkLocation;
     public TMP_Text family;
-    public List<TMP_Text> skills;
+    public TMP_Text skills;
     public void UpdateWorkerStats()
     {
         if (currentIndex < 0){return;}
         nameStat.text = villageData.workers[currentIndex];
+        family.text = villageData.workerFamilySize[currentIndex];
+        currentWorkLocation.text = buildingData.ReturnBuildingName(villageData.ReturnWorkersBuilding(currentIndex));
+        UpdateWorkerSkills();
+    }
+
+    protected void UpdateWorkerSkills()
+    {
+        string skillString = "";
+        string[] allSkills = villageData.workerSkills[currentIndex].Split(",");
+        string[] specificSkills = new string[2];
+        for (int i = 0; i < allSkills.Length; i++)
+        {
+            if (allSkills[i].Length < 3){continue;}
+            specificSkills = allSkills[i].Split("=");
+            skillString += buildingData.ReturnBuildingName(int.Parse(specificSkills[0]))+"\n";
+        }
+        skills.text = skillString;
     }
 }

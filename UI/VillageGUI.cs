@@ -35,6 +35,18 @@ public class VillageGUI : MonoBehaviour
         {
             case 0:
                 workerStatSheet.UpdateWorkerStats();
+                villageManager.HighlightSelectedWorker(workerStatSheet.currentIndex);
+                break;
+        }
+    }
+    public void UpdatePanels()
+    {
+        switch (state)
+        {
+            case 0:
+                villageStats.UpdateVillageStats();
+                workerStatSheet.UpdateWorkerStats();
+                villageManager.HighlightSelectedWorker(workerStatSheet.currentIndex);
                 break;
         }
     }
@@ -43,6 +55,7 @@ public class VillageGUI : MonoBehaviour
     {
         if (newState == state){state = -1;}
         else {state = newState;}
+        villageManager.SetState(state);
         ActivatePanels();
     }
 }

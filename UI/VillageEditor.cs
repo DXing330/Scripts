@@ -10,13 +10,9 @@ public class VillageEditor : Map
         LoadVillageData();
     }
     public VillageDataManager villageData;
+    public VillageGUI GUI;
     public BuildingDataManager buildingData;
     public BasicSpriteManager buildingSprites;
-    public VillageStats villageStats;
-    protected void UpdateVillageStats()
-    {
-        villageStats.UpdateVillageStats();
-    }
     public List<int> allBuildings;
     protected void UpdateAllBuildings(List<string> buildings, List<string> locations)
     {
@@ -56,6 +52,27 @@ public class VillageEditor : Map
         UpdateMap();
     }
 
+    public int state = -1;
+    public void SetState(int newState)
+    {
+        state = newState;
+        HighlightBasedOnState();
+    }
+    protected void HighlightBasedOnState()
+    {
+        switch (state)
+        {
+            case -1:
+                for (int i = 0; i < terrainTiles.Count; i++)
+                {
+                    terrainTiles[i].ResetHighlight();
+                }
+                break;
+            case 0:
+                HighlightSelectedWorker();
+                break;
+        }
+    }
     protected void UpdateMap()
     {
         for (int i = 0; i < terrainTiles.Count; i++)
@@ -63,7 +80,7 @@ public class VillageEditor : Map
             terrainTiles[i].ResetAllImages();
             UpdateTile(i, currentTiles[i]);
         }
-        HighlightSelectedWorker();
+        HighlightBasedOnState();
     }
 
     // need to be able to highlight when selecting things
@@ -92,5 +109,31 @@ public class VillageEditor : Map
     {
         base.MoveMap(direction);
         UpdateMap();
+    }
+
+    public override void ClickOnTile(int index)
+    {
+        int tileNumber = currentTiles[index];
+        if (tileNumber < 0){return;}
+        switch (state)
+        {
+            case 0:
+                AssignSelectedWorker(tileNumber);
+                break;
+        }
+        GUI.UpdatePanels();
+    }
+
+    protected void AssignSelectedWorker(int tileNumber)
+    {
+        if (selectedWorker < 0){return;}
+        // Check capacity of building.
+            // First get the building index on the tile.
+        int buildingIndex = villageData.ReturnBuildingIndexOnTile(tileNumber);
+        if (buildingIndex < 0){return;}
+            // Then compare the current capacity to max capacity.
+        if (villageData.ReturnCurrentLocationCapacity(tileNumber) >= buildingData.ReturnWorkerLimit(int.Parse(villageData.buildings[buildingIndex]), int.Parse(villageData.buildingLevels[buildingIndex]))){return;}
+        villageData.workerLocations[selectedWorker] = tileNumber.ToString();
+        villageData.Save();
     }
 }

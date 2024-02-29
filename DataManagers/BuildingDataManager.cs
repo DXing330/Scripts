@@ -14,6 +14,8 @@ public class BuildingDataManager : MonoBehaviour
     public List<string> workersPerLevel;
     public List<string> upgradeCosts;
     public List<string> buildableTerrains;
+    public List<string> outputs;
+    public List<string> flavorTexts;
     protected List<string> dummyList;
 
     [ContextMenu("Load")]
@@ -28,6 +30,8 @@ public class BuildingDataManager : MonoBehaviour
         workersPerLevel = configBlocks[5].Split("|").ToList();
         upgradeCosts = configBlocks[6].Split("|").ToList();
         buildableTerrains = configBlocks[7].Split("|").ToList();
+        outputs = configBlocks[8].Split("|").ToList();
+        flavorTexts = configBlocks[9].Split("|").ToList();
     }
 
     public int ReturnBuildingMaxHealth(int buildingIndex, int level)
@@ -39,6 +43,10 @@ public class BuildingDataManager : MonoBehaviour
     public string ReturnBuildingName(int buildingIndex)
     {
         if (buildingIndex < 0 || buildingIndex >= names.Count){return "";}
+        // Assigned to home means not working.
+        if (names[buildingIndex] == "Residential"){return "Rest";}
+        // Assigned to center means ???
+        if (names[buildingIndex] == "Center"){return "";}
         return names[buildingIndex];
     }
 
@@ -53,6 +61,14 @@ public class BuildingDataManager : MonoBehaviour
         dummyList.Clear();
         if (buildingIndex < 0 || buildingIndex >= names.Count){return dummyList;}
         dummyList = buildableTerrains[buildingIndex].Split(",").ToList();
+        return dummyList;
+    }
+
+    public List<string> ReturnOutputList(int buildingIndex)
+    {
+        dummyList.Clear();
+        if (buildingIndex < 0 || buildingIndex >= names.Count){return dummyList;}
+        dummyList = outputs[buildingIndex].Split(",").ToList();
         return dummyList;
     }
 }
