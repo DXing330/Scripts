@@ -10,6 +10,16 @@ public class SceneManager : MonoBehaviour
         GameManager.instance.ReturnToHub();
     }
 
+    public void ReturnFromVillage()
+    {
+        GameManager.instance.ReturnToHub(true);
+    }
+
+    public void ReturnToVillage()
+    {
+        GameManager.instance.ReturnToVillage();
+    }
+
     public void LoadCurrentLocationScene()
     {
         // Based on location in GameManager.

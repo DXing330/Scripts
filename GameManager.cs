@@ -42,8 +42,15 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public void ReturnToHub()
+    public int villageOnLevel = 0;
+    public int villageOnIndex = 38;
+    public void ReturnToHub(bool village = false)
     {
+        if (village)
+        {
+            currentLevel = villageOnLevel;
+            currentLocation = villageOnIndex;
+        }
         UnityEngine.SceneManagement.SceneManager.LoadScene("Overworld");
         SaveData();
     }

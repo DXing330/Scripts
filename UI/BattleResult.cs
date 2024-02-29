@@ -17,18 +17,22 @@ public class BattleResult : MonoBehaviour
     public GameObject rewardGold;
     public GameObject rewardMana;
     public GameObject rewardBlood;
+    public GameObject victoryReturnButton;
+    public GameObject defeatReturnButton;
 
     void Start()
     {
         if (GameManager.instance.recentlyWon == 0)
         {
             win = false;
+            defeatReturnButton.SetActive(true);
         }
         else
         {
             goldGain = GameManager.instance.recentlyGainedGold;
             manaGain = GameManager.instance.recentlyGainedMana;
             bloodGain = GameManager.instance.recentlyGainedBlood;
+            victoryReturnButton.SetActive(true);
         }
         UpdateResults();
     }
