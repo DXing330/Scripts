@@ -46,7 +46,11 @@ public class WorkerStatSheet : MonoBehaviour
         {
             if (allSkills[i].Length < 3){continue;}
             specificSkills = allSkills[i].Split("=");
-            skillString += buildingData.ReturnBuildingName(int.Parse(specificSkills[0]))+"\n";
+            // Only add real skills.
+            if (int.Parse(specificSkills[1]) >= 100)
+            {
+                skillString += buildingData.ReturnBuildingName(int.Parse(specificSkills[0]))+"\n";
+            }
         }
         skills.text = skillString;
     }

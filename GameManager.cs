@@ -48,6 +48,12 @@ public class GameManager : MonoBehaviour
         SaveData();
     }
 
+    public void ReturnToVillage()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Village");
+        SaveData();
+    }
+
     public void MoveScenes(string sceneName)
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);

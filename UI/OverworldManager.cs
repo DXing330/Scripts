@@ -19,6 +19,7 @@ public class OverworldManager : Map
     // Could be a list later.
     public Sprite playerSprite;
     public BasicSpriteManager locationSprites;
+    public List<string> indexNameDictionary;
 
     protected override void Start()
     {
@@ -93,6 +94,7 @@ public class OverworldManager : Map
             {
                 terrainTiles[i].UpdateImage(playerSprite);
             }
+            UpdateLocationFeatures(i, currentTiles[i]);
             // Need to draw the player and any special location features.
         }
     }
@@ -118,6 +120,15 @@ public class OverworldManager : Map
             terrainTiles[imageIndex].UpdateColor(tileType);
             terrainTiles[imageIndex].UpdateTileImage(tileSprites.allSprites[tileType]);
         }
+    }
+
+    protected void UpdateLocationFeatures(int imageIndex, int tileIndex)
+    {
+        if (tileIndex < 0 || tileIndex >= (totalRows * totalColumns)){return;}
+        if (levelLocations[tileIndex].Length <= 0){return;}
+        string featureName = indexNameDictionary[int.Parse(levelLocations[tileIndex])];
+        if (featureName.Length <= 0){return;}
+        terrainTiles[imageIndex].UpdateLocationImage(locationSprites.SpriteDictionary(featureName));
     }
 
     protected override void UpdateCenterTile(int tileNumber = -1)
@@ -200,7 +211,7 @@ public class OverworldManager : Map
     public override void ClickOnTile(int tileNumber)
     {
         if (!interactable){return;}
-        if (currentLocation == currentTiles[tileNumber]){return;}
+        if (currentLocation == currentTiles[tileNumber]){MoveIntoTile(currentLocation);}
         if (currentTiles[tileNumber] < 0){return;}
         List<int> path = new List<int>(pathfinder.DestReachable(currentLocation, currentTiles[tileNumber], currentTiles));
         if (path.Count <= 0){return;}
@@ -236,6 +247,9 @@ public class OverworldManager : Map
                 break;
             case "3":
                 // FindTreasure(tileLocation);
+                break;
+            case "4":
+                MoveToVillage(tileLocation);
                 break;
         }
     }
@@ -284,5 +298,14 @@ public class OverworldManager : Map
         int previousLevel = currentLevel;
         currentLevel = int.Parse(newLevel);
         LoadLevel(true, previousLevel);
+    }
+
+    protected void MoveToVillage(int tileLocation)
+    {
+        // Your village.
+        if (locationSpecifics[tileLocation] == "0")
+        {
+            GameManager.instance.ReturnToVillage();
+        }
     }
 }

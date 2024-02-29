@@ -352,8 +352,10 @@ public class LevelEditor : Map
                 return "Switch Scene";
             case 3:
                 return "Treasure";
+            case 4:
+                return "Village";
         }
-        return "";
+        return enctype;
     }
 
     public override void AdjustRows(bool increase = true)

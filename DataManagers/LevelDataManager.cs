@@ -14,6 +14,7 @@ public class LevelDataManager : BasicDataManager
     public string allLevels;
     public List<string> allLevelsList;
 
+    [ContextMenu("New Game")]
     public override void NewGame()
     {
         allLevels = defaultAllLevels;
