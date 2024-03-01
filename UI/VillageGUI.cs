@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class VillageGUI : MonoBehaviour
 {
@@ -8,6 +10,7 @@ public class VillageGUI : MonoBehaviour
     {
         villageData = GameManager.instance.villageData;
         workerStatSheet.villageData = villageData;
+        buildingStatSheet.villageData = villageData;
         villageStats.villageData = villageData;
         villageStats.UpdateVillageStats();
     }
@@ -18,6 +21,12 @@ public class VillageGUI : MonoBehaviour
     public void ChangeWorkerIndex(bool right = true)
     {
         workerStatSheet.ChangeIndex(right);
+        villageManager.HighlightSelectedWorker(workerStatSheet.currentIndex);
+    }
+    public BuildingStatSheet buildingStatSheet;
+    public void ChangeBuildingIndex(int newIndex)
+    {
+        buildingStatSheet.SetIndex(newIndex);
         villageManager.HighlightSelectedWorker(workerStatSheet.currentIndex);
     }
     public List<GameObject> panels;
@@ -37,6 +46,10 @@ public class VillageGUI : MonoBehaviour
                 workerStatSheet.UpdateWorkerStats();
                 villageManager.HighlightSelectedWorker(workerStatSheet.currentIndex);
                 break;
+            case 1:
+                buildingStatSheet.UpdateBuildingStats();
+                villageManager.HighlightSelectedBuilding(buildingStatSheet.currentIndex);
+                break;
         }
     }
     public void UpdatePanels()
@@ -48,14 +61,33 @@ public class VillageGUI : MonoBehaviour
                 workerStatSheet.UpdateWorkerStats();
                 villageManager.HighlightSelectedWorker(workerStatSheet.currentIndex);
                 break;
+            case 1:
+                villageStats.UpdateVillageStats();
+                buildingStatSheet.UpdateBuildingStats();
+                villageManager.HighlightSelectedBuilding(buildingStatSheet.currentIndex);
+                break;
         }
     }
     public int state = -1;
+    public List<TMP_Text> stateTexts;
+    protected void BoldStateText()
+    {
+        for (int i = 0; i < stateTexts.Count; i++)
+        {
+            bool isSet = (stateTexts[i].fontStyle & FontStyles.Bold) != 0;
+            if(isSet){stateTexts[i].fontStyle ^= FontStyles.Bold;}
+        }
+        if (state >= 0)
+        {
+            stateTexts[state].fontStyle |= FontStyles.Bold;
+        }
+    }
     public void ChangeState(int newState)
     {
         if (newState == state){state = -1;}
         else {state = newState;}
         villageManager.SetState(state);
         ActivatePanels();
+        BoldStateText();
     }
 }

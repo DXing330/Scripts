@@ -53,6 +53,8 @@ public class VillageDataManager : BasicDataManager
     public List<string> buildingPhaseBuildings; // empty
     public List<string> buildingPhaseLocations; // empty
     public List<string> buildTimes; // empty
+    public List<string> possibleBuildings; // House|Farm|Quarry|Lumberyard
+    public List<string> buildingsOnTerrainTypes; // Farm,House|Lumberyard||||||||Quarry||||
     protected List<int> projectedOutputs = new List<int>();
 
     [ContextMenu("New Game")]
@@ -87,6 +89,8 @@ public class VillageDataManager : BasicDataManager
         data += GameManager.instance.ConvertListToString(buildingPhaseBuildings)+"#";
         data += GameManager.instance.ConvertListToString(buildingPhaseLocations)+"#";
         data += GameManager.instance.ConvertListToString(buildTimes)+"#";
+        data += GameManager.instance.ConvertListToString(possibleBuildings)+"#";
+        data += GameManager.instance.ConvertListToString(buildingsOnTerrainTypes)+"#";
         File.WriteAllText(saveDataPath+"/village.txt", data);
     }
 
@@ -131,6 +135,8 @@ public class VillageDataManager : BasicDataManager
         buildingPhaseBuildings = dataBlocks[13].Split("|").ToList();
         buildingPhaseLocations = dataBlocks[14].Split("|").ToList();
         buildTimes = dataBlocks[15].Split("|").ToList();
+        possibleBuildings = dataBlocks[16].Split("|").ToList();
+        buildingsOnTerrainTypes = dataBlocks[17].Split("|").ToList();
     }
 
     public int DetermineHousingLimit()
@@ -239,9 +245,10 @@ public class VillageDataManager : BasicDataManager
             // Loop through the output types.
             for (int j = 0; j < outputTypes.Count; j++)
             {
-                if (int.Parse(outputTypes[j]) < 0){continue;}
-                if (outputTypes[j].Length <= 0){continue;}
-                projectedOutputs[int.Parse(outputTypes[j])] += 1 + skillLevel;
+                if (outputTypes[j].Length <= 2){continue;}
+                // Output format is type=amount.
+                string[] outputSpecifics = outputTypes[j].Split("=");
+                projectedOutputs[int.Parse(outputSpecifics[0])] += int.Parse(outputSpecifics[1]) + skillLevel;
             }
         }
         return projectedOutputs;

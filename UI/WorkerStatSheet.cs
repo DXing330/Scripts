@@ -25,6 +25,7 @@ public class WorkerStatSheet : MonoBehaviour
         UpdateWorkerStats();
     }
     public TMP_Text nameStat;
+    public TMP_Text healthStat;
     public TMP_Text currentWorkLocation;
     public TMP_Text family;
     public TMP_Text skills;
@@ -32,8 +33,9 @@ public class WorkerStatSheet : MonoBehaviour
     {
         if (currentIndex < 0){return;}
         nameStat.text = villageData.workers[currentIndex];
+        healthStat.text = villageData.workerHealth[currentIndex];
         family.text = villageData.workerFamilySize[currentIndex];
-        currentWorkLocation.text = buildingData.ReturnBuildingName(villageData.ReturnWorkersBuilding(currentIndex));
+        currentWorkLocation.text = buildingData.ReturnBuildingTask(villageData.ReturnWorkersBuilding(currentIndex));
         UpdateWorkerSkills();
     }
 

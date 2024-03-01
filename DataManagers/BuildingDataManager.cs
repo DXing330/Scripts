@@ -16,6 +16,7 @@ public class BuildingDataManager : MonoBehaviour
     public List<string> buildableTerrains;
     public List<string> outputs;
     public List<string> flavorTexts;
+    public List<string> buildTimes;
     protected List<string> dummyList;
 
     [ContextMenu("Load")]
@@ -32,6 +33,7 @@ public class BuildingDataManager : MonoBehaviour
         buildableTerrains = configBlocks[7].Split("|").ToList();
         outputs = configBlocks[8].Split("|").ToList();
         flavorTexts = configBlocks[9].Split("|").ToList();
+        buildTimes = configBlocks[10].Split("|").ToList();
     }
 
     public int ReturnBuildingMaxHealth(int buildingIndex, int level)
@@ -40,13 +42,29 @@ public class BuildingDataManager : MonoBehaviour
         return (int.Parse(baseHealths[buildingIndex])+(level-1)*int.Parse(hpPerLevel[buildingIndex]));
     }
 
+    public int ReturnHealthPerLevel(int buildingIndex)
+    {
+        if (buildingIndex < 0 || buildingIndex >= names.Count){return 0;}
+        return (int.Parse(hpPerLevel[buildingIndex]));
+    }
+
+    public int ReturnWorkerPerLevel(int buildingIndex)
+    {
+        if (buildingIndex < 0 || buildingIndex >= names.Count){return 0;}
+        return (int.Parse(workersPerLevel[buildingIndex]));
+    }
+
     public string ReturnBuildingName(int buildingIndex)
     {
         if (buildingIndex < 0 || buildingIndex >= names.Count){return "";}
+        return names[buildingIndex];
+    }
+
+    public string ReturnBuildingTask(int buildingIndex)
+    {
+        if (buildingIndex < 0 || buildingIndex >= names.Count){return "";}
         // Assigned to home means not working.
-        if (names[buildingIndex] == "Residential"){return "Rest";}
-        // Assigned to center means ???
-        if (names[buildingIndex] == "Center"){return "";}
+        if (names[buildingIndex] == "House"){return "Rest";}
         return names[buildingIndex];
     }
 
@@ -70,5 +88,25 @@ public class BuildingDataManager : MonoBehaviour
         if (buildingIndex < 0 || buildingIndex >= names.Count){return dummyList;}
         dummyList = outputs[buildingIndex].Split(",").ToList();
         return dummyList;
+    }
+
+    public string ReturnFlavorText(int buildingIndex)
+    {
+        if (buildingIndex < 0 || buildingIndex >= names.Count){return "";}
+        return flavorTexts[buildingIndex];
+    }
+
+    public int ReturnBuildTime(int buildingIndex, int level = 0)
+    {
+        if (buildingIndex < 0 || buildingIndex >= names.Count){return -1;}
+        int time = int.Parse(buildTimes[buildingIndex]);
+        return time*(level+1);
+    }
+
+    public int ReturnBuildCost(int buildingIndex, int level = 0)
+    {
+        if (buildingIndex < 0 || buildingIndex >= names.Count){return -1;}
+        int cost = int.Parse(upgradeCosts[buildingIndex]);
+        return cost*(level+1);
     }
 }

@@ -71,6 +71,9 @@ public class VillageEditor : Map
             case 0:
                 HighlightSelectedWorker();
                 break;
+            case 1:
+                HighlightSelectedBuilding();
+                break;
         }
     }
     protected void UpdateMap()
@@ -104,6 +107,25 @@ public class VillageEditor : Map
             terrainTiles[indexOf].Highlight();
         }
     }
+    int selectedBuilding = -1;
+    public void HighlightSelectedBuilding(int newlySelectedBuilding = -1)
+    {
+        if (newlySelectedBuilding >= 0)
+        {
+            selectedBuilding = newlySelectedBuilding;
+        }
+        if (selectedBuilding < 0){return;}
+        for (int i = 0; i < terrainTiles.Count; i++)
+        {
+            terrainTiles[i].ResetHighlight();
+        }
+        int location = int.Parse(villageData.buildingLocations[selectedBuilding]);
+        int indexOf = currentTiles.IndexOf(location);
+        if (indexOf >= 0)
+        {
+            terrainTiles[indexOf].Highlight();
+        }
+    }
 
     public override void MoveMap(int direction)
     {
@@ -120,6 +142,9 @@ public class VillageEditor : Map
             case 0:
                 AssignSelectedWorker(tileNumber);
                 break;
+            case 1:
+                SelectBuilding(tileNumber);
+                break;
         }
         GUI.UpdatePanels();
     }
@@ -135,5 +160,12 @@ public class VillageEditor : Map
         if (villageData.ReturnCurrentLocationCapacity(tileNumber) >= buildingData.ReturnWorkerLimit(int.Parse(villageData.buildings[buildingIndex]), int.Parse(villageData.buildingLevels[buildingIndex]))){return;}
         villageData.workerLocations[selectedWorker] = tileNumber.ToString();
         villageData.Save();
+    }
+
+    protected void SelectBuilding(int tileNumber)
+    {
+        int buildingIndex = villageData.ReturnBuildingIndexOnTile(tileNumber);
+        if (buildingIndex < 0){return;}
+        GUI.ChangeBuildingIndex(buildingIndex);
     }
 }
