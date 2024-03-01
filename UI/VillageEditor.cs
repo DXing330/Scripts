@@ -74,6 +74,9 @@ public class VillageEditor : Map
             case 1:
                 HighlightSelectedBuilding();
                 break;
+            case 2:
+                HighlightSelectedTile();
+                break;
         }
     }
     protected void UpdateMap()
@@ -126,6 +129,24 @@ public class VillageEditor : Map
             terrainTiles[indexOf].Highlight();
         }
     }
+    int selectedTile = -1;
+    public void HighlightSelectedTile(int newlySelectedTile = -1)
+    {
+        if (newlySelectedTile >= 0)
+        {
+            selectedTile = newlySelectedTile;
+        }
+        if (selectedTile < 0){return;}
+        for (int i = 0; i < terrainTiles.Count; i++)
+        {
+            terrainTiles[i].ResetHighlight();
+        }
+        int indexOf = currentTiles.IndexOf(selectedTile);
+        if (indexOf >= 0)
+        {
+            terrainTiles[indexOf].Highlight();
+        }
+    }
 
     public override void MoveMap(int direction)
     {
@@ -144,6 +165,9 @@ public class VillageEditor : Map
                 break;
             case 1:
                 SelectBuilding(tileNumber);
+                break;
+            case 2:
+                SelectTerrain(tileNumber);
                 break;
         }
         GUI.UpdatePanels();
@@ -167,5 +191,16 @@ public class VillageEditor : Map
         int buildingIndex = villageData.ReturnBuildingIndexOnTile(tileNumber);
         if (buildingIndex < 0){return;}
         GUI.ChangeBuildingIndex(buildingIndex);
+    }
+
+    protected void SelectTerrain(int tileNumber)
+    {
+        // Check to make sure there is no building there.
+        if (!villageData.buildingLocations.Contains(tileNumber.ToString()) && !villageData.buildingPhaseLocations.Contains(tileNumber.ToString()))
+        {
+            HighlightSelectedTile(tileNumber);
+            // Pass the terrain type to the new building thing.
+            GUI.ChangeTerrainType(int.Parse(allTiles[tileNumber]));
+        }
     }
 }

@@ -36,7 +36,7 @@ public class BuildingDataManager : MonoBehaviour
         buildTimes = configBlocks[10].Split("|").ToList();
     }
 
-    public int ReturnBuildingMaxHealth(int buildingIndex, int level)
+    public int ReturnBuildingMaxHealth(int buildingIndex, int level = 1)
     {
         if (buildingIndex < 0 || buildingIndex >= names.Count){return 0;}
         return (int.Parse(baseHealths[buildingIndex])+(level-1)*int.Parse(hpPerLevel[buildingIndex]));
@@ -60,6 +60,11 @@ public class BuildingDataManager : MonoBehaviour
         return names[buildingIndex];
     }
 
+    public int ReturnBuildingIndex(string buildingName)
+    {
+        return names.IndexOf(buildingName);
+    }
+
     public string ReturnBuildingTask(int buildingIndex)
     {
         if (buildingIndex < 0 || buildingIndex >= names.Count){return "";}
@@ -68,7 +73,7 @@ public class BuildingDataManager : MonoBehaviour
         return names[buildingIndex];
     }
 
-    public int ReturnWorkerLimit(int buildingIndex, int level)
+    public int ReturnWorkerLimit(int buildingIndex, int level = 1)
     {
         if (buildingIndex < 0 || buildingIndex >= names.Count){return 0;}
         return (int.Parse(baseWorkers[buildingIndex])+(level-1)*int.Parse(workersPerLevel[buildingIndex]));

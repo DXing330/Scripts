@@ -50,6 +50,7 @@ public class BuildingStatSheet : MonoBehaviour
         {
             outputObjects[i].SetActive(false);
         }
+        if (buildingType < 0){return;}
         int outputTypes = 0;
         List<string> allOutputs = buildingData.ReturnOutputList(buildingType);
         for (int i = 0; i < allOutputs.Count; i++)
@@ -61,5 +62,25 @@ public class BuildingStatSheet : MonoBehaviour
             outputs[outputTypes].SetSprite(outputSprites[int.Parse(outputSpecifics[0])]);
             outputTypes++;
         }   
+    }
+
+    public void UpdateBasicStats(int buildingType)
+    {
+        nameStat.text = buildingData.ReturnBuildingName(buildingType).ToString();
+        healthStat.text = buildingData.ReturnBuildingMaxHealth(buildingType).ToString();
+        workerLimit.text = buildingData.ReturnWorkerLimit(buildingType).ToString();
+        upgradeCost.text = buildingData.ReturnBuildCost(buildingType).ToString();
+        upgradeTime.text = buildingData.ReturnBuildTime(buildingType).ToString();
+        UpdateOutputs(buildingType);
+    }
+
+    public void ResetBasicStats()
+    {
+        nameStat.text = "";
+        healthStat.text = "";
+        workerLimit.text = "";
+        upgradeCost.text = "";
+        upgradeTime.text = "";
+        UpdateOutputs(-1);
     }
 }

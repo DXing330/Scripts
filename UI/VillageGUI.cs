@@ -11,6 +11,7 @@ public class VillageGUI : MonoBehaviour
         villageData = GameManager.instance.villageData;
         workerStatSheet.villageData = villageData;
         buildingStatSheet.villageData = villageData;
+        newBuildingStatSheet.villageData = villageData;
         villageStats.villageData = villageData;
         villageStats.UpdateVillageStats();
     }
@@ -28,6 +29,11 @@ public class VillageGUI : MonoBehaviour
     {
         buildingStatSheet.SetIndex(newIndex);
         villageManager.HighlightSelectedWorker(workerStatSheet.currentIndex);
+    }
+    public NewBuildingStatSheet newBuildingStatSheet;
+    public void ChangeTerrainType(int newType)
+    {
+        newBuildingStatSheet.SetTerrainType(newType);
     }
     public List<GameObject> panels;
     protected void ActivatePanels()
@@ -49,6 +55,9 @@ public class VillageGUI : MonoBehaviour
             case 1:
                 buildingStatSheet.UpdateBuildingStats();
                 villageManager.HighlightSelectedBuilding(buildingStatSheet.currentIndex);
+                break;
+            case 2:
+                newBuildingStatSheet.SetTerrainType(-1);
                 break;
         }
     }
