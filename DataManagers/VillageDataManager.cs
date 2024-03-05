@@ -33,9 +33,9 @@ public class VillageDataManager : BasicDataManager
     }
     public List<string> villageTiles; // figure it out
     // Keep track of resources I guess.
-        // money|food|materials|woman
+        // money|food|wood|stone|woman
         // women can be married to increase loyalty and make it harder to for workers to leave.
-    public List<string> resources; // 0|2|0|0
+    public List<string> resources; // 0|2|0|0|0
     // Have some workers than you can manage/automate.
         // Maybe give them names and other attributes?
     public List<string> workers; // alex|bob
@@ -45,11 +45,11 @@ public class VillageDataManager : BasicDataManager
     public List<string> workerSkills; // 1=100|1=100 indicates farming skill level 1 // skill levels = sqrt(value/100), very slow to increase skills later
     public List<string> workerLocations; // 39|31 indicates unassigned workers
     // village has buildings on top of terrain
-    public List<string> buildings; // 0|1|2|2 = city center | farm | housing
+    public List<string> buildings; // 0|1|2|2|5|4 = city center | farm | housing|house|quarry|lumberyard
     // Need to shift the buildings around whenever the village expands.
-    public List<string> buildingLocations; // 40|30|39|31
-    public List<string> buildingLevels; // 1|1|1|1
-    public List<string> buildingHealths; // 200|40|60|60
+    public List<string> buildingLocations; // 40|30|39|31|38|37
+    public List<string> buildingLevels; // 1|1|1|1|1|1
+    public List<string> buildingHealths; // 200|40|40|40|40|40
     public List<string> buildingPhaseBuildings; // empty
     public List<string> buildingPhaseLocations; // empty
     public List<string> buildTimes; // empty
@@ -221,6 +221,7 @@ public class VillageDataManager : BasicDataManager
         projectedOutputs.Clear();
         projectedOutputs.Add(0);
         projectedOutputs.Add(-(DeterminePopulation()));
+        projectedOutputs.Add(0);
         projectedOutputs.Add(0);
         // No projections without workers.
         if (workerLocations.Count <= 0){return projectedOutputs;}

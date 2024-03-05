@@ -23,9 +23,11 @@ public class BuildingStatSheet : MonoBehaviour
     public TMP_Text worker_level;
     public List<StatImageText> outputs;
     public List<GameObject> outputObjects;
-    public List<Sprite> outputSprites;
+    public List<Sprite> resourceSprites;
     public TMP_Text flavor;
     public TMP_Text upgradeCost;
+    public List<GameObject> costObjects;
+    public List<StatImageText> costs;
     public TMP_Text upgradeTime;
 
     public void UpdateBuildingStats()
@@ -39,9 +41,9 @@ public class BuildingStatSheet : MonoBehaviour
         hp_level.text = "(+"+buildingData.ReturnHealthPerLevel(buildingType)+")";
         workerLimit.text = buildingData.ReturnWorkerLimit(buildingType, buildingLevel).ToString();
         worker_level.text = "(+"+buildingData.ReturnWorkerPerLevel(buildingType)+")";
-        upgradeCost.text = buildingData.ReturnBuildCost(buildingType, buildingLevel).ToString();
         upgradeTime.text = buildingData.ReturnBuildTime(buildingType, buildingLevel).ToString();
         UpdateOutputs(buildingType);
+        UpdateBuildCost(buildingType, buildingLevel);
     }
 
     protected void UpdateOutputs(int buildingType)
@@ -59,28 +61,50 @@ public class BuildingStatSheet : MonoBehaviour
             string[] outputSpecifics = allOutputs[i].Split("=");
             outputObjects[outputTypes].SetActive(true);
             outputs[outputTypes].SetText(outputSpecifics[1]);
-            outputs[outputTypes].SetSprite(outputSprites[int.Parse(outputSpecifics[0])]);
+            outputs[outputTypes].SetSprite(resourceSprites[int.Parse(outputSpecifics[0])]);
             outputTypes++;
         }   
     }
 
+    protected void UpdateBuildCost(int buildingType, int level = 0)
+    {
+        for (int i = 0; i < costObjects.Count; i++)
+        {
+            costObjects[i].SetActive(false);
+        }
+        if (buildingType < 0){return;}
+        int costTypes = 0;
+        int specificCost = 0;
+        List<string> allCosts = buildingData.ReturnBuildCost(buildingType);
+        for (int i = 0; i < allCosts.Count; i++)
+        {
+            if (allCosts[i].Length <= 2){continue;}
+            string[] costSpecifics = allCosts[i].Split("=");
+            costObjects[costTypes].SetActive(true);
+            specificCost = int.Parse(costSpecifics[1]);
+            specificCost *= (level+1);
+            costs[costTypes].SetText(specificCost.ToString());
+            costs[costTypes].SetSprite(resourceSprites[int.Parse(costSpecifics[0])]);
+            costTypes++;
+        }
+    }
+    
     public void UpdateBasicStats(int buildingType)
     {
         nameStat.text = buildingData.ReturnBuildingName(buildingType).ToString();
         healthStat.text = buildingData.ReturnBuildingMaxHealth(buildingType).ToString();
-        workerLimit.text = buildingData.ReturnWorkerLimit(buildingType).ToString();
-        upgradeCost.text = buildingData.ReturnBuildCost(buildingType).ToString();
         upgradeTime.text = buildingData.ReturnBuildTime(buildingType).ToString();
         UpdateOutputs(buildingType);
+        UpdateBuildCost(buildingType);
     }
 
     public void ResetBasicStats()
     {
         nameStat.text = "";
         healthStat.text = "";
-        workerLimit.text = "";
         upgradeCost.text = "";
         upgradeTime.text = "";
         UpdateOutputs(-1);
+        UpdateBuildCost(-1);
     }
 }

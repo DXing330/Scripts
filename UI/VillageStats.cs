@@ -37,16 +37,16 @@ public class VillageStats : MonoBehaviour
     protected void UpdateProjectedResources()
     {
         projectedOutputs = villageData.ReturnOutputs();
-        for (int i = 0; i < projectedOutputs.Count; i++)
+        for (int i = 0; i < projectedResourceChange.Count; i++)
         {
-            if (projectedOutputs[i] > 0)
+            if (projectedOutputs[i+1] > 0)
             {
-                projectedResourceChange[i].text = "+"+projectedOutputs[i].ToString();
+                projectedResourceChange[i].text = "+"+projectedOutputs[i+1].ToString();
                 projectedResourceChange[i].color = Color.green;
             }
             else
             {
-                projectedResourceChange[i].text = projectedOutputs[i].ToString();
+                projectedResourceChange[i].text = projectedOutputs[i+1].ToString();
                 projectedResourceChange[i].color = Color.red;
             }
         }

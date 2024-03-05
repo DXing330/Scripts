@@ -108,10 +108,18 @@ public class BuildingDataManager : MonoBehaviour
         return time*(level+1);
     }
 
-    public int ReturnBuildCost(int buildingIndex, int level = 0)
+    /*public int ReturnBuildCost(int buildingIndex, int level = 0)
     {
         if (buildingIndex < 0 || buildingIndex >= names.Count){return -1;}
         int cost = int.Parse(upgradeCosts[buildingIndex]);
         return cost*(level+1);
+    }*/
+
+    public List<string> ReturnBuildCost(int buildingIndex)
+    {
+        dummyList.Clear();
+        if (buildingIndex < 0 || buildingIndex >= names.Count){return dummyList;}
+        dummyList = upgradeCosts[buildingIndex].Split(",").ToList();
+        return dummyList;
     }
 }
