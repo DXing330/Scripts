@@ -10,6 +10,7 @@ public class NewBuildingStatSheet : MonoBehaviour
     public int selectedTerrainType = -1;
     public string selectedBuildingName;
     public int selectedBuildingType = -1;
+    public int ReturnSelectedBuilding(){return selectedBuildingType;}
     public BasicSpriteManager buildingSprites;
     public BuildingStatSheet statSheet;
     public List<string> possibleBuildingTypes;
@@ -91,5 +92,19 @@ public class NewBuildingStatSheet : MonoBehaviour
     {
         if (selectedBuildingType < 0){return;}
         statSheet.UpdateBasicStats(selectedBuildingType);
+    }
+
+    public void CheckOnUnBuilt(int tileNumber)
+    {
+        UpdateUnbuiltStats(tileNumber);
+    }
+
+    protected void UpdateUnbuiltStats(int tileNumber)
+    {
+        // Get the building type.
+        int buildingType = villageData.ReturnNewBuildingType(tileNumber);
+        if (buildingType < 0){return;}
+        statSheet.UpdateUnbuiltStats(buildingType);
+        statSheet.upgradeTime.text = villageData.ReturnNewBuildingTime(tileNumber);
     }
 }

@@ -98,6 +98,13 @@ public class BuildingStatSheet : MonoBehaviour
         UpdateBuildCost(buildingType);
     }
 
+    public void UpdateUnbuiltStats(int buildingType)
+    {
+        nameStat.text = buildingData.ReturnBuildingName(buildingType).ToString();
+        healthStat.text = buildingData.ReturnBuildingMaxHealth(buildingType).ToString();
+        UpdateOutputs(buildingType);
+    }
+
     public void ResetBasicStats()
     {
         nameStat.text = "";

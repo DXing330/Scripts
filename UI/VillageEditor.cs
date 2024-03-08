@@ -14,6 +14,7 @@ public class VillageEditor : Map
     public BuildingDataManager buildingData;
     public BasicSpriteManager buildingSprites;
     public List<int> allBuildings;
+    public List<int> newBuildings;
     protected void UpdateAllBuildings(List<string> buildings, List<string> locations)
     {
         allBuildings.Clear();
@@ -28,7 +29,20 @@ public class VillageEditor : Map
             allBuildings[int.Parse(locations[i])] = int.Parse(buildings[i]);
         }
     }
-
+    protected void UpdateNewBuildings(List<string> buildings, List<string> locations)
+    {
+        newBuildings.Clear();
+        for (int i = 0; i < totalRows * totalColumns; i++)
+        {
+            newBuildings.Add(-1);
+        }
+        if (locations.Count <= 0){return;}
+        for (int i = 0; i < locations.Count; i++)
+        {
+            if (locations[i].Length <= 0){continue;}
+            newBuildings[int.Parse(locations[i])] = int.Parse(buildings[i]);
+        }
+    }
     protected override void UpdateTile(int imageIndex, int tileIndex)
     {
         base.UpdateTile(imageIndex, tileIndex);
@@ -40,18 +54,22 @@ public class VillageEditor : Map
         {
             terrainTiles[imageIndex].UpdateLocationImage(buildingSprites.allSprites[allBuildings[tileIndex]]);
         }
+        if (newBuildings[tileIndex] >= 0)
+        {
+            terrainTiles[imageIndex].UpdateLocationImage(buildingSprites.allSprites[newBuildings[tileIndex]]);
+            terrainTiles[imageIndex].BlackenLocationImage();
+        }
     }
-
     protected void LoadVillageData()
     {
         totalRows = villageData.totalRows;
         totalColumns = villageData.totalColumns;
         allTiles = villageData.villageTiles;
         UpdateAllBuildings(villageData.buildings, villageData.buildingLocations);
+        UpdateNewBuildings(villageData.buildingPhaseBuildings, villageData.buildingPhaseLocations);
         UpdateCenterTile();
         UpdateMap();
     }
-
     public int state = -1;
     public void SetState(int newState)
     {
@@ -130,6 +148,7 @@ public class VillageEditor : Map
         }
     }
     int selectedTile = -1;
+    public int ReturnSelectedTile(){return selectedTile;}
     public void HighlightSelectedTile(int newlySelectedTile = -1)
     {
         if (newlySelectedTile >= 0)
@@ -176,6 +195,13 @@ public class VillageEditor : Map
     protected void AssignSelectedWorker(int tileNumber)
     {
         if (selectedWorker < 0){return;}
+        // Check if your assigning them to a building project.
+        if (villageData.CheckIfNewBuilding(tileNumber))
+        {
+            villageData.workerLocations[selectedWorker] = tileNumber.ToString();
+            villageData.Save();
+            return;
+        }
         // Check capacity of building.
             // First get the building index on the tile.
         int buildingIndex = villageData.ReturnBuildingIndexOnTile(tileNumber);
@@ -196,11 +222,42 @@ public class VillageEditor : Map
     protected void SelectTerrain(int tileNumber)
     {
         // Check to make sure there is no building there.
-        if (!villageData.buildingLocations.Contains(tileNumber.ToString()) && !villageData.buildingPhaseLocations.Contains(tileNumber.ToString()))
+        if (villageData.buildingLocations.Contains(tileNumber.ToString())){return;}
+        if (!villageData.buildingPhaseLocations.Contains(tileNumber.ToString()))
         {
             HighlightSelectedTile(tileNumber);
             // Pass the terrain type to the new building thing.
             GUI.ChangeTerrainType(int.Parse(allTiles[tileNumber]));
         }
+        else
+        {
+            HighlightSelectedTile(tileNumber);
+            GUI.CheckUnbuiltBuilding(tileNumber);
+        }
+    }
+
+    public void TryToBuildNew(int buildingType)
+    {
+        List<int> allCosts = buildingData.ReturnBuildCostInOrder(buildingType);
+        List<string> allResources = villageData.resources;
+        List<string> updatedResources = new List<string>(allResources);
+        int specificAmount = 0;
+        // Check all the costs.
+        // O(1), constant amount of different resource costs.
+        for (int i = 0; i < allResources.Count; i++)
+        {
+            specificAmount = int.Parse(allResources[i]);
+            if (specificAmount < allCosts[i])
+            {
+                return;
+            }
+            updatedResources[i] = (specificAmount - allCosts[i]).ToString();
+        }
+        // If everything checks out then start building.
+        villageData.resources = updatedResources;
+        int buildTime = buildingData.ReturnBuildTime(buildingType);
+        villageData.StartBuilding(selectedTile, buildingType, buildTime);
+        UpdateNewBuildings(villageData.buildingPhaseBuildings, villageData.buildingPhaseLocations);
+        UpdateMap();
     }
 }

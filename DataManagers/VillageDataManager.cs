@@ -186,6 +186,33 @@ public class VillageDataManager : BasicDataManager
         return -1;
     }
 
+    public bool CheckIfNewBuilding(int location)
+    {
+        string loc = location.ToString();
+        if (buildingPhaseLocations.Contains(loc)){return true;}
+        return false;
+    }
+
+    public int ReturnNewBuildingType(int location)
+    {
+        string loc = location.ToString();
+        for (int i = 0; i < buildingPhaseLocations.Count; i++)
+        {
+            if (buildingPhaseLocations[i] == loc){return int.Parse(buildingPhaseBuildings[i]);}
+        }
+        return -1;
+    }
+
+    public string ReturnNewBuildingTime(int location)
+    {
+        string loc = location.ToString();
+        for (int i = 0; i < buildingPhaseLocations.Count; i++)
+        {
+            if (buildingPhaseLocations[i] == loc){return (buildTimes[i]);}
+        }
+        return "";
+    }
+
     public int ReturnCurrentLocationCapacity(int location)
     {
         int c = 0;
@@ -253,5 +280,12 @@ public class VillageDataManager : BasicDataManager
             }
         }
         return projectedOutputs;
+    }
+
+    public void StartBuilding(int tileNumber, int buildingType, int duration)
+    {
+        buildingPhaseLocations.Add(tileNumber.ToString());
+        buildingPhaseBuildings.Add(buildingType.ToString());
+        buildTimes.Add(duration.ToString());
     }
 }

@@ -221,6 +221,7 @@ public class GameManager : MonoBehaviour
             gameData[i].NewGame();
         }
         SaveData();
+        LoadData();
     }
 
     public void GainResource(int type, int amount)

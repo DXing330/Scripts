@@ -92,6 +92,13 @@ public class TerrainTile : MonoBehaviour
         locationImage.color = tempColor;
     }
 
+    public void BlackenLocationImage()
+    {
+        Color tempColor = Color.black;
+        tempColor.a = 1.0f;
+        locationImage.color = tempColor;
+    }
+
     public void ResetImage()
     {
         actorImage.sprite = null;

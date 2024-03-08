@@ -35,6 +35,10 @@ public class VillageGUI : MonoBehaviour
     {
         newBuildingStatSheet.SetTerrainType(newType);
     }
+    public void CheckUnbuiltBuilding(int tileNumber)
+    {
+        newBuildingStatSheet.CheckOnUnBuilt(tileNumber);
+    }
     public List<GameObject> panels;
     protected void ActivatePanels()
     {
@@ -98,5 +102,13 @@ public class VillageGUI : MonoBehaviour
         villageManager.SetState(state);
         ActivatePanels();
         BoldStateText();
+    }
+    public void TryToBuildNew()
+    {
+        // Get the tile and building.
+        int buildingType = newBuildingStatSheet.ReturnSelectedBuilding();
+        if (buildingType < 0){return;}
+        villageManager.TryToBuildNew(buildingType);
+        villageStats.UpdateVillageStats();
     }
 }
