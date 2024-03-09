@@ -36,10 +36,26 @@ public class VillageDataManager : BasicDataManager
         // money|food|wood|stone|woman
         // women can be married to increase loyalty and make it harder to for workers to leave.
     public List<string> resources; // 0|2|0|0|0
+    public void UpdateResources(List<int> changes)
+    {
+        for (int i = 0; i < resources.Count; i++)
+        {
+            // Can't store more than 100x the center's level of any resource, not enough space?
+            resources[i] = (Mathf.Min(int.Parse(buildingLevels[0])*100, int.Parse(resources[i])+changes[i])).ToString();
+        }
+    }
     // Have some workers than you can manage/automate.
         // Maybe give them names and other attributes?
     public List<string> workers; // alex|bob
     // skill format is skill=level,skill2=level2,etc.
+    protected string GenerateNewWorker()
+    {
+        string worker = "";
+        // Decide on name.
+        // Decide on skills.
+        // You get to pick from X workers which ones you want to keep?
+        return worker;
+    }
     public List<string> workerFamilySize; // 1|1 indicates size of family ie cost to feed
     public List<string> workerHealth; // 20|20 max is 20, 0 = death, deal with family somehow
     public List<string> workerSkills; // 1=100|1=100 indicates farming skill level 1 // skill levels = sqrt(value/100), very slow to increase skills later
@@ -56,6 +72,23 @@ public class VillageDataManager : BasicDataManager
     public List<string> possibleBuildings; // House|Farm|Quarry|Lumberyard
     public List<string> buildingsOnTerrainTypes; // Farm,House|Lumberyard||||||||Quarry||||
     protected List<int> projectedOutputs = new List<int>();
+
+    public void NewDay()
+    {
+        // Get daily outputs.
+        UpdateResources(ReturnOutputs());
+        // Update any building phase stuff.
+        UpdateBuildTimes();
+        // Decrease worker's health if they aren't resting.
+    }
+
+    protected void UpdateBuildTimes()
+    {
+        for (int i = 0; i < workerLocations.Count; i++)
+        {
+            Build(workerLocations[i], i);
+        }
+    }
 
     [ContextMenu("New Game")]
     public override void NewGame()
@@ -162,6 +195,20 @@ public class VillageDataManager : BasicDataManager
         return pop;
     }
 
+    public int DetermineFoodConsumption()
+    {
+        int consumption = 0;
+        int familycons = 0;
+        for (int i = 0; i < workerFamilySize.Count; i++)
+        {
+            if (workerFamilySize[i].Length <= 0){continue;}
+            familycons = int.Parse(workerFamilySize[i]);
+            if (familycons >= 2){familycons = 1 + (familycons/2);}
+            consumption += familycons;
+        }
+        return consumption;
+    }
+
     public int DetermineWorkerPopulation()
     {
         return workers.Count;
@@ -203,6 +250,15 @@ public class VillageDataManager : BasicDataManager
         return -1;
     }
 
+    public int ReturnNewBuildingIndex(string location)
+    {
+        for (int i = 0; i < buildingPhaseLocations.Count; i++)
+        {
+            if (buildingPhaseLocations[i] == location){return i;}
+        }
+        return -1;
+    }
+
     public string ReturnNewBuildingTime(int location)
     {
         string loc = location.ToString();
@@ -231,15 +287,51 @@ public class VillageDataManager : BasicDataManager
 
     public int ReturnWorkerSkillLevel(int workerIndex, int buildingType)
     {
+        IncreaseWorkerSkillLevel(workerIndex, buildingType);
         string[] allWorkerSkills = workerSkills[workerIndex].Split(",");
         string[] specificSkill = new string[2];
         for (int i = 0; i < allWorkerSkills.Length; i++)
         {
             if (allWorkerSkills[i].Length < 3){continue;}
             specificSkill = allWorkerSkills[i].Split("=");
-            if (int.Parse(specificSkill[0]) == buildingType){return int.Parse(specificSkill[1])/100;}
+            if (int.Parse(specificSkill[0]) == buildingType)
+            {
+                return (int)Mathf.Floor(Mathf.Sqrt(int.Parse(specificSkill[1])/100));
+            }
         }
         return 0;
+    }
+
+    protected void IncreaseWorkerSkillLevel(int workerIndex, int buildingType)
+    {
+        List<string> allWorkerSkills = workerSkills[workerIndex].Split(",").ToList();
+        string[] specificSkill = new string[2];
+        for (int i = 0; i < allWorkerSkills.Count; i++)
+        {
+            if (allWorkerSkills[i].Length < 3){continue;}
+            specificSkill = allWorkerSkills[i].Split("=");
+            if (int.Parse(specificSkill[0]) == buildingType)
+            {
+                allWorkerSkills[i] = specificSkill[0]+"="+(int.Parse(specificSkill[1])+1);
+                workerSkills[workerIndex] = GameManager.instance.ConvertListToString(allWorkerSkills, ",");
+                return;
+            }
+        }
+        workerSkills[workerIndex] += ","+buildingType+"=0";
+    }
+
+    public void SortWorkerSkills(int workerIndex)
+    {
+        // Implement quick sort later I guess.
+        List<string> allWorkerSkills = workerSkills[workerIndex].Split(",").ToList();
+        List<int> skillLevels = new List<int>();
+        string[] specificSkill = new string[2];
+        for (int i = 0; i < allWorkerSkills.Count; i++)
+        {
+            skillLevels.Add(int.Parse(allWorkerSkills[i].Split("=")[1]));
+        }
+        allWorkerSkills = GameManager.instance.utility.QuickSortListbyIntList(allWorkerSkills, skillLevels, 0, allWorkerSkills.Count - 1);
+        workerSkills[workerIndex] = GameManager.instance.ConvertListToString(allWorkerSkills, ",");
     }
     
     public List<int> ReturnOutputs()
@@ -247,7 +339,8 @@ public class VillageDataManager : BasicDataManager
         // At first projected outputs are all 0.
         projectedOutputs.Clear();
         projectedOutputs.Add(0);
-        projectedOutputs.Add(-(DeterminePopulation()));
+        projectedOutputs.Add(-(DetermineFoodConsumption()));
+        projectedOutputs.Add(0);
         projectedOutputs.Add(0);
         projectedOutputs.Add(0);
         // No projections without workers.
@@ -287,5 +380,31 @@ public class VillageDataManager : BasicDataManager
         buildingPhaseLocations.Add(tileNumber.ToString());
         buildingPhaseBuildings.Add(buildingType.ToString());
         buildTimes.Add(duration.ToString());
+    }
+
+    protected void Build(string location, int workerIndex)
+    {
+        int index = ReturnNewBuildingIndex(location);
+        if (index < 0){return;}
+        int newTime = (int.Parse(buildTimes[index]) - 1);
+        if (newTime <= 0)
+        {
+            FinishBuilding(index);
+            return;
+        }
+        buildTimes[index] = newTime.ToString();
+    }
+
+    // Make an unbuilt building a real building.
+    protected void FinishBuilding(int index)
+    {
+        string newType = buildingPhaseBuildings[index];
+        buildings.Add(newType);
+        buildingLocations.Add(buildingPhaseLocations[index]);
+        buildingLevels.Add("1");
+        buildingHealths.Add((buildingData.ReturnBuildingMaxHealth(int.Parse(newType))).ToString());
+        buildingPhaseBuildings.RemoveAt(index);
+        buildingPhaseLocations.RemoveAt(index);
+        buildTimes.RemoveAt(index);
     }
 }

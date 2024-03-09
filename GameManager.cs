@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public GeneralUtility utility;
     public int basePartySize = 2;
     public List<PlayerActor> playerActors;
     public PlayerActor player;
@@ -222,6 +223,13 @@ public class GameManager : MonoBehaviour
         }
         SaveData();
         LoadData();
+    }
+
+    public void NewDay()
+    {
+        time++;
+        villageData.NewDay();
+        SaveData();
     }
 
     public void GainResource(int type, int amount)

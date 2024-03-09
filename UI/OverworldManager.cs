@@ -211,7 +211,7 @@ public class OverworldManager : Map
     public override void ClickOnTile(int tileNumber)
     {
         if (!interactable){return;}
-        if (currentLocation == currentTiles[tileNumber]){MoveIntoTile(currentLocation);}
+        if (currentLocation == currentTiles[tileNumber]){MoveIntoTile(currentLocation, false);}
         if (currentTiles[tileNumber] < 0){return;}
         List<int> path = new List<int>(pathfinder.DestReachable(currentLocation, currentTiles[tileNumber], currentTiles));
         if (path.Count <= 0){return;}
@@ -231,9 +231,10 @@ public class OverworldManager : Map
         interactable = true;
     }
 
-    protected void MoveIntoTile(int tileLocation)
+    protected void MoveIntoTile(int tileLocation, bool newDay = true)
     {
         GameManager.instance.UpdateLocation(currentLocation, currentLevel);
+        if (newDay){GameManager.instance.NewDay();}
         switch (levelLocations[tileLocation])
         {
             case "0":

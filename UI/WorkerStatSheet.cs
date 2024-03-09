@@ -28,7 +28,7 @@ public class WorkerStatSheet : MonoBehaviour
     public TMP_Text healthStat;
     public TMP_Text currentWorkLocation;
     public TMP_Text family;
-    public TMP_Text skills;
+    public List<TMP_Text> skills;
     public void UpdateWorkerStats()
     {
         if (currentIndex < 0){return;}
@@ -40,21 +40,32 @@ public class WorkerStatSheet : MonoBehaviour
         UpdateWorkerSkills();
     }
 
+    protected void ResetSkills()
+    {
+        for (int i = 0; i < skills.Count; i++)
+        {
+            skills[i].text = "";
+        }
+    }
+
     protected void UpdateWorkerSkills()
     {
-        string skillString = "";
+        ResetSkills();
+        int index = 0;
+        villageData.SortWorkerSkills(currentIndex);
         string[] allSkills = villageData.workerSkills[currentIndex].Split(",");
         string[] specificSkills = new string[2];
         for (int i = 0; i < allSkills.Length; i++)
         {
+            if (index >= skills.Count){break;}
             if (allSkills[i].Length < 3){continue;}
             specificSkills = allSkills[i].Split("=");
             // Only add real skills.
             if (int.Parse(specificSkills[1]) >= 100)
             {
-                skillString += buildingData.ReturnBuildingName(int.Parse(specificSkills[0]))+"\n";
+                skills[index].text = buildingData.ReturnBuildingName(int.Parse(specificSkills[0]));
+                index++;
             }
         }
-        skills.text = skillString;
     }
 }
