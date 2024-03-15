@@ -14,6 +14,7 @@ public class OverworldStatSheet : MonoBehaviour
     public Image actorSprite;
     public ActorSprites spriteDictionary;
     public PlayerActor statActor;
+    public int index;
 
     public virtual void UpdateStatSheet(PlayerActor actor)
     {
@@ -32,7 +33,7 @@ public class OverworldStatSheet : MonoBehaviour
 
     public virtual void ClickOnStatSheet()
     {
-        GameManager.instance.armyData.SetViewStatsActor(statActor);
+        GameManager.instance.armyData.SetViewStatsIndex(index);
         UnityEngine.SceneManagement.SceneManager.LoadScene("EquipmentSelect");
     }
 }

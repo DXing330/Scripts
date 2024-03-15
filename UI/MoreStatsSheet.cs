@@ -14,6 +14,12 @@ public class MoreStatsSheet : OverworldStatSheet
         UpdateStatSheet(statActor);
     }
 
+    public void ReUpdate()
+    {
+        statActor = GameManager.instance.armyData.viewStatsActor;
+        UpdateStatSheet(statActor);
+    }
+
     public void UpdateMoreStats()
     {
         UpdateEquipStats();

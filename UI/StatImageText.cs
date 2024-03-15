@@ -18,4 +18,14 @@ public class StatImageText : MonoBehaviour
     {
         image.sprite = newSprite;
     }
+
+    public void HighlightText()
+    {
+        stat.color = Color.red;
+    }
+
+    public void Unhighlight()
+    {
+        stat.color = Color.white;
+    }
 }

@@ -66,6 +66,15 @@ public class ArmyDataManager : BasicDataManager
     public List<string> availableFighters = new List<string>(0);
     public List<string> fighterHealths = new List<string>(0);
     public PlayerActor viewStatsActor;
+    public int viewStatsIndex = -1;
+    public void SetViewStatsIndex(int index)
+    {
+        viewStatsIndex = index;
+        if (viewStatsIndex >= 0 && viewStatsIndex < allPartyMembers.Count)
+        {
+            viewStatsActor = allPartyMembers[viewStatsIndex];
+        }
+    }
     public void SetViewStatsActor(PlayerActor newActor)
     {
         viewStatsActor = newActor;
