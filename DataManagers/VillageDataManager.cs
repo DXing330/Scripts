@@ -13,24 +13,6 @@ public class VillageDataManager : BasicDataManager
         // terrain info needs dimensions and terrain types
     public int totalRows; // 9
     public int totalColumns; // 9
-    public List<List<string>> allStats = new List<List<string>>();
-    protected void SetAllStats()
-    {
-        allStats.Clear();
-        allStats.Add(villageTiles);
-        allStats.Add(resources);
-        allStats.Add(workers);
-        allStats.Add(workerFamilySize);
-        allStats.Add(workerHealth);
-        allStats.Add(workerSkills);
-        allStats.Add(workerLocations);
-        allStats.Add(buildings);
-        allStats.Add(buildingLocations);
-        allStats.Add(buildingLevels);
-        allStats.Add(buildingHealths);
-        allStats.Add(buildingPhaseBuildings);
-        allStats.Add(buildTimes);
-    }
     public List<string> villageTiles; // figure it out
     // Keep track of resources I guess.
         // money|food|wood|stone|woman
@@ -164,7 +146,7 @@ public class VillageDataManager : BasicDataManager
         buildings = dataBlocks[9].Split("|").ToList();
         buildingLocations = dataBlocks[10].Split("|").ToList();
         buildingLevels = dataBlocks[11].Split("|").ToList();
-        buildingHealths = dataBlocks[12].Split("|").ToList();
+        //buildingHealths = dataBlocks[12].Split("|").ToList();
         buildingPhaseBuildings = dataBlocks[13].Split("|").ToList();
         buildingPhaseLocations = dataBlocks[14].Split("|").ToList();
         buildTimes = dataBlocks[15].Split("|").ToList();
@@ -285,6 +267,11 @@ public class VillageDataManager : BasicDataManager
         return ReturnBuildingOnTile(workerLocations[workerIndex]);
     }
 
+    public bool WorkerBuilding(int workerIndex)
+    {
+        return CheckIfNewBuilding(int.Parse(workerLocations[workerIndex]));
+    }
+
     public int ReturnWorkerSkillLevel(int workerIndex, int buildingType)
     {
         IncreaseWorkerSkillLevel(workerIndex, buildingType);
@@ -353,6 +340,9 @@ public class VillageDataManager : BasicDataManager
         // O(n)
         for (int i = 0; i < workerLocations.Count; i++)
         {
+            // If they're building then no outputs.
+            // O(n) // n = length of new buildings.
+            if (CheckIfNewBuilding(int.Parse(workerLocations[i]))){continue;}
             // Find what building they're assigned to.
             // O(m)
             buildingType = ReturnBuildingOnTile(workerLocations[i]);
@@ -395,16 +385,45 @@ public class VillageDataManager : BasicDataManager
         buildTimes[index] = newTime.ToString();
     }
 
-    // Make an unbuilt building a real building.
+    // Make an unbuilt building a real building or increase a building's level.
     protected void FinishBuilding(int index)
     {
-        string newType = buildingPhaseBuildings[index];
-        buildings.Add(newType);
-        buildingLocations.Add(buildingPhaseLocations[index]);
-        buildingLevels.Add("1");
-        buildingHealths.Add((buildingData.ReturnBuildingMaxHealth(int.Parse(newType))).ToString());
+        int indexOf = buildingLocations.IndexOf(buildingPhaseLocations[index]);
+        if (indexOf < 0)
+        {
+            string newType = buildingPhaseBuildings[index];
+            buildings.Add(newType);
+            buildingLocations.Add(buildingPhaseLocations[index]);
+            buildingLevels.Add("1");
+            //buildingHealths.Add((buildingData.ReturnBuildingMaxHealth(int.Parse(newType))).ToString());
+        }
+        else
+        {
+            buildingLevels[indexOf] = (int.Parse(buildingLevels[indexOf])+1).ToString();
+        }
         buildingPhaseBuildings.RemoveAt(index);
         buildingPhaseLocations.RemoveAt(index);
         buildTimes.RemoveAt(index);
+    }
+
+    public bool TryToConsumeResources(List<int> costs)
+    {
+        List<string> updatedResources = new List<string>(resources);
+        int specificAmount = 0;
+        // Check all the costs.
+        // O(1), constant amount of different resource costs.
+        for (int i = 0; i < resources.Count; i++)
+        {
+            specificAmount = int.Parse(resources[i]);
+            if (specificAmount < costs[i])
+            {
+                // Fail a specific requirement.
+                return false;
+            }
+            updatedResources[i] = (specificAmount - costs[i]).ToString();
+        }
+        // Meet all the requirements.
+        resources = updatedResources;
+        return true;
     }
 }

@@ -18,7 +18,7 @@ public class BuildingDataManager : MonoBehaviour
     public List<string> outputs;
     public List<string> flavorTexts;
     public List<string> buildTimes;
-    protected List<string> dummyList;
+    public List<string> dummyList;
 
     [ContextMenu("Load")]
     public void LoadAllData()
@@ -117,7 +117,7 @@ public class BuildingDataManager : MonoBehaviour
         return dummyList;
     }
 
-    public List<int> ReturnBuildCostInOrder(int buildingIndex)
+    public List<int> ReturnBuildCostInOrder(int buildingIndex, int buildingLevel = 0)
     {
         dummyList.Clear();
         List<int> costs = new List<int>();
@@ -131,7 +131,7 @@ public class BuildingDataManager : MonoBehaviour
         {
             if (dummyList[i].Length < 3){continue;}
             string[] specifics = dummyList[i].Split("=");
-            costs[int.Parse(specifics[0])] = int.Parse(specifics[1]);
+            costs[int.Parse(specifics[0])] = (buildingLevel+1)*int.Parse(specifics[1]);
         }
         return costs;
     }

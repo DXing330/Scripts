@@ -108,7 +108,7 @@ public class VillageEditor : Map
     }
 
     // need to be able to highlight when selecting things
-    int selectedWorker = -1;
+    public int selectedWorker = -1;
     public void HighlightSelectedWorker(int newlySelectedWorker = -1)
     {
         if (newlySelectedWorker >= 0)
@@ -128,7 +128,7 @@ public class VillageEditor : Map
             terrainTiles[indexOf].Highlight();
         }
     }
-    int selectedBuilding = -1;
+    public int selectedBuilding = -1;
     public void HighlightSelectedBuilding(int newlySelectedBuilding = -1)
     {
         if (newlySelectedBuilding >= 0)
@@ -147,7 +147,7 @@ public class VillageEditor : Map
             terrainTiles[indexOf].Highlight();
         }
     }
-    int selectedTile = -1;
+    public int selectedTile = -1;
     public int ReturnSelectedTile(){return selectedTile;}
     public void HighlightSelectedTile(int newlySelectedTile = -1)
     {
@@ -239,25 +239,28 @@ public class VillageEditor : Map
     public void TryToBuildNew(int buildingType)
     {
         List<int> allCosts = buildingData.ReturnBuildCostInOrder(buildingType);
-        List<string> allResources = villageData.resources;
-        List<string> updatedResources = new List<string>(allResources);
-        int specificAmount = 0;
-        // Check all the costs.
-        // O(1), constant amount of different resource costs.
-        for (int i = 0; i < allResources.Count; i++)
+        if (villageData.TryToConsumeResources(allCosts))
         {
-            specificAmount = int.Parse(allResources[i]);
-            if (specificAmount < allCosts[i])
-            {
-                return;
-            }
-            updatedResources[i] = (specificAmount - allCosts[i]).ToString();
+            int buildTime = buildingData.ReturnBuildTime(buildingType);
+            villageData.StartBuilding(selectedTile, buildingType, buildTime);
+            UpdateNewBuildings(villageData.buildingPhaseBuildings, villageData.buildingPhaseLocations);
+            UpdateMap();
         }
-        // If everything checks out then start building.
-        villageData.resources = updatedResources;
-        int buildTime = buildingData.ReturnBuildTime(buildingType);
-        villageData.StartBuilding(selectedTile, buildingType, buildTime);
-        UpdateNewBuildings(villageData.buildingPhaseBuildings, villageData.buildingPhaseLocations);
-        UpdateMap();
+    }
+
+    public void TryToUpgrade(int buildingType, int buildingLevel = 1)
+    {
+        // Can't upgrade what is already being upgraded.
+        string loc = villageData.buildingLocations[selectedBuilding];
+        if (villageData.buildingPhaseLocations.Contains(loc)){return;}
+        List<int> allCosts = buildingData.ReturnBuildCostInOrder(buildingType, buildingLevel);
+        if (villageData.TryToConsumeResources(allCosts))
+        {
+            // Try to upgrade that tile.
+            int buildTime = buildingData.ReturnBuildTime(buildingType, buildingLevel);
+            villageData.StartBuilding(int.Parse(villageData.buildingLocations[selectedBuilding]), buildingType, buildTime);
+            UpdateNewBuildings(villageData.buildingPhaseBuildings, villageData.buildingPhaseLocations);
+            UpdateMap();
+        }
     }
 }

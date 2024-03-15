@@ -25,10 +25,27 @@ public class VillageGUI : MonoBehaviour
         villageManager.HighlightSelectedWorker(workerStatSheet.currentIndex);
     }
     public BuildingStatSheet buildingStatSheet;
+    public void ShiftBuildingIndex(bool right = true)
+    {
+        int count = villageData.buildings.Count;
+        int currentIndex = buildingStatSheet.currentIndex;
+        if (right)
+        {
+            if (currentIndex < count - 1){currentIndex++;}
+            else {currentIndex = 0;}
+        }
+        else
+        {
+            if (currentIndex > 0){currentIndex--;}
+            else {currentIndex = count - 1;}
+        }
+        ChangeBuildingIndex(currentIndex);
+        UpdatePanels();
+    }
     public void ChangeBuildingIndex(int newIndex)
     {
         buildingStatSheet.SetIndex(newIndex);
-        villageManager.HighlightSelectedWorker(workerStatSheet.currentIndex);
+        //villageManager.HighlightSelectedBuilding(workerStatSheet.currentIndex);
     }
     public NewBuildingStatSheet newBuildingStatSheet;
     public void ChangeTerrainType(int newType)
@@ -95,6 +112,7 @@ public class VillageGUI : MonoBehaviour
             stateTexts[state].fontStyle |= FontStyles.Bold;
         }
     }
+
     public void ChangeState(int newState)
     {
         if (newState == state){state = -1;}
@@ -103,12 +121,23 @@ public class VillageGUI : MonoBehaviour
         ActivatePanels();
         BoldStateText();
     }
+
     public void TryToBuildNew()
     {
         // Get the tile and building.
         int buildingType = newBuildingStatSheet.ReturnSelectedBuilding();
         if (buildingType < 0){return;}
         villageManager.TryToBuildNew(buildingType);
+        villageStats.UpdateVillageStats();
+    }
+
+    public void TryToUpgrade()
+    {
+        // Get the tile and building.
+        int buildingType = buildingStatSheet.buildingType;
+        int buildingLevel = buildingStatSheet.buildingLevel;
+        if (buildingType < 0){return;}
+        villageManager.TryToUpgrade(buildingType, buildingLevel);
         villageStats.UpdateVillageStats();
     }
 }

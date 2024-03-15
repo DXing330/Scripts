@@ -15,6 +15,9 @@ public class BuildingStatSheet : MonoBehaviour
         currentIndex = newIndex;
         UpdateBuildingStats();
     }
+    public int buildingType = -1;
+    public int buildingLevel = -1;
+    public int location = -1;
     public TMP_Text nameStat;
     public TMP_Text levelStat;
     public TMP_Text healthStat;
@@ -32,16 +35,23 @@ public class BuildingStatSheet : MonoBehaviour
 
     public void UpdateBuildingStats()
     {
-        int buildingType = int.Parse(villageData.buildings[currentIndex]);
-        int buildingLevel = int.Parse(villageData.buildingLevels[currentIndex]);
+        buildingType = int.Parse(villageData.buildings[currentIndex]);
+        buildingLevel = int.Parse(villageData.buildingLevels[currentIndex]);
+        location = int.Parse(villageData.buildingLocations[currentIndex]);
         flavor.text = buildingData.ReturnFlavorText(buildingType);
         nameStat.text = buildingData.ReturnBuildingName(buildingType).ToString();
         levelStat.text = buildingLevel.ToString();
-        healthStat.text = villageData.buildingHealths[currentIndex]+"/"+buildingData.ReturnBuildingMaxHealth(buildingType, buildingLevel);
+        //healthStat.text = villageData.buildingHealths[currentIndex]+"/"+buildingData.ReturnBuildingMaxHealth(buildingType, buildingLevel);
+        healthStat.text = buildingData.ReturnBuildingMaxHealth(buildingType, buildingLevel).ToString();
         hp_level.text = "(+"+buildingData.ReturnHealthPerLevel(buildingType)+")";
         workerLimit.text = buildingData.ReturnWorkerLimit(buildingType, buildingLevel).ToString();
         worker_level.text = "(+"+buildingData.ReturnWorkerPerLevel(buildingType)+")";
         upgradeTime.text = buildingData.ReturnBuildTime(buildingType, buildingLevel).ToString();
+        // If already upgrading then return the remaining time.
+        if (villageData.CheckIfNewBuilding(location))
+        {
+            upgradeTime.text = villageData.ReturnNewBuildingTime(location);
+        }
         UpdateOutputs(buildingType);
         UpdateBuildCost(buildingType, buildingLevel);
     }
