@@ -55,10 +55,10 @@ public class VillageDataManager : BasicDataManager
     public List<string> buildingsOnTerrainTypes; // Farm,House|Lumberyard||||||||Quarry||||
     protected List<int> projectedOutputs = new List<int>();
 
-    public void NewDay()
+    public void NewDay(bool resources = true)
     {
-        // Get daily outputs.
-        UpdateResources(ReturnOutputs());
+        // Get outputs every other day.
+        if (resources){UpdateResources(ReturnOutputs());}
         // Update any building phase stuff.
         UpdateBuildTimes();
         // Decrease worker's health if they aren't resting.

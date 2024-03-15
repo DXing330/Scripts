@@ -10,6 +10,7 @@ public class PlayerSettings : BasicDataManager
     public string allSettings;
     // First setting will be to whether to do a simulated auto battle or not.
     public List<string> settingsList;
+    // Great place to add stuff like how many days it takes to generate resources, etc.
 
     public override void Save()
     {

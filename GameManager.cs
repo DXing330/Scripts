@@ -228,7 +228,7 @@ public class GameManager : MonoBehaviour
     public void NewDay()
     {
         time++;
-        villageData.NewDay();
+        villageData.NewDay(utility.DivisibleThree(time));
         SaveData();
     }
 

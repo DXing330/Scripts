@@ -7,6 +7,21 @@ using UnityEngine;
 
 public class GeneralUtility : MonoBehaviour
 {
+    public bool DivisibleNumber(int input, int check = 2)
+    {
+        return (input%check==0);
+    }
+
+    public bool EvenNumber(int number)
+    {
+        return (number%2==0);
+    }
+
+    public bool DivisibleThree(int number)
+    {
+        return (number%3==0);
+    }
+    
     public string ConvertListToString(List<string> string_list, string delimiter = "|")
     {
         return String.Join(delimiter, string_list);
