@@ -25,7 +25,45 @@ public class PlayerActor : AllStats
     public string species = "Undead";
     public List<string> movementCosts;
     public List<string> learntPassives;
+    protected void UpdatePassives()
+    {
+        playerActor.passiveSkillNames.Clear();
+        if (learntPassives.Count > 0)
+        {
+            for (int i = 0; i < Mathf.Min(currentLevel, learntPassives.Count); i++)
+            {
+                playerActor.passiveSkillNames.Add(learntPassives[i]);
+            }
+        }
+        allEquipment.UpdatePassives(playerActor);
+        playerActor.passiveSkillNames = new List<string>(playerActor.passiveSkillNames.Distinct());
+    }
+    public List<string> ReturnPassives()
+    {
+        UpdatePassives();
+        allEquipment.UpdateActorStats(playerActor);
+        playerActor.passiveSkillNames = new List<string>(playerActor.passiveSkillNames.Distinct());
+        return playerActor.passiveSkillNames;
+    }
     public List<string> learntSkills;
+    protected void UpdateActives()
+    {
+        playerActor.activeSkillNames.Clear();
+        if (learntSkills.Count > 0)
+        {
+            for (int i = 0; i < Mathf.Min(currentLevel, learntSkills.Count); i++)
+            {
+                playerActor.activeSkillNames.Add(learntSkills[i]);
+            }
+        }
+        allEquipment.UpdateActives(playerActor);
+        playerActor.activeSkillNames = new List<string>(playerActor.activeSkillNames.Distinct());
+    }
+    public List<string> ReturnActives()
+    {
+        UpdateActives();
+        return playerActor.activeSkillNames;
+    }
     public EquipmentContainer allEquipment;
 
     public void ResetAllData()
@@ -91,16 +129,8 @@ public class PlayerActor : AllStats
         {
             return;
         }
-        playerActor.activeSkillNames.Clear();
-        for (int i = 0; i < Mathf.Min(currentLevel, learntSkills.Count); i++)
-        {
-            playerActor.activeSkillNames.Add(learntSkills[i]);
-        }
-        playerActor.passiveSkillNames.Clear();
-        for (int i = 0; i < Mathf.Min(currentLevel, learntPassives.Count); i++)
-        {
-            playerActor.passiveSkillNames.Add(learntPassives[i]);
-        }
+        UpdateActives();
+        UpdatePassives();
         allEquipment.UpdateActorStats(playerActor);
     }
 

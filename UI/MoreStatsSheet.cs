@@ -35,9 +35,9 @@ public class MoreStatsSheet : OverworldStatSheet
         equipStatTexts[equipStatTexts.Count - 1].text = equipStats[0].ToString();
     }
 
-    public override void UpdateStatSheet(PlayerActor actor)
+    public override void UpdateStatSheet(PlayerActor actor, bool baseStats = false)
     {
-        base.UpdateStatSheet(actor);
+        base.UpdateStatSheet(actor, true);
         UpdateEquipStats();
     }
 }

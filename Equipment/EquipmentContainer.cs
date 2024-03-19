@@ -119,6 +119,12 @@ public class EquipmentContainer : AllStats
         actor.baseAttack += baseAttack;
         actor.baseDefense += baseDefense;
         actor.baseMovement += baseMovement;
+        //UpdateActives(actor);
+        //UpdatePassives(actor);
+    }
+
+    public void UpdateActives(TacticActor actor)
+    {
         if (bonusActives.Count > 0)
         {
             for (int i = 0; i < bonusActives.Count; i++)
@@ -127,6 +133,10 @@ public class EquipmentContainer : AllStats
                 actor.activeSkillNames.Add(bonusActives[i]);
             }
         }
+    }
+
+    public void UpdatePassives(TacticActor actor)
+    {
         if (bonusPassives.Count > 0)
         {
             for (int i = 0; i < bonusPassives.Count; i++)
@@ -141,5 +151,15 @@ public class EquipmentContainer : AllStats
     {
         GetEquipStats();
         return base.ReturnStatList();
+    }
+
+    public List<string> ReturnEquipPassives()
+    {
+        return bonusPassives;
+    }
+
+    public List<string> ReturnEquipActives()
+    {
+        return bonusActives;
     }
 }

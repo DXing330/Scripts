@@ -7,6 +7,13 @@ using UnityEngine;
 
 public class GeneralUtility : MonoBehaviour
 {
+    public void DisableAllObjects(List<GameObject> objects)
+    {
+        for (int i = 0; i < objects.Count; i++)
+        {
+            objects[i].SetActive(false);
+        }
+    }
     public bool DivisibleNumber(int input, int check = 2)
     {
         return (input%check==0);

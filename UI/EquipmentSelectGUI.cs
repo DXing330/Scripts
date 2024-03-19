@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class EquipmentSelectGUI : MonoBehaviour
+public class EquipmentSelectGUI : BasicGUI
 {
     public EquipmentInventory equipInventory;
     public EquipmentSprites equipSprites;

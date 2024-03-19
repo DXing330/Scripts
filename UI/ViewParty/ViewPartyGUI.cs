@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class ViewPartyGUI : MonoBehaviour
+public class ViewPartyGUI : BasicGUI
 {
     public PartyMemberList partyMemberList;
     public int selectedMember = -1;
@@ -24,6 +24,7 @@ public class ViewPartyGUI : MonoBehaviour
     public List<TMP_Text> stateTexts;
     public MoreStatsSheet equipmentStats;
     public EquipmentSelectGUI equipmentSelect;
+    public ViewSkillGUI skillView;
     public void SelectState(int selected)
     {
         if (selected == state){state = -1;}
@@ -54,6 +55,10 @@ public class ViewPartyGUI : MonoBehaviour
             case 0:
                 equipmentSelect.GetViewedActor();
                 equipmentStats.ReUpdate();
+                break;
+            case 1:
+                skillView.SetActor(partyMemberList.partyMembers[selectedMember]);
+                skillView.UpdateSkillTextList();
                 break;
         }
     }
