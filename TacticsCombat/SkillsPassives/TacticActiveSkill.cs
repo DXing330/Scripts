@@ -38,6 +38,15 @@ public class TacticActiveSkill : MonoBehaviour
         return displayedStats;
     }
 
+    public List<string> ReturnRangeStats()
+    {
+        List<string> rangeStats = new List<string>();
+        rangeStats.Add(range.ToString());
+        rangeStats.Add(span.ToString());
+        rangeStats.Add(targetingShape);
+        return rangeStats;
+    }
+
     protected string ReturnTargettingString(int targetType)
     {
         switch (targetType)
