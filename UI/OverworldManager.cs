@@ -67,7 +67,7 @@ public class OverworldManager : Map
         if (previousEntranceLocation >= 0)
         {
             // Find an appropriate spawn point.
-            pathfinder.RecurviseAdjacency(previousEntranceLocation);
+            pathfinder.RecursiveAdjacency(previousEntranceLocation);
             List<int> adjacentFromEntrance = pathfinder.adjacentTiles;
             for (int i = 0; i < adjacentFromEntrance.Count; i++)
             {

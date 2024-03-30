@@ -11,7 +11,7 @@ public class Test : MonoBehaviour
 
     void Start()
     {
-        //RecurviseAdjacency(0, 2);
+        //RecursiveAdjacency(0, 2);
         int test1 = 1;
         string test2 = "1";
         Debug.Log(test1.ToString().StartsWith(test2));
@@ -41,7 +41,7 @@ public class Test : MonoBehaviour
         return tempAdjTiles;
     }
 
-    public void RecurviseAdjacency(int location, int range = 1)
+    public void RecursiveAdjacency(int location, int range = 1)
     {
         adjacentTiles.Clear();
         if (range <= 0)

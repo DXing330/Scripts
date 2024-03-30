@@ -159,7 +159,7 @@ public class TerrainPathfinder : BasicPathfinder
         // This part is where the heap is used making it O(nlgn) instead of O(n^2).
         int closestTile = heap.Pull();
         reachableTiles.Add(closestTile);
-        RecurviseAdjacency(closestTile);
+        RecursiveAdjacency(closestTile);
         for (int i = 0; i < adjacentTiles.Count; i++)
         {
             int moveCost = 1;
@@ -183,7 +183,7 @@ public class TerrainPathfinder : BasicPathfinder
         if (closestTile < 0){return;}
         if (path){checkedTiles.Add(closestTile);}
         else{reachableTiles.Add(closestTile);}
-        RecurviseAdjacency(closestTile);
+        RecursiveAdjacency(closestTile);
         for (int i = 0; i < adjacentTiles.Count; i++)
         {
             // Need an extra check for occupied tiles.
@@ -510,7 +510,7 @@ public class TerrainPathfinder : BasicPathfinder
         // O(n).
         for (int i = 0; i < reachableTiles.Count; i++)
         {
-            RecurviseAdjacency(reachableTiles[i], attackRange);
+            RecursiveAdjacency(reachableTiles[i], attackRange);
             attackableTiles.AddRange(adjacentTiles.Except(attackableTiles));
         }
         attackableTiles.Remove(startIndex);

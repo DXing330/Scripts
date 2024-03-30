@@ -720,7 +720,7 @@ public class TerrainMap : MonoBehaviour
     {
         int adjacentEnemies = 0;
         int location = attackTarget.locationIndex;
-        pathFinder.RecurviseAdjacency(location);
+        pathFinder.RecursiveAdjacency(location);
         for (int i = 0; i < pathFinder.adjacentTiles.Count; i++)
         {
             TacticActor tempActor = ReturnActorOnTile(pathFinder.adjacentTiles[i]);
@@ -892,7 +892,7 @@ public class TerrainMap : MonoBehaviour
         {
             return true;
         }
-        pathFinder.RecurviseAdjacency(location);
+        pathFinder.RecursiveAdjacency(location);
         if (pathFinder.adjacentTiles.Contains(target))
         {
             return true;

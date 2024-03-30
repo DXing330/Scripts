@@ -107,7 +107,7 @@ public class BasicPathfinder : MonoBehaviour
         }
         return tempAdjTiles;
     }
-    public void RecurviseAdjacency(int location, int range = 1)
+    public void RecursiveAdjacency(int location, int range = 1)
     {
         adjacentTiles.Clear();
         if (range <= 0)
@@ -180,7 +180,7 @@ public class BasicPathfinder : MonoBehaviour
         int closestTile = heap.Pull();
         checkedTiles.Add(closestTile);
         if (closestTile < 0){return;}
-        RecurviseAdjacency(closestTile);
+        RecursiveAdjacency(closestTile);
         for (int i = 0; i < adjacentTiles.Count; i++)
         {
 

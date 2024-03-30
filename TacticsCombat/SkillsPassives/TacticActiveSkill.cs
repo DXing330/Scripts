@@ -25,6 +25,40 @@ public class TacticActiveSkill : MonoBehaviour
     public int currentPower;
     public string actionCost;
     public string flavorText;
+    public List<string> ReturnStatList()
+    {
+        List<string> displayedStats = new List<string>();
+        // Don't need name since's it on the side.
+        displayedStats.Add(effect);
+        displayedStats.Add(ReturnTargettingString(skillTarget));
+        displayedStats.Add(cost.ToString());
+        displayedStats.Add(basePower.ToString());
+        displayedStats.Add(effectSpecifics);
+        displayedStats.Add(actionCost);
+        return displayedStats;
+    }
+
+    protected string ReturnTargettingString(int targetType)
+    {
+        switch (targetType)
+        {
+            case 0:
+                return "Enemies";
+            case 1:
+                return "Allies";
+            case 2:
+                return "ALL";
+            case 3:
+                return "Self";
+            case 4:
+                return "None";
+            case 5:
+                return "Others";
+            case 6:
+                return "Soul-Linked";
+        }
+        return "";
+    }
 
     // Definitely don't need two of these.
     public void AffectActor(TacticActor actor, int power = 0, string newEffect = "")

@@ -52,6 +52,7 @@ public class TextList : MonoBehaviour
         {
             textBoxes[i].color = normal;
         }
+        if (index < 0){return;}
         textBoxes[index].color = highlight;
     }
 

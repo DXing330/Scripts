@@ -14,7 +14,7 @@ public class MoveManager : MonoBehaviour
 
     private bool Moveable(TacticActor actor, int dest, int distance)
     {
-        pathfinder.RecurviseAdjacency(actor.locationIndex);
+        pathfinder.RecursiveAdjacency(actor.locationIndex);
         if (!pathfinder.adjacentTiles.Contains(dest) || pathfinder.occupiedTiles[dest] > 0)
         {
             return false;

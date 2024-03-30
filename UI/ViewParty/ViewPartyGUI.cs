@@ -59,6 +59,7 @@ public class ViewPartyGUI : BasicGUI
             case 1:
                 skillView.SetActor(partyMemberList.partyMembers[selectedMember]);
                 skillView.UpdateSkillTextList();
+                skillView.ResetSkillView();
                 break;
         }
     }
