@@ -30,11 +30,6 @@ public class GeneralUtility : MonoBehaviour
         return (number%3==0);
     }
 
-    public int ReturnSpotInList(int row, int column, int total_Columns)
-    {
-        return ((row * total_Columns) + column);
-    }
-
     public string ConvertListToString(List<string> string_list, string delimiter = "|")
     {
         return String.Join(delimiter, string_list);
