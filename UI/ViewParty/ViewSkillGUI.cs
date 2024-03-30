@@ -70,11 +70,20 @@ public class ViewSkillGUI : MonoBehaviour
         rangeDetails[center].UpdateImage(actorSprites.SpriteDictionary(actor.typeName));
         // Find what tiles are in range.
         pathfinder.RecursiveAdjacency(center, int.Parse(rangeStats[0]));
-        List<int> tilesInRange = pathfinder.adjacentTiles;
         // Highlight tiles in range.
-        for (int i = 0; i < tilesInRange.Count; i++)
+        for (int i = 0; i < pathfinder.adjacentTiles.Count; i++)
         {
-            rangeDetails[tilesInRange[i]].Highlight();
+            rangeDetails[pathfinder.adjacentTiles[i]].Highlight();
+        }
+        // If the span is greater than zero then highlight the span as well.
+        int span = int.Parse(rangeStats[1]);
+        if (span > 0)
+        {
+            pathfinder.RecursiveAdjacency(center, span);
+            for (int i = 0; i < pathfinder.adjacentTiles.Count; i++)
+            {
+                rangeDetails[pathfinder.adjacentTiles[i]].Highlight(false);
+            }
         }
     }
 }

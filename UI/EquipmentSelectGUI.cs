@@ -30,14 +30,28 @@ public class EquipmentSelectGUI : BasicGUI
     }
     public MoreStatsSheet statSheet;
     public int changeEquipType = -1;
+    public void ResetEquipType()
+    {
+        changeEquipType = -1;
+        for (int i = 0; i < equipSlots.Count; i++)
+        {
+            equipSlots[i].ResetTitleColor();
+            if (i == changeEquipType)
+            {
+                equipSlots[i].HighlightTitle();
+            }
+        }
+        inventoryObject.SetActive(false);
+        ResetStatTexts();
+    }
     public void ChangeEquipType(int newType)
     {
         currentInventoryPage = 0;
         selectedEquipIndex = -1;
+        ResetStatTexts();
         if (changeEquipType == newType)
         {
-            changeEquipType = -1;
-            inventoryObject.SetActive(false);
+            ResetEquipType();
         }
         else
         {

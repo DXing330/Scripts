@@ -55,6 +55,7 @@ public class ViewPartyGUI : BasicGUI
             case 0:
                 equipmentSelect.GetViewedActor();
                 equipmentStats.ReUpdate();
+                equipmentSelect.ResetEquipType();
                 break;
             case 1:
                 skillView.SetActor(partyMemberList.partyMembers[selectedMember]);
