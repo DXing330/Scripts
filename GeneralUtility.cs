@@ -15,6 +15,14 @@ public class GeneralUtility : MonoBehaviour
         }
     }
 
+    public void EnableAllObjects(List<GameObject> objects)
+    {
+        for (int i = 0; i < objects.Count; i++)
+        {
+            objects[i].SetActive(true);
+        }
+    }
+
     public bool DivisibleNumber(int input, int check = 2)
     {
         return (input%check==0);
@@ -49,6 +57,19 @@ public class GeneralUtility : MonoBehaviour
     public int CountOccurencesOfStringInList(List<string> listToCountFrom, string stringToCount)
     {
         int count = listToCountFrom.Count(s => s == stringToCount);
+        return count;
+    }
+
+    public int CountOccurencesOfCharInString(string stringToCountFrom, char charToCount)
+    {
+        int count = 0;
+        for (int i = 0; i < stringToCountFrom.Length; i++)
+        {
+            if (stringToCountFrom[i] == charToCount)
+            {
+                count++;
+            }
+        }
         return count;
     }
 

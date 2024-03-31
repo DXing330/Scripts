@@ -21,6 +21,7 @@ public class ViewSkillGUI : MonoBehaviour
     }
     public GameObject detailsPanel;
     public List<TMP_Text> skillDetails;
+    public TMP_Text skillDescription;
     public List<TerrainTile> rangeDetails;
     public BasicPathfinder pathfinder;
     public int rangeMapSize = 9;
@@ -42,11 +43,8 @@ public class ViewSkillGUI : MonoBehaviour
     protected void UpdateSkill(string skillName)
     {
         skillData.LoadDataForSkill(dummySkill, skillName);
-        skillDetailStrings = dummySkill.ReturnStatList();
-        for (int i = 0; i < skillDetails.Count; i++)
-        {
-            skillDetails[i].text = skillDetailStrings[i];
-        }
+        //skillDetailStrings = dummySkill.ReturnStatList();
+        UpdateDescription();
         UpdateRange();
     }
 
@@ -69,7 +67,8 @@ public class ViewSkillGUI : MonoBehaviour
         int center = (rangeMapSize*rangeMapSize/2);
         rangeDetails[center].UpdateImage(actorSprites.SpriteDictionary(actor.typeName));
         // Find what tiles are in range.
-        pathfinder.RecursiveAdjacency(center, int.Parse(rangeStats[0]));
+        int range = int.Parse(rangeStats[0]);
+        pathfinder.RecursiveAdjacency(center, range);
         // Highlight tiles in range.
         for (int i = 0; i < pathfinder.adjacentTiles.Count; i++)
         {
@@ -84,6 +83,17 @@ public class ViewSkillGUI : MonoBehaviour
             {
                 rangeDetails[pathfinder.adjacentTiles[i]].Highlight(false);
             }
+            if (range > 0){rangeDetails[center].Highlight(false);}
+        }
+    }
+
+    protected void UpdateDescription()
+    {
+        skillDescription.text = "";
+        int parts = GameManager.instance.utility.CountOccurencesOfCharInString(dummySkill.effect, '+');
+        for (int i = 0; i < parts+1; i++)
+        {
+            skillDescription.text += dummySkill.ReturnEffectDescription(i)+"\n";
         }
     }
 }

@@ -30,10 +30,12 @@ public class TacticActiveSkill : MonoBehaviour
         List<string> displayedStats = new List<string>();
         // Don't need name since's it on the side.
         displayedStats.Add(effect);
-        displayedStats.Add(ReturnTargettingString(skillTarget));
-        displayedStats.Add(cost.ToString());
-        displayedStats.Add(basePower.ToString());
         displayedStats.Add(effectSpecifics);
+        displayedStats.Add(lockOn.ToString());
+        displayedStats.Add(skillTarget.ToString());
+        displayedStats.Add(basePower.ToString());
+        //displayedStats.Add(ReturnTargettingString(skillTarget));
+        displayedStats.Add(cost.ToString());
         displayedStats.Add(actionCost);
         return displayedStats;
     }
@@ -47,24 +49,35 @@ public class TacticActiveSkill : MonoBehaviour
         return rangeStats;
     }
 
-    protected string ReturnTargettingString(int targetType)
+    protected string ReturnTargettingString()
     {
-        switch (targetType)
+        int target = skillTarget;
+        if (lockOn == 0){target *= -1;}
+        switch (target)
         {
             case 0:
-                return "Enemies";
+                if (lockOn == 0){return "enemies";}
+                return "an enemy";
             case 1:
-                return "Allies";
+                return "an ally";
             case 2:
-                return "ALL";
+                return "all units";
             case 3:
-                return "Self";
+                return "yourself";
             case 4:
                 return "None";
             case 5:
-                return "Others";
+                return "another unit";
             case 6:
-                return "Soul-Linked";
+                return "a Soul-Linked unit";
+            case -1:
+                return "allies";
+            case -2:
+                return "all units";
+            case -5:
+                return "other units";
+            case -6:
+                return "Soul-Linked units";
         }
         return "";
     }
@@ -139,10 +152,12 @@ public class TacticActiveSkill : MonoBehaviour
         return cost;
     }
 
-    public string ReturnEffectDescription()
+    public string ReturnEffectDescription(int part = 0)
     {
+        string[] effects = effect.Split("+");
+        string currentEffect = effects[part];
         string description = "";
-        switch (effect)
+        switch (currentEffect)
         {
             case ("Support"):
                 return SupportEffectDescription();
@@ -151,9 +166,15 @@ public class TacticActiveSkill : MonoBehaviour
             case ("Damage"):
                 return BattleEffectDescription();
             case ("Heal"):
-                break;
+                return HealEffectDescription();
+            case ("Displace"):
+                return DisplaceEffectDescription();
             case ("Move"):
                 return MoveEffectDescription();
+            case ("TempPassive"):
+                return TempPassiveDescription();
+            case ("TerrainChange"):
+                return TerrainChangeDescription();
             case ("Act"):
                 return ActEffectDescription();
         }
@@ -162,13 +183,37 @@ public class TacticActiveSkill : MonoBehaviour
 
     private string SupportEffectDescription()
     {
-        string description = "Applies "+effectSpecifics+" for "+basePower.ToString()+" turns.";
+        string description = "Applies "+effectSpecifics+" to "+ReturnTargettingString()+" for "+basePower.ToString()+" turns.";
         return description;
     }
 
     private string BattleEffectDescription()
     {
-        string description = "Deals "+(basePower * 10).ToString()+"% damage.";
+        string description = "Deals "+(basePower * 10).ToString()+"% damage to "+ReturnTargettingString()+".";
+        return description;
+    }
+
+    private string HealEffectDescription()
+    {
+        string description = "Restores up to "+(basePower).ToString()+" HP for "+ReturnTargettingString()+".";
+        return description;
+    }
+
+    private string DisplaceEffectDescription()
+    {
+        string description = effectSpecifics+" "+ReturnTargettingString()+".";
+        return description;
+    }
+
+    private string TempPassiveDescription()
+    {
+        string description = "Grant "+effectSpecifics+" to "+ReturnTargettingString()+" for 1 turn.";
+        return description;
+    }
+
+    private string TerrainChangeDescription()
+    {
+        string description = "The fire rises!";
         return description;
     }
 

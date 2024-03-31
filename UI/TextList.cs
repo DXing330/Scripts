@@ -14,10 +14,23 @@ public class TextList : MonoBehaviour
         allText = newTexts;
         currentPage = 0;
         UpdateCurrentPage();
+        DetermineChangeButtons();
     }
     public List<TMP_Text> textBoxes;
     public List<GameObject> textObjects;
     public int currentPage = 0;
+    public List<GameObject> changeButtons;
+    protected void DetermineChangeButtons()
+    {
+        if (allText.Count > textBoxes.Count)
+        {
+            GameManager.instance.utility.EnableAllObjects(changeButtons);
+        }
+        else
+        {
+            GameManager.instance.utility.DisableAllObjects(changeButtons);
+        }
+    }
     public void ChangePage(bool right = true)
     {
         int lastPage = allText.Count/textBoxes.Count;
