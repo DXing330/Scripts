@@ -7,6 +7,8 @@ using TMPro;
 public class StatImageText : MonoBehaviour
 {
     public Image image;
+    public Color highlightColor;
+    public Color normalColor;
     public TMP_Text stat;
 
     public void SetText(string newText)
@@ -21,11 +23,11 @@ public class StatImageText : MonoBehaviour
 
     public void HighlightText()
     {
-        stat.color = Color.red;
+        stat.color = highlightColor;
     }
 
     public void Unhighlight()
     {
-        stat.color = Color.white;
+        stat.color = normalColor;
     }
 }
