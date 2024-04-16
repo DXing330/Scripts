@@ -10,6 +10,7 @@ public class SkillMenu : MonoBehaviour
     public TMP_Text skillEnergyCost;
     public Text skillDetails;
     public TMP_Text skillActionCost;
+    public List<GameObject> actionCostOrbs;
     public TacticActiveSkill activeSkill;
     public SkillSelectList skillList;
     public AttackMenu lockOnMenu;
@@ -46,11 +47,21 @@ public class SkillMenu : MonoBehaviour
         string skillDetailsText = "";
         // Need to show the energy and action cost.
         skillName.text = activeSkill.skillName;
-        skillActionCost.text = activeSkill.ReturnActionCostString();
+        UpdateActionCost(activeSkill.ReturnActionCost());
+        //skillActionCost.text = activeSkill.ReturnActionCostString();
         skillEnergyCost.text = activeSkill.cost.ToString();
         skillDetailsText += activeSkill.flavorText;
         skillDetailsText += "\n"+activeSkill.ReturnEffectDescription();
         skillDetails.text = skillDetailsText;
+    }
+
+    private void UpdateActionCost(int cost)
+    {
+        GameManager.instance.utility.DisableAllObjects(actionCostOrbs);
+        for (int i = 0; i < Mathf.Min(cost, actionCostOrbs.Count); i++)
+        {
+            actionCostOrbs[i].SetActive(true);
+        }
     }
 
     public void SwitchSkill(bool right = true)

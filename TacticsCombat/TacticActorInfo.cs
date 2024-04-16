@@ -2,15 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class TacticActorInfo : MonoBehaviour
 {
-    public Text health;
-    public Text attack;
-    public Text defense;
-    public Text movement;
-    public Text energy;
-    public Text actions;
+    public TMP_Text health;
+    public TMP_Text attack;
+    public TMP_Text defense;
+    public TMP_Text movement;
+    public TMP_Text energy;
+    public TMP_Text actions;
 
     public void ResetInfo()
     {

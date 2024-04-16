@@ -152,6 +152,18 @@ public class TacticActiveSkill : MonoBehaviour
         return cost;
     }
 
+    public int ReturnActionCost()
+    {
+        if (actionCost == "Attack")
+        {
+            return 1;
+        }
+        else
+        {
+            return int.Parse(actionCost);
+        }
+    }
+
     public string ReturnEffectDescription(int part = 0)
     {
         string[] effects = effect.Split("+");

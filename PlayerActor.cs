@@ -129,10 +129,10 @@ public class PlayerActor : AllStats
             playerActor.baseHealth = currentHealth;
         }
         playerActor.species = species;
-        if (learntSkills.Count <= 0)
+        /*if (learntSkills.Count <= 0)
         {
             return;
-        }
+        }*/
         UpdateActives();
         UpdatePassives();
         allEquipment.UpdateActorStats(playerActor);

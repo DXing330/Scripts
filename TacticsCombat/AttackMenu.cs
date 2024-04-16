@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class AttackMenu : MonoBehaviour
 {
     public Image targetSprite;
-    public Text targetName;
-    public Text targetHealth;
+    public TMP_Text targetName;
+    public TMP_Text targetHealth;
     public TacticActor target;
     public TerrainMap terrainMap;
 

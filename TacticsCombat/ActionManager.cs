@@ -6,6 +6,7 @@ using TMPro;
 public class ActionManager : MonoBehaviour
 {
     public TMP_Text actionsLeft;
+    public List<GameObject> actionOrbs;
     public TerrainMap terrainMap;
     public List<GameObject> actionMenus;
     protected void DisableMenus(int menuIndex = -1)
@@ -34,15 +35,15 @@ public class ActionManager : MonoBehaviour
 
     public void UpdateActionsLeft()
     {
-        actionsLeft.text = "";
+        GameManager.instance.utility.DisableAllObjects(actionOrbs);
         currentActor = terrainMap.ReturnCurrentTurnActor();
         if (currentActor == null || currentActor.actionsLeft <= 0)
         {
             return;
         }
-        for (int i = 0; i < currentActor.actionsLeft; i++)
+        for (int i = 0; i < Mathf.Min(currentActor.actionsLeft, actionOrbs.Count); i++)
         {
-            actionsLeft.text += " o ";
+            actionOrbs[i].SetActive(true);
         }
     }
 
