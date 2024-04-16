@@ -29,9 +29,16 @@ public class WorkerStatSheet : MonoBehaviour
     public TMP_Text currentWorkLocation;
     public TMP_Text family;
     public List<TMP_Text> skills;
-    public void UpdateWorkerStats()
+    public GameObject errorPanel;
+    public virtual void UpdateWorkerStats()
     {
+        errorPanel.SetActive(false);
         if (currentIndex < 0){return;}
+        if (villageData.workers.Count <= 0 || villageData.workers[currentIndex].Length <= 0)
+        {
+            errorPanel.SetActive(true);
+            return;
+        }
         nameStat.text = villageData.workers[currentIndex];
         //healthStat.text = villageData.workerHealth[currentIndex];
         family.text = villageData.workerFamilySize[currentIndex];
@@ -41,7 +48,7 @@ public class WorkerStatSheet : MonoBehaviour
         UpdateWorkerSkills();
     }
 
-    protected void ResetSkills()
+    protected virtual void ResetSkills()
     {
         for (int i = 0; i < skills.Count; i++)
         {
@@ -49,7 +56,7 @@ public class WorkerStatSheet : MonoBehaviour
         }
     }
 
-    protected void UpdateWorkerSkills()
+    protected virtual void UpdateWorkerSkills()
     {
         ResetSkills();
         int index = 0;

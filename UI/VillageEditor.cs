@@ -111,6 +111,7 @@ public class VillageEditor : Map
     public int selectedWorker = -1;
     public void HighlightSelectedWorker(int newlySelectedWorker = -1)
     {
+        if (villageData.workers.Count <= 0){return;}
         if (newlySelectedWorker >= 0)
         {
             selectedWorker = newlySelectedWorker;

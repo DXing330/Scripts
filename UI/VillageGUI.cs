@@ -10,6 +10,7 @@ public class VillageGUI : BasicGUI
     {
         villageData = GameManager.instance.villageData;
         workerStatSheet.villageData = villageData;
+        newWorkerStatSheet.villageData = villageData;
         buildingStatSheet.villageData = villageData;
         newBuildingStatSheet.villageData = villageData;
         villageStats.villageData = villageData;
@@ -23,6 +24,7 @@ public class VillageGUI : BasicGUI
     public VillageEditor villageManager;
     public VillageStats villageStats;
     public WorkerStatSheet workerStatSheet;
+    public NewWorkerStatSheet newWorkerStatSheet;
     public void ChangeWorkerIndex(bool right = true)
     {
         workerStatSheet.ChangeIndex(right);

@@ -26,6 +26,21 @@ public class VillageDataManager : BasicDataManager
             resources[i] = (Mathf.Min(int.Parse(buildingLevels[0])*100, int.Parse(resources[i])+changes[i])).ToString();
         }
     }
+
+    protected void AdjustMorale()
+    {
+        // They need food and housing or else they'll quickly leave.
+        if (int.Parse(resources[1]) < 0)
+        {
+            DecreaseVassalMorale();
+        }
+        if (DetermineHousingLimit() < workers.Count)
+        {
+            DecreaseVassalMorale();
+        }
+        // Later add more ACKs stuff like festivals and garrisons.
+        // If they're resting then increase their morale up to 6.
+    }
     // Have some workers than you can manage/automate.
         // Maybe give them names and other attributes?
     public List<string> workers; // alex|bob
@@ -54,14 +69,22 @@ public class VillageDataManager : BasicDataManager
     public List<string> possibleBuildings; // House|Farm|Quarry|Lumberyard
     public List<string> buildingsOnTerrainTypes; // Farm,House|Lumberyard||||||||Quarry||||
     protected List<int> projectedOutputs = new List<int>();
+    public VassalHiringDataManager vassalHiring;
 
     public void NewDay(bool resources = true)
     {
         // Get outputs every other day.
-        if (resources){UpdateResources(ReturnOutputs());}
+        if (resources)
+        {
+            UpdateResources(ReturnOutputs());
+            AdjustMorale();
+        }
         // Update any building phase stuff.
         UpdateBuildTimes();
-        // Decrease worker's health if they aren't resting.
+        for (int i = 0; i < workers.Count; i++)
+        {
+            IncreaseWorkerSkillLevel(i);
+        }
     }
 
     protected void UpdateBuildTimes()
@@ -81,6 +104,7 @@ public class VillageDataManager : BasicDataManager
             File.Delete (saveDataPath+"/village.txt");
         }
         villageData = starterVillage;
+        vassalHiring.NewGame();
         QuickSave();
         Load();
     }
@@ -107,6 +131,7 @@ public class VillageDataManager : BasicDataManager
         data += GameManager.instance.ConvertListToString(possibleBuildings)+"#";
         data += GameManager.instance.ConvertListToString(buildingsOnTerrainTypes)+"#";
         File.WriteAllText(saveDataPath+"/village.txt", data);
+        vassalHiring.Save();
     }
 
     protected void QuickSave()
@@ -129,6 +154,7 @@ public class VillageDataManager : BasicDataManager
             villageData = starterVillage;
         }
         SetData();
+        vassalHiring.Load();
     }
 
     protected void SetData()
@@ -139,10 +165,15 @@ public class VillageDataManager : BasicDataManager
         villageTiles = dataBlocks[2].Split("|").ToList();
         resources = dataBlocks[3].Split("|").ToList();
         workers = dataBlocks[4].Split("|").ToList();
+        GameManager.instance.RemoveEmptyListItems(workers);
         workerFamilySize = dataBlocks[5].Split("|").ToList();
+        GameManager.instance.RemoveEmptyListItems(workerFamilySize,0);
         workerLoyalty = dataBlocks[6].Split("|").ToList();
+        GameManager.instance.RemoveEmptyListItems(workerLoyalty,0);
         workerSkills = dataBlocks[7].Split("|").ToList();
+        GameManager.instance.RemoveEmptyListItems(workerSkills);
         workerLocations = dataBlocks[8].Split("|").ToList();
+        GameManager.instance.RemoveEmptyListItems(workerLocations);
         buildings = dataBlocks[9].Split("|").ToList();
         buildingLocations = dataBlocks[10].Split("|").ToList();
         buildingLevels = dataBlocks[11].Split("|").ToList();
@@ -152,6 +183,25 @@ public class VillageDataManager : BasicDataManager
         buildTimes = dataBlocks[15].Split("|").ToList();
         possibleBuildings = dataBlocks[16].Split("|").ToList();
         buildingsOnTerrainTypes = dataBlocks[17].Split("|").ToList();
+    }
+
+    protected void DecreaseVassalMorale()
+    {
+        for (int i = 0; i < workerLoyalty.Count; i++)
+        {
+            int newLoyalty = int.Parse(workerLoyalty[i])-1;
+            if (newLoyalty <= 0){LoseVassal(i);}
+            else{workerLoyalty[i] = (newLoyalty).ToString();}
+        }
+    }
+
+    protected void LoseVassal(int index)
+    {
+        workers.RemoveAt(index);
+        workerFamilySize.RemoveAt(index);
+        workerLocations.RemoveAt(index);
+        workerLoyalty.RemoveAt(index);
+        workerSkills.RemoveAt(index);
     }
 
     public int DetermineHousingLimit()
@@ -274,7 +324,6 @@ public class VillageDataManager : BasicDataManager
 
     public int ReturnWorkerSkillLevel(int workerIndex, int buildingType)
     {
-        IncreaseWorkerSkillLevel(workerIndex, buildingType);
         string[] allWorkerSkills = workerSkills[workerIndex].Split(",");
         string[] specificSkill = new string[2];
         for (int i = 0; i < allWorkerSkills.Length; i++)
@@ -289,8 +338,9 @@ public class VillageDataManager : BasicDataManager
         return 0;
     }
 
-    protected void IncreaseWorkerSkillLevel(int workerIndex, int buildingType)
+    protected void IncreaseWorkerSkillLevel(int workerIndex)
     {
+        int buildingType = ReturnBuildingOnTile(workerLocations[workerIndex]);
         List<string> allWorkerSkills = workerSkills[workerIndex].Split(",").ToList();
         string[] specificSkill = new string[2];
         for (int i = 0; i < allWorkerSkills.Count; i++)
@@ -331,15 +381,16 @@ public class VillageDataManager : BasicDataManager
         projectedOutputs.Add(0);
         projectedOutputs.Add(0);
         // No projections without workers.
-        if (workerLocations.Count <= 0){return projectedOutputs;}
+        if (workers.Count <= 0){return projectedOutputs;}
         int buildingType = -1;
         int skillLevel = 0;
         List<string> outputTypes = new List<string>();
         // n = # workers <= m = # buildings
         // Get the outputs for each worker.
         // O(n)
-        for (int i = 0; i < workerLocations.Count; i++)
+        for (int i = 0; i < workers.Count; i++)
         {
+            if (workers[i].Length <= 0){continue;}
             // If they're building then no outputs.
             // O(n) // n = length of new buildings.
             if (CheckIfNewBuilding(int.Parse(workerLocations[i]))){continue;}
@@ -349,6 +400,8 @@ public class VillageDataManager : BasicDataManager
             // Check if the worker is skilled at this type of work and at what level.
             // O(p) // p = # worker skills
             skillLevel = ReturnWorkerSkillLevel(i, buildingType);
+            // Skill level will also start to generate gold.
+            projectedOutputs[0] += (skillLevel/2);
             // Find out what kind of produce they make.
             // O(q) // q = # buildingTypes
             outputTypes = buildingData.ReturnOutputList(buildingType);
@@ -359,7 +412,7 @@ public class VillageDataManager : BasicDataManager
                 if (outputTypes[j].Length <= 2){continue;}
                 // Output format is type=amount.
                 string[] outputSpecifics = outputTypes[j].Split("=");
-                projectedOutputs[int.Parse(outputSpecifics[0])] += int.Parse(outputSpecifics[1]) + skillLevel;
+                projectedOutputs[int.Parse(outputSpecifics[0])] += int.Parse(outputSpecifics[1]) + (skillLevel/2);
             }
         }
         return projectedOutputs;
