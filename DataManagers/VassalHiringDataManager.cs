@@ -7,6 +7,7 @@ using UnityEngine;
 public class VassalHiringDataManager : BasicDataManager
 {
     // Start of game.
+    public VillageDataManager villageData;
     protected string dividingCharacter = "!";
     public string allData;
     public int lastHiringDate = 0;
