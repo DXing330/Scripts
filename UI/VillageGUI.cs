@@ -15,6 +15,10 @@ public class VillageGUI : BasicGUI
         villageStats.villageData = villageData;
         villageStats.UpdateVillageStats();
     }
+    public void ReturnToDefault()
+    {
+        ChangeState(state);
+    }
     public VillageDataManager villageData;
     public VillageEditor villageManager;
     public VillageStats villageStats;
@@ -57,12 +61,22 @@ public class VillageGUI : BasicGUI
         newBuildingStatSheet.CheckOnUnBuilt(tileNumber);
     }
     public List<GameObject> panels;
+    public GameObject returnPanel;
+    protected void ActivateReturnPanel()
+    {
+        if (state >= 0)
+        {
+            returnPanel.SetActive(true);
+        }
+        else{returnPanel.SetActive(false);}
+    }
     protected void ActivatePanels()
     {
         for (int i = 0; i < panels.Count; i++)
         {
             panels[i].SetActive(false);
         }
+        ActivateReturnPanel();
         if (state >= 0)
         {
             panels[state].SetActive(true);
@@ -119,7 +133,7 @@ public class VillageGUI : BasicGUI
         else {state = newState;}
         villageManager.SetState(state);
         ActivatePanels();
-        BoldStateText();
+        //BoldStateText();
     }
 
     public void TryToBuildNew()

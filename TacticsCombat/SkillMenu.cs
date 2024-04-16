@@ -6,9 +6,9 @@ using TMPro;
 
 public class SkillMenu : MonoBehaviour
 {
-    public Text skillName;
+    public TMP_Text TMPskillName;
     public TMP_Text skillEnergyCost;
-    public Text skillDetails;
+    public TMP_Text TMPskillDetails;
     public TMP_Text skillActionCost;
     public List<GameObject> actionCostOrbs;
     public TacticActiveSkill activeSkill;
@@ -26,8 +26,8 @@ public class SkillMenu : MonoBehaviour
     {
         Color tempColor = Color.white;
         tempColor.a = 0f;
-        skillName.text = "N/A";
-        skillDetails.text = "N/A";
+        TMPskillName.text = "N/A";
+        TMPskillDetails.text = "N/A";
     }
 
     public void UpdateSkill(TacticActiveSkill newSkill)
@@ -46,13 +46,13 @@ public class SkillMenu : MonoBehaviour
     {
         string skillDetailsText = "";
         // Need to show the energy and action cost.
-        skillName.text = activeSkill.skillName;
+        TMPskillName.text = activeSkill.skillName;
         UpdateActionCost(activeSkill.ReturnActionCost());
         //skillActionCost.text = activeSkill.ReturnActionCostString();
         skillEnergyCost.text = activeSkill.cost.ToString();
         skillDetailsText += activeSkill.flavorText;
         skillDetailsText += "\n"+activeSkill.ReturnEffectDescription();
-        skillDetails.text = skillDetailsText;
+        TMPskillDetails.text = skillDetailsText;
     }
 
     private void UpdateActionCost(int cost)

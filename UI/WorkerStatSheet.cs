@@ -33,7 +33,7 @@ public class WorkerStatSheet : MonoBehaviour
     {
         if (currentIndex < 0){return;}
         nameStat.text = villageData.workers[currentIndex];
-        healthStat.text = villageData.workerHealth[currentIndex];
+        //healthStat.text = villageData.workerHealth[currentIndex];
         family.text = villageData.workerFamilySize[currentIndex];
         currentWorkLocation.text = buildingData.ReturnBuildingTask(villageData.ReturnWorkersBuilding(currentIndex));
         if (currentWorkLocation.text.Length < 3){currentWorkLocation.text = "Build";}

@@ -39,7 +39,7 @@ public class VillageDataManager : BasicDataManager
         return worker;
     }
     public List<string> workerFamilySize; // 1|1 indicates size of family ie cost to feed
-    public List<string> workerHealth; // 20|20 max is 20, 0 = death, deal with family somehow
+    public List<string> workerLoyalty; // 6|6, 12 = lifelong devotee, 6 = paid loyalty = base, 0 = rebellious.
     public List<string> workerSkills; // 1=100|1=100 indicates farming skill level 1 // skill levels = sqrt(value/100), very slow to increase skills later
     public List<string> workerLocations; // 39|31 indicates unassigned workers
     // village has buildings on top of terrain
@@ -94,7 +94,7 @@ public class VillageDataManager : BasicDataManager
         data += GameManager.instance.ConvertListToString(resources)+"#";
         data += GameManager.instance.ConvertListToString(workers)+"#";
         data += GameManager.instance.ConvertListToString(workerFamilySize)+"#";
-        data += GameManager.instance.ConvertListToString(workerHealth)+"#";
+        data += GameManager.instance.ConvertListToString(workerLoyalty)+"#";
         data += GameManager.instance.ConvertListToString(workerSkills)+"#";
         data += GameManager.instance.ConvertListToString(workerLocations)+"#";
         data += GameManager.instance.ConvertListToString(buildings)+"#";
@@ -140,7 +140,7 @@ public class VillageDataManager : BasicDataManager
         resources = dataBlocks[3].Split("|").ToList();
         workers = dataBlocks[4].Split("|").ToList();
         workerFamilySize = dataBlocks[5].Split("|").ToList();
-        workerHealth = dataBlocks[6].Split("|").ToList();
+        workerLoyalty = dataBlocks[6].Split("|").ToList();
         workerSkills = dataBlocks[7].Split("|").ToList();
         workerLocations = dataBlocks[8].Split("|").ToList();
         buildings = dataBlocks[9].Split("|").ToList();
