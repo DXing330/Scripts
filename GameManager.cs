@@ -136,10 +136,7 @@ public class GameManager : MonoBehaviour
         activesPassives += ConvertListToString(familiarPassives)+"#";
         activesPassives += ConvertListToString(familiarActives)+"#";
         File.WriteAllText(saveDataPath+"/skillData.txt", activesPassives);
-        for (int i = 0; i < gameData.Count; i++)
-        {
-            gameData[i].Save();
-        }
+        utility.DataManagerSave(gameData);
     }
 
     private void QuickSave()
@@ -154,10 +151,7 @@ public class GameManager : MonoBehaviour
         {
             loadedData = File.ReadAllText(saveDataPath+"/saveData.txt");
             LoadDataString();
-            for (int i = 0; i < gameData.Count; i++)
-            {
-                gameData[i].Load();
-            }
+            utility.DataManagerLoad(gameData);
         }
         else{NewGame();}
         // First load the current party.
@@ -218,10 +212,7 @@ public class GameManager : MonoBehaviour
 
         }
         File.WriteAllText(saveDataPath+"/skillData.txt", "");
-        for (int i = 0; i < gameData.Count; i++)
-        {
-            gameData[i].NewGame();
-        }
+        utility.DataManagerNewGame(gameData);
         SaveData();
         LoadData();
     }

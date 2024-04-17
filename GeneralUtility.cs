@@ -7,6 +7,30 @@ using UnityEngine;
 
 public class GeneralUtility : MonoBehaviour
 {
+    public void DataManagerSave(List<BasicDataManager> data)
+    {
+        foreach (BasicDataManager dataManager in data)
+        {
+            dataManager.Save();
+        }
+    }
+
+    public void DataManagerLoad(List<BasicDataManager> data)
+    {
+        foreach (BasicDataManager dataManager in data)
+        {
+            dataManager.Load();
+        }
+    }
+
+    public void DataManagerNewGame(List<BasicDataManager> data)
+    {
+        foreach (BasicDataManager dataManager in data)
+        {
+            dataManager.NewGame();
+        }
+    }
+
     public void DisableAllObjects(List<GameObject> objects)
     {
         for (int i = 0; i < objects.Count; i++)

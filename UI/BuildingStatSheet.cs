@@ -35,13 +35,13 @@ public class BuildingStatSheet : MonoBehaviour
 
     public void UpdateBuildingStats()
     {
-        buildingType = int.Parse(villageData.buildings[currentIndex]);
-        buildingLevel = int.Parse(villageData.buildingLevels[currentIndex]);
-        location = int.Parse(villageData.buildingLocations[currentIndex]);
+        buildingType = int.Parse(villageData.buildings.buildings[currentIndex]);
+        buildingLevel = int.Parse(villageData.buildings.buildingLevels[currentIndex]);
+        location = int.Parse(villageData.buildings.buildingLocations[currentIndex]);
         flavor.text = buildingData.ReturnFlavorText(buildingType);
         nameStat.text = buildingData.ReturnBuildingName(buildingType).ToString();
         levelStat.text = buildingLevel.ToString();
-        //healthStat.text = villageData.buildingHealths[currentIndex]+"/"+buildingData.ReturnBuildingMaxHealth(buildingType, buildingLevel);
+        //healthStat.text = villageData.buildings.buildingHealths[currentIndex]+"/"+buildingData.ReturnBuildingMaxHealth(buildingType, buildingLevel);
         healthStat.text = buildingData.ReturnBuildingMaxHealth(buildingType, buildingLevel).ToString();
         hp_level.text = "(+"+buildingData.ReturnHealthPerLevel(buildingType)+")";
         workerLimit.text = buildingData.ReturnWorkerLimit(buildingType, buildingLevel).ToString();

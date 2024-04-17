@@ -9,7 +9,6 @@ public class VassalHiringDataManager : BasicDataManager
     // Start of game.
     public VillageDataManager villageData;
     protected string dividingCharacter = "!";
-    public string allData;
     public int lastHiringDate = 0;
     // Cooldown could decrease.
     public int hiringCooldown = 30;
@@ -48,8 +47,7 @@ public class VassalHiringDataManager : BasicDataManager
         if (File.Exists(saveDataPath+"/hiringvassals.txt"))
         {
             loadedData = File.ReadAllText(saveDataPath+"/hiringvassals.txt");
-            allData = loadedData;
-            string[] dataBlocks = allData.Split("#");
+            string[] dataBlocks = loadedData.Split("#");
             lastHiringDate = int.Parse(dataBlocks[0]);
             hiringCooldown = int.Parse(dataBlocks[1]);
             currentlyAvailable = dataBlocks[2].Split(dividingCharacter).ToList();

@@ -11,7 +11,7 @@ public class WorkerStatSheet : MonoBehaviour
     public int currentIndex = 0;
     public virtual void ChangeIndex(bool right = true)
     {
-        int last = villageData.workers.Count;
+        int last = villageData.vassals.vassals.Count;
         if (right)
         {
             if (currentIndex + 1 < last){currentIndex++;}
@@ -34,14 +34,14 @@ public class WorkerStatSheet : MonoBehaviour
     {
         errorPanel.SetActive(false);
         if (currentIndex < 0){return;}
-        if (villageData.workers.Count <= 0 || villageData.workers[currentIndex].Length <= 0)
+        if (villageData.vassals.vassals.Count <= 0 || villageData.vassals.vassals[currentIndex].Length <= 0)
         {
             errorPanel.SetActive(true);
             return;
         }
-        nameStat.text = villageData.workers[currentIndex];
+        nameStat.text = villageData.vassals.vassals[currentIndex];
         //healthStat.text = villageData.workerHealth[currentIndex];
-        family.text = villageData.workerFamilySize[currentIndex];
+        family.text = villageData.vassals.familySizes[currentIndex];
         currentWorkLocation.text = buildingData.ReturnBuildingTask(villageData.ReturnWorkersBuilding(currentIndex));
         if (currentWorkLocation.text.Length < 3){currentWorkLocation.text = "Build";}
         if (villageData.WorkerBuilding(currentIndex)){currentWorkLocation.text = "Build";}
@@ -61,7 +61,7 @@ public class WorkerStatSheet : MonoBehaviour
         ResetSkills();
         int index = 0;
         villageData.SortWorkerSkills(currentIndex);
-        string[] allSkills = villageData.workerSkills[currentIndex].Split(",");
+        string[] allSkills = villageData.vassals.skills[currentIndex].Split(",");
         string[] specificSkills = new string[2];
         for (int i = 0; i < allSkills.Length; i++)
         {

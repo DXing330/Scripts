@@ -33,7 +33,7 @@ public class VillageGUI : BasicGUI
     public BuildingStatSheet buildingStatSheet;
     public void ShiftBuildingIndex(bool right = true)
     {
-        int count = villageData.buildings.Count;
+        int count = villageData.buildings.buildings.Count;
         int currentIndex = buildingStatSheet.currentIndex;
         if (right)
         {
@@ -167,7 +167,7 @@ public class VillageGUI : BasicGUI
         int cost = villageData.vassalHiring.ReturnHiringCost(wantedIndex);
         if (villageData.PayGold(cost))
         {
-            villageData.GainWorker(villageData.vassalHiring.HireVassal(wantedIndex));
+            villageData.vassals.GainVassal(villageData.vassalHiring.HireVassal(wantedIndex));
             newWorkerStatSheet.StartViewingApplicants();
         }
         else{newWorkerStatSheet.PoorError();}

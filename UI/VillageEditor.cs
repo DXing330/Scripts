@@ -65,8 +65,8 @@ public class VillageEditor : Map
         totalRows = villageData.totalRows;
         totalColumns = villageData.totalColumns;
         allTiles = villageData.villageTiles;
-        UpdateAllBuildings(villageData.buildings, villageData.buildingLocations);
-        UpdateNewBuildings(villageData.buildingPhaseBuildings, villageData.buildingPhaseLocations);
+        UpdateAllBuildings(villageData.buildings.buildings, villageData.buildings.buildingLocations);
+        UpdateNewBuildings(villageData.buildings.buildingPhaseBuildings, villageData.buildings.buildingPhaseLocations);
         UpdateCenterTile();
         UpdateMap();
     }
@@ -111,7 +111,7 @@ public class VillageEditor : Map
     public int selectedWorker = -1;
     public void HighlightSelectedWorker(int newlySelectedWorker = -1)
     {
-        if (villageData.workers.Count <= 0){return;}
+        if (villageData.vassals.vassals.Count <= 0){return;}
         if (newlySelectedWorker >= 0)
         {
             selectedWorker = newlySelectedWorker;
@@ -121,7 +121,7 @@ public class VillageEditor : Map
         {
             terrainTiles[i].ResetHighlight();
         }
-        int location = int.Parse(villageData.workerLocations[selectedWorker]);
+        int location = int.Parse(villageData.vassals.locations[selectedWorker]);
         if (location < 0){return;}
         int indexOf = currentTiles.IndexOf(location);
         if (indexOf >= 0)
@@ -141,7 +141,7 @@ public class VillageEditor : Map
         {
             terrainTiles[i].ResetHighlight();
         }
-        int location = int.Parse(villageData.buildingLocations[selectedBuilding]);
+        int location = int.Parse(villageData.buildings.buildingLocations[selectedBuilding]);
         int indexOf = currentTiles.IndexOf(location);
         if (indexOf >= 0)
         {
@@ -199,7 +199,7 @@ public class VillageEditor : Map
         // Check if your assigning them to a building project.
         if (villageData.CheckIfNewBuilding(tileNumber))
         {
-            villageData.workerLocations[selectedWorker] = tileNumber.ToString();
+            villageData.vassals.locations[selectedWorker] = tileNumber.ToString();
             villageData.Save();
             return;
         }
@@ -208,8 +208,8 @@ public class VillageEditor : Map
         int buildingIndex = villageData.ReturnBuildingIndexOnTile(tileNumber);
         if (buildingIndex < 0){return;}
             // Then compare the current capacity to max capacity.
-        if (villageData.ReturnCurrentLocationCapacity(tileNumber) >= buildingData.ReturnWorkerLimit(int.Parse(villageData.buildings[buildingIndex]), int.Parse(villageData.buildingLevels[buildingIndex]))){return;}
-        villageData.workerLocations[selectedWorker] = tileNumber.ToString();
+        if (villageData.ReturnCurrentLocationCapacity(tileNumber) >= buildingData.ReturnWorkerLimit(int.Parse(villageData.buildings.buildings[buildingIndex]), int.Parse(villageData.buildings.buildingLevels[buildingIndex]))){return;}
+        villageData.vassals.locations[selectedWorker] = tileNumber.ToString();
         villageData.Save();
     }
 
@@ -223,8 +223,8 @@ public class VillageEditor : Map
     protected void SelectTerrain(int tileNumber)
     {
         // Check to make sure there is no building there.
-        if (villageData.buildingLocations.Contains(tileNumber.ToString())){return;}
-        if (!villageData.buildingPhaseLocations.Contains(tileNumber.ToString()))
+        if (villageData.buildings.buildingLocations.Contains(tileNumber.ToString())){return;}
+        if (!villageData.buildings.buildingPhaseLocations.Contains(tileNumber.ToString()))
         {
             HighlightSelectedTile(tileNumber);
             // Pass the terrain type to the new building thing.
@@ -244,7 +244,7 @@ public class VillageEditor : Map
         {
             int buildTime = buildingData.ReturnBuildTime(buildingType);
             villageData.StartBuilding(selectedTile, buildingType, buildTime);
-            UpdateNewBuildings(villageData.buildingPhaseBuildings, villageData.buildingPhaseLocations);
+            UpdateNewBuildings(villageData.buildings.buildingPhaseBuildings, villageData.buildings.buildingPhaseLocations);
             UpdateMap();
         }
     }
@@ -252,15 +252,15 @@ public class VillageEditor : Map
     public void TryToUpgrade(int buildingType, int buildingLevel = 1)
     {
         // Can't upgrade what is already being upgraded.
-        string loc = villageData.buildingLocations[selectedBuilding];
-        if (villageData.buildingPhaseLocations.Contains(loc)){return;}
+        string loc = villageData.buildings.buildingLocations[selectedBuilding];
+        if (villageData.buildings.buildingPhaseLocations.Contains(loc)){return;}
         List<int> allCosts = buildingData.ReturnBuildCostInOrder(buildingType, buildingLevel);
         if (villageData.TryToConsumeResources(allCosts))
         {
             // Try to upgrade that tile.
             int buildTime = buildingData.ReturnBuildTime(buildingType, buildingLevel);
-            villageData.StartBuilding(int.Parse(villageData.buildingLocations[selectedBuilding]), buildingType, buildTime);
-            UpdateNewBuildings(villageData.buildingPhaseBuildings, villageData.buildingPhaseLocations);
+            villageData.StartBuilding(int.Parse(villageData.buildings.buildingLocations[selectedBuilding]), buildingType, buildTime);
+            UpdateNewBuildings(villageData.buildings.buildingPhaseBuildings, villageData.buildings.buildingPhaseLocations);
             UpdateMap();
         }
     }
