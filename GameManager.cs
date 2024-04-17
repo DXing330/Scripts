@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     public ArmyDataManager armyData;
     public EquipmentInventory equipInventory;
     public ActorDataManager actorData;
-    public EquipmentData equipData;
+    //public EquipmentData equipData;
     public UnitUpgradeData upgradeData;
     public ScriptedBattleDataManager fixedBattleData;
     private string saveDataPath;
@@ -106,6 +106,7 @@ public class GameManager : MonoBehaviour
     public int currentLevel = -1;
     public int currentLocation = -1;
     public int time = 0;
+    public int yearLength = 300;
     public List<string> playerPassives;
     public List<string> playerActives;
     public List<string> familiarPassives;
@@ -229,6 +230,10 @@ public class GameManager : MonoBehaviour
     {
         time++;
         villageData.NewDay(utility.DivisibleThree(time));
+        if (utility.DivisibleNumber(time,yearLength))
+        {
+            villageData.NewYear();
+        }
         SaveData();
     }
 

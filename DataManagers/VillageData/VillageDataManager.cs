@@ -48,7 +48,7 @@ public class VillageDataManager : BasicDataManager
             DecreaseVassalMorale();
         }
         // If there is a surplus of food they'll be content.
-        else if (int.Parse(resources[1]) < workers.Count)
+        else if (int.Parse(resources[1]) < DetermineFoodConsumption())
         {
             IncreaseVassalMorale(6);
         }
@@ -108,6 +108,41 @@ public class VillageDataManager : BasicDataManager
         for (int i = 0; i < workers.Count; i++)
         {
             IncreaseWorkerSkillLevel(i);
+        }
+    }
+
+    public void NewYear()
+    {
+        // People born.
+    }
+
+    protected void UpdateFamilySizes()
+    {
+        int size = 1;
+        for (int i = 0; i < workerFamilySize.Count; i++)
+        {
+            size = int.Parse(workerFamilySize[i]);
+            size += DetermineFamilySizeChange(size);
+            workerFamilySize[i] = size.ToString();
+        }
+    }
+
+    protected int DetermineFamilySizeChange(int currentSize)
+    {
+        // Rush to start a family.
+        if (currentSize < 4)
+        {
+            return 1;
+        }
+        // Slow down a little.
+        else if (currentSize > 4 && currentSize < 8)
+        {
+            return Random.Range(0,1);
+        }
+        // Too many means not enough care, easier to die.
+        else
+        {
+            return Random.Range(-1,1);
         }
     }
 
@@ -214,7 +249,8 @@ public class VillageDataManager : BasicDataManager
         for (int i = 0; i < workerLoyalty.Count; i++)
         {
             int newLoyalty = int.Parse(workerLoyalty[i])-1;
-            if (newLoyalty <= 0){LoseVassal(i);}
+            // Bigger families have a harder time moving away.
+            if (newLoyalty <= -(int.Parse(workerFamilySize[i]))){LoseVassal(i);}
             else{workerLoyalty[i] = (newLoyalty).ToString();}
         }
     }
