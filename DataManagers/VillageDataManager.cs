@@ -18,21 +18,39 @@ public class VillageDataManager : BasicDataManager
         // money|food|wood|stone|woman
         // women can be married to increase loyalty and make it harder to for workers to leave.
     public List<string> resources; // 0|2|0|0|0
+
+    public bool PayGold(int amount)
+    {
+        int currentGold = int.Parse(resources[0]);
+        if (amount > currentGold){return false;}
+        else
+        {
+            currentGold -= amount;
+            resources[0] = currentGold.ToString();
+            return true;
+        }
+    }
     public void UpdateResources(List<int> changes)
     {
         for (int i = 0; i < resources.Count; i++)
         {
             // Can't store more than 100x the center's level of any resource, not enough space?
-            resources[i] = (Mathf.Min(int.Parse(buildingLevels[0])*100, int.Parse(resources[i])+changes[i])).ToString();
+            //resources[i] = (Mathf.Min(int.Parse(buildingLevels[0])*100, int.Parse(resources[i])+changes[i])).ToString();
+            // No need for such limits.
+            resources[i] = (int.Parse(resources[i])+changes[i]).ToString();
         }
     }
-
     protected void AdjustMorale()
     {
         // They need food and housing or else they'll quickly leave.
         if (int.Parse(resources[1]) < 0)
         {
             DecreaseVassalMorale();
+        }
+        // If there is a surplus of food they'll be content.
+        else if (int.Parse(resources[1]) < workers.Count)
+        {
+            IncreaseVassalMorale(6);
         }
         if (DetermineHousingLimit() < workers.Count)
         {
@@ -44,14 +62,16 @@ public class VillageDataManager : BasicDataManager
     // Have some workers than you can manage/automate.
         // Maybe give them names and other attributes?
     public List<string> workers; // alex|bob
-    // skill format is skill=level,skill2=level2,etc.
-    protected string GenerateNewWorker()
+    public void GainWorker(string newWorker)
     {
-        string worker = "";
-        // Decide on name.
-        // Decide on skills.
-        // You get to pick from X workers which ones you want to keep?
-        return worker;
+        string[] workerStats = newWorker.Split("|");
+        workers.Add(workerStats[0]);
+        workerSkills.Add(workerStats[1]);
+        workerFamilySize.Add(workerStats[2]);
+        // They start in the center where they were hired.
+        workerLocations.Add("40");
+        // They start off with basic loyalty.
+        workerLoyalty.Add("6");
     }
     public List<string> workerFamilySize; // 1|1 indicates size of family ie cost to feed
     public List<string> workerLoyalty; // 6|6, 12 = lifelong devotee, 6 = paid loyalty = base, 0 = rebellious.
@@ -62,6 +82,10 @@ public class VillageDataManager : BasicDataManager
     // Need to shift the buildings around whenever the village expands.
     public List<string> buildingLocations; // 40|30|39|31|38|37
     public List<string> buildingLevels; // 1|1|1|1|1|1
+    public int ReturnCenterLevel()
+    {
+        return int.Parse(buildingLevels[0]);
+    }
     public List<string> buildingHealths; // 200|40|40|40|40|40
     public List<string> buildingPhaseBuildings; // empty
     public List<string> buildingPhaseLocations; // empty
@@ -192,6 +216,16 @@ public class VillageDataManager : BasicDataManager
             int newLoyalty = int.Parse(workerLoyalty[i])-1;
             if (newLoyalty <= 0){LoseVassal(i);}
             else{workerLoyalty[i] = (newLoyalty).ToString();}
+        }
+    }
+
+    protected void IncreaseVassalMorale(int max = 6)
+    {
+        for (int i = 0; i < workerLoyalty.Count; i++)
+        {
+            int newLoyalty = int.Parse(workerLoyalty[i])+1;
+            if (newLoyalty > max){newLoyalty = max;}
+            {workerLoyalty[i] = (newLoyalty).ToString();}
         }
     }
 

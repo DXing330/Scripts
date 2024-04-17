@@ -96,6 +96,10 @@ public class VillageGUI : BasicGUI
             case 2:
                 newBuildingStatSheet.SetTerrainType(-1);
                 break;
+            case 3:
+                villageData.vassalHiring.StartHiring();
+                newWorkerStatSheet.StartViewingApplicants();
+                break;
         }
     }
     public void UpdatePanels()
@@ -155,5 +159,17 @@ public class VillageGUI : BasicGUI
         if (buildingType < 0){return;}
         villageManager.TryToUpgrade(buildingType, buildingLevel);
         villageStats.UpdateVillageStats();
+    }
+
+    public void TryToHire()
+    {
+        int wantedIndex = newWorkerStatSheet.currentIndex;
+        int cost = villageData.vassalHiring.ReturnHiringCost(wantedIndex);
+        if (villageData.PayGold(cost))
+        {
+            villageData.GainWorker(villageData.vassalHiring.HireVassal(wantedIndex));
+            newWorkerStatSheet.StartViewingApplicants();
+        }
+        else{newWorkerStatSheet.PoorError();}
     }
 }

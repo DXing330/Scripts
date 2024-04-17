@@ -9,7 +9,7 @@ public class WorkerStatSheet : MonoBehaviour
     public VillageDataManager villageData;
     public BuildingDataManager buildingData;
     public int currentIndex = 0;
-    public void ChangeIndex(bool right = true)
+    public virtual void ChangeIndex(bool right = true)
     {
         int last = villageData.workers.Count;
         if (right)
