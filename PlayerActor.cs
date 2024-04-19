@@ -9,6 +9,7 @@ public class PlayerActor : AllStats
     public string allBaseStats;
     public string typeName;
     public string personalName;
+    public void SetPersonalName(string newName){personalName = newName;}
     public string ReturnName()
     {
         if (personalName.Length < 2){return typeName;}

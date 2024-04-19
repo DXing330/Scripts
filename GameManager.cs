@@ -45,6 +45,26 @@ public class GameManager : MonoBehaviour
 
     public int villageOnLevel = 0;
     public int villageOnIndex = 38;
+
+    public void StartFromMenu(bool newGame = false)
+    {
+        if (newGame)
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("NameSelect");
+        }
+        else
+        {
+            if (playerName.Length < 1)
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("NameSelect");
+            }
+            else
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Overworld");
+            }
+        }
+    }
+
     public void ReturnToHub(bool village = false)
     {
         if (village)
@@ -95,6 +115,13 @@ public class GameManager : MonoBehaviour
         return count;
     }
 
+    public string playerName = "";
+    public void UpdatePlayerName(string newName)
+    {
+        playerName = newName;
+        player.SetPersonalName(playerName);
+        QuickSave();
+    }
     public int playerLevel = 1;
     public int goldCoins = 0;
     public int manaCrystals = 0;
@@ -128,7 +155,7 @@ public class GameManager : MonoBehaviour
     [ContextMenu("Save Game")]
     public void SaveData()
     {
-        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+currentLevel+"|"+currentLocation;
+        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+currentLevel+"|"+currentLocation+"|"+playerName;
         File.WriteAllText(saveDataPath+"/saveData.txt", data);
         string activesPassives = "";
         activesPassives += ConvertListToString(playerPassives)+"#";
@@ -141,7 +168,7 @@ public class GameManager : MonoBehaviour
 
     private void QuickSave()
     {
-        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+currentLevel+"|"+currentLocation;
+        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+currentLevel+"|"+currentLocation+"|"+playerName;
         File.WriteAllText(saveDataPath+"/saveData.txt", data);
     }
 
@@ -175,6 +202,7 @@ public class GameManager : MonoBehaviour
         time = int.Parse(dataBlocks[4]);
         currentLevel = int.Parse(dataBlocks[5]);
         currentLocation = int.Parse(dataBlocks[6]);
+        UpdatePlayerName(dataBlocks[7]);
     }
 
     public void RefreshMaps()
@@ -209,6 +237,7 @@ public class GameManager : MonoBehaviour
             time = 0;
             currentLevel = -1;
             currentLocation = -1;
+            playerName = "";
 
         }
         File.WriteAllText(saveDataPath+"/skillData.txt", "");
