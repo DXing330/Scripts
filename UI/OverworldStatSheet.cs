@@ -19,7 +19,7 @@ public class OverworldStatSheet : MonoBehaviour
     public virtual void UpdateStatSheet(PlayerActor actor, bool baseStats = false)
     {
         statActor = actor;
-        actorName.text = actor.typeName;
+        actorName.text = actor.ReturnName();
         List<int> allStats = actor.ReturnStatList();
         List<int> equipStats = actor.allEquipment.ReturnStatList();
         float xScale = 0;

@@ -36,6 +36,15 @@ public class EquipmentInventory : BasicDataManager
         }
         Save();
     }
+    public void LoseEquipSetsAtIndices(List<int> indices)
+    {
+        for (int i = 0; i < indices.Count; i++)
+        {
+            if (indices[i] >= allEquippedEquipment.Count){continue;}
+            allEquippedEquipment.RemoveAt(indices[i]);
+        }
+        Save();
+    }
     public List<string> allTools;
     public List<string> allArmors;
     public List<string> allAccessories;

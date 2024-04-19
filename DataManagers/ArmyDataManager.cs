@@ -84,18 +84,23 @@ public class ArmyDataManager : BasicDataManager
     {
         availableFighters.Clear();
         fighterHealths.Clear();
+        List<int> deadMembers = new List<int>();
         for (int i = 0; i < allPartyMembers.Count; i++)
         {
             if (allPartyMembers[i].typeName == "Player" || allPartyMembers[i].typeName == "Familiar"){continue;}
             int currentHealth = allPartyMembers[i].ReturnCurrentHealth();
-            if (currentHealth <= 0){continue;}
+            if (currentHealth <= 0)
+            {
+                deadMembers.Insert(0, i);
+                continue;
+            }
             availableFighters.Add(allPartyMembers[i].typeName);
             fighterHealths.Add(currentHealth.ToString());
         }
         LoadAvailableFighters();
         GetPartyMembersAndStats();
         // Need to also remove equipment from party members that have been defeated. Usually if they die they lose all their equipment, basically destroyed in battle or so damaged its worthless.
-        GameManager.instance.equipInventory.LoseEquipSets(allPartyMembers.Count);
+        GameManager.instance.equipInventory.LoseEquipSetsAtIndices(deadMembers);
     }
 
     public void UpdatePartyStats()
@@ -152,8 +157,6 @@ public class ArmyDataManager : BasicDataManager
         }
         LoadAvailableFighters();
         //GetAllPartyMembers();
-
-
     }
 
     public void GainFighter(string fighterName)

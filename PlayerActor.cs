@@ -8,6 +8,12 @@ public class PlayerActor : AllStats
     public TacticActor playerActor;
     public string allBaseStats;
     public string typeName;
+    public string personalName;
+    public string ReturnName()
+    {
+        if (personalName.Length < 2){return typeName;}
+        return personalName;
+    }
     public int currentLevel;
     public int currentHealth = -1;
     public int ReturnCurrentHealth()
@@ -141,6 +147,7 @@ public class PlayerActor : AllStats
     // Mob characters don't get any level bonuses, just equipment bonuses.
     public void SideCharacterUpdateStats()
     {
+        GameManager.instance.actorData.LoadPlayerActorData(this, typeName);
         GameManager.instance.actorData.LoadActorData(playerActor, typeName);
         CopyAllStats(playerActor);
         playerActor.typeName = typeName;

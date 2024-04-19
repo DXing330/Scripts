@@ -30,9 +30,9 @@ public class PartyMemberList : MonoBehaviour
         for (int i = 0; i < partyMembers.Count; i++)
         {
             memberObjects[i].SetActive(true);
-            name = partyMembers[i].typeName;
+            name = partyMembers[i].ReturnName();
             memberImageNames[i].SetText(name);
-            memberImageNames[i].SetSprite(spriteDictionary.SpriteDictionary(name));
+            memberImageNames[i].SetSprite(spriteDictionary.SpriteDictionary(partyMembers[i].typeName));
         }
     }
 

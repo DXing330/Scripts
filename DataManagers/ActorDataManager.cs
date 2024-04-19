@@ -103,6 +103,7 @@ public class ActorDataManager : MonoBehaviour
         actor.moveType = int.Parse(actorMovetypes[index]);
         actor.playerActor.movementType = int.Parse(actorMovetypes[index]);
         actor.size = int.Parse(actorSizes[index]);
+        actor.species = actorSpecies[index];
         actor.baseInitiative = int.Parse(actorInitiatives[index]);
         UpdateActorMoveCosts(actor.playerActor);
     }
