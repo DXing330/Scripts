@@ -55,6 +55,7 @@ public class EquipmentInventory : BasicDataManager
         allArmors.Clear();
         allAccessories.Clear();
         if (allEquipment.Count <= 0){return;}
+        GameManager.instance.RemoveEmptyListItems(allEquipment);
         for (int i = 0; i < allEquipment.Count; i++)
         {
             string[] data = allEquipment[i].Split("|");
@@ -120,7 +121,28 @@ public class EquipmentInventory : BasicDataManager
     public void EquipToActor(string equipment, PlayerActor actor, int slot)
     {
         // if slot = -1, remove any tools and add them back.
-        actor.allEquipment.Equip(equipment, slot);
+        string[] data = equipment.Split("|");
+        int trueSlot = int.Parse(data[6]);
+        if (trueSlot < 0)
+        {
+            string equip = actor.allEquipment.Unequip(0);
+            if (equip.Length > 6){GainEquipment(equip);}
+            equip = actor.allEquipment.Unequip(1);
+            if (equip.Length > 6){GainEquipment(equip);}
+            actor.allEquipment.Equip(equipment, slot);
+        }
+        else
+        {
+            // First check if it's equipable.
+            if (actor.allEquipment.Equipable(equipment,slot))
+            {
+                string equip = actor.allEquipment.Unequip(slot);
+                if (equip.Length > 6){GainEquipment(equip);}
+                actor.allEquipment.Equip(equipment, slot);
+            }
+            // If not then nothing changes.
+            else{return;}
+        }
         LostEquipment(equipment);
         SaveEquipSets();
         GameManager.instance.armyData.UpdatePartyStats();
@@ -129,7 +151,7 @@ public class EquipmentInventory : BasicDataManager
     public void UnequipFromActor(PlayerActor actor, int slot)
     {
         string equip = actor.allEquipment.Unequip(slot);
-        GainEquipment(equip);
+        if (equip.Length > 6){GainEquipment(equip);}
         SaveEquipSets();
         GameManager.instance.armyData.UpdatePartyStats();
     }

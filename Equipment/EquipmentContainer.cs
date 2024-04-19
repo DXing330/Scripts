@@ -16,6 +16,20 @@ public class EquipmentContainer : AllStats
         return GameManager.instance.ConvertListToString(allEquipment,"@");
     }
 
+    public bool Equipable(string equipment, int slot)
+    {
+        if (slot == 1 && allEquipment[0].Length > 6)
+        {
+            string[] data = allEquipment[0].Split("|");
+            int trueSlot = int.Parse(data[6]);
+            if (trueSlot < 0)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     public void Equip(string equipment, int slot)
     {
         if (slot < totalEquipmentTypes)
@@ -31,24 +45,12 @@ public class EquipmentContainer : AllStats
                 int trueSlot = int.Parse(data[6]);
                 if (trueSlot < 0)
                 {
-                    Unequip(0);
-                    Unequip(1);
                     allEquipment[0] = equipment;
                 }
                 else
                 {
                     allEquipment[slot] = equipment;
                 }
-            }
-        }
-        // Can't equip something else if you have a two hander.
-        if (slot == 1 && allEquipment[0].Length > 6)
-        {
-            string[] data = allEquipment[0].Split("|");
-            int trueSlot = int.Parse(data[6]);
-            if (trueSlot < 0)
-            {
-                Unequip(1);
             }
         }
     }

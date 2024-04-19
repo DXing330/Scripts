@@ -21,6 +21,8 @@ public class ViewSkillGUI : MonoBehaviour
     }
     public GameObject detailsPanel;
     public List<TMP_Text> skillDetails;
+    public ImagePanel actionCost;
+    public ImagePanel energyCost;
     public TMP_Text skillDescription;
     public List<TerrainTile> rangeDetails;
     public BasicPathfinder pathfinder;
@@ -44,6 +46,7 @@ public class ViewSkillGUI : MonoBehaviour
     {
         skillData.LoadDataForSkill(dummySkill, skillName);
         //skillDetailStrings = dummySkill.ReturnStatList();
+        UpdateCosts();
         UpdateDescription();
         UpdateRange();
     }
@@ -53,6 +56,12 @@ public class ViewSkillGUI : MonoBehaviour
         skillTextList.HighlightText(index);
         detailsPanel.SetActive(true);
         UpdateSkill(skillTextList.ReturnText(index));
+    }
+
+    protected void UpdateCosts()
+    {
+        actionCost.ActivateImages(dummySkill.ReturnActionCost());
+        energyCost.ActivateImages(dummySkill.cost);
     }
 
     protected void UpdateRange()
