@@ -57,11 +57,11 @@ public class EquipmentSelectGUI : BasicGUI
         {
             changeEquipType = newType;
             inventoryObject.SetActive(true);
-            GetPossibleEquips(newType);
+            GetPossibleEquips(changeEquipType);
             if (possibleEquips.Count <= 0)
             {
                 // No possible equips, just hide it.
-                ChangeEquipType(newType);
+                ChangeEquipType(changeEquipType);
                 return;
             }
             UpdateInventoryTiles();
@@ -216,8 +216,9 @@ public class EquipmentSelectGUI : BasicGUI
         if (selectedEquipIndex < 0){return;}
         inventoryTiles[selectedEquipIndex].Highlight();
     }
-    protected void UpdateInventoryTiles()
+    public void UpdateInventoryTiles()
     {
+        GetPossibleEquips(changeEquipType);
         ResetInventoryTileObjects();
         ResetInventoryHighlights();
         int startIndex = currentInventoryPage*inventoryTiles.Count;

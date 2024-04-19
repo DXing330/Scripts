@@ -79,6 +79,7 @@ public class ArmyDataManager : BasicDataManager
     {
         viewStatsActor = newActor;
     }
+    // This function should remove party members that have no more health.
     protected void UpdateAvailableHealths()
     {
         availableFighters.Clear();
@@ -93,6 +94,8 @@ public class ArmyDataManager : BasicDataManager
         }
         LoadAvailableFighters();
         GetPartyMembersAndStats();
+        // Need to also remove equipment from party members that have been defeated. Usually if they die they lose all their equipment, basically destroyed in battle or so damaged its worthless.
+        GameManager.instance.equipInventory.LoseEquipSets(allPartyMembers.Count);
     }
 
     public void UpdatePartyStats()
@@ -149,6 +152,8 @@ public class ArmyDataManager : BasicDataManager
         }
         LoadAvailableFighters();
         //GetAllPartyMembers();
+
+
     }
 
     public void GainFighter(string fighterName)

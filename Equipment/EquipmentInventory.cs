@@ -21,7 +21,21 @@ public class EquipmentInventory : BasicDataManager
         }
         SortEquipmentIntoLists();
     }
+    public void LostEquipment(string equipment)
+    {
+        allEquipment.Remove(equipment);
+        SortEquipmentIntoLists();
+    }
     public List<string> allEquippedEquipment;
+    public void LoseEquipSets(int index)
+    {
+        if (index >= allEquippedEquipment.Count){return;}
+        for (int i = 0; i < allEquippedEquipment.Count; i++)
+        {
+            if (i >= index){allEquippedEquipment.RemoveAt(i);}
+        }
+        Save();
+    }
     public List<string> allTools;
     public List<string> allArmors;
     public List<string> allAccessories;
@@ -31,6 +45,7 @@ public class EquipmentInventory : BasicDataManager
         allTools.Clear();
         allArmors.Clear();
         allAccessories.Clear();
+        if (allEquipment.Count <= 0){return;}
         for (int i = 0; i < allEquipment.Count; i++)
         {
             string[] data = allEquipment[i].Split("|");
@@ -97,13 +112,15 @@ public class EquipmentInventory : BasicDataManager
     {
         // if slot = -1, remove any tools and add them back.
         actor.allEquipment.Equip(equipment, slot);
+        LostEquipment(equipment);
         SaveEquipSets();
         GameManager.instance.armyData.UpdatePartyStats();
     }
 
     public void UnequipFromActor(PlayerActor actor, int slot)
     {
-        actor.allEquipment.Unequip(slot);
+        string equip = actor.allEquipment.Unequip(slot);
+        GainEquipment(equip);
         SaveEquipSets();
         GameManager.instance.armyData.UpdatePartyStats();
     }
@@ -119,6 +136,8 @@ public class EquipmentInventory : BasicDataManager
             // Can't use | or # obviously.
             allEquipment = blocks[0].Split("+").ToList();
             allEquippedEquipment = blocks[1].Split("+").ToList();
+            GameManager.instance.RemoveEmptyListItems(allEquipment);
+            GameManager.instance.RemoveEmptyListItems(allEquippedEquipment);
         }
         else
         {
