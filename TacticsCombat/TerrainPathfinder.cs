@@ -184,6 +184,7 @@ public class TerrainPathfinder : BasicPathfinder
         if (path){checkedTiles.Add(closestTile);}
         else{reachableTiles.Add(closestTile);}
         RecursiveAdjacency(closestTile);
+        // O(n)
         for (int i = 0; i < adjacentTiles.Count; i++)
         {
             // Need an extra check for occupied tiles.
@@ -193,6 +194,7 @@ public class TerrainPathfinder : BasicPathfinder
             }
             else
             {
+                // O(1)
                 newDirection = DirectionBetweenLocations(closestTile, adjacentTiles[i]);
                 directionChange = ReturnDirectionChange(closestDirection, newDirection);
                 moveCost = actor.ReturnMoveCostForTile(terrainInfo[adjacentTiles[i]]);
@@ -497,7 +499,8 @@ public class TerrainPathfinder : BasicPathfinder
         ResetDistances(startIndex);
         // Check what tiles you can move to.
         int distance = 0;
-        while (distance <= moveRange && reachableTiles.Count < totalColumns * totalRows)
+        for (int i = 0; i < totalRows * totalColumns; i++)
+        //while (reachableTiles.Count < totalColumns * totalRows)
         {
             distance = heap.PeekWeight();
             if (distance > moveRange)
