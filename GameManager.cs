@@ -132,12 +132,27 @@ public class GameManager : MonoBehaviour
     public int recentlyGainedBlood = 0;
     public int currentLevel = -1;
     public int currentLocation = -1;
+    public int villageLevel = 0;
+    public int villageLocation = 38;
+    public bool AtVillage()
+    {
+        if (currentLevel == villageLevel && currentLocation == villageLocation){return true;}
+        return false;
+    }
     public int time = 0;
     public int yearLength = 300;
     public List<string> playerPassives;
     public List<string> playerActives;
     public List<string> familiarPassives;
     public List<string> familiarActives;
+    public int villageBattle = 0;
+    public string villageBattleDataString;
+    public void StartVillageBattle(string newBattle)
+    {
+        villageBattleDataString = newBattle;
+        villageBattle = 1;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("BattleMap");
+    }
     public int randomBattle = 0;
     public string battleName = "";
     public string fixedTerrainString;
@@ -155,7 +170,7 @@ public class GameManager : MonoBehaviour
     [ContextMenu("Save Game")]
     public void SaveData()
     {
-        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+currentLevel+"|"+currentLocation+"|"+playerName;
+        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+currentLevel+"|"+currentLocation+"|"+playerName+"|"+villageLevel+"|"+villageLocation;
         File.WriteAllText(saveDataPath+"/saveData.txt", data);
         string activesPassives = "";
         activesPassives += ConvertListToString(playerPassives)+"#";
@@ -168,7 +183,7 @@ public class GameManager : MonoBehaviour
 
     private void QuickSave()
     {
-        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+currentLevel+"|"+currentLocation+"|"+playerName;
+        string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+currentLevel+"|"+currentLocation+"|"+playerName+"|"+villageLevel+"|"+villageLocation;
         File.WriteAllText(saveDataPath+"/saveData.txt", data);
     }
 
@@ -203,6 +218,8 @@ public class GameManager : MonoBehaviour
         currentLevel = int.Parse(dataBlocks[5]);
         currentLocation = int.Parse(dataBlocks[6]);
         UpdatePlayerName(dataBlocks[7]);
+        villageLevel = int.Parse(dataBlocks[8]);
+        villageLocation = int.Parse(dataBlocks[9]);
     }
 
     public void RefreshMaps()

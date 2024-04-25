@@ -7,6 +7,7 @@ using TMPro;
 
 public class ActorManager : MonoBehaviour
 {
+    public SpawnPatternLocationFinder spawnPointLocator;
     public ActorSprites actorSprites;
     public TacticActor actorPrefab;
     public TerrainMap terrainMap;
@@ -39,7 +40,87 @@ public class ActorManager : MonoBehaviour
     public int collectedGold = 0;
     public int collectedMana = 0;
     public int collectedBlood = 0;
+
+    public void LoadVillageBattle(string[] dataBlocks)
+    {
+        GameManager.instance.villageBattle = 0;
+        UpdateBattleGoal("Repel All Enemies");
+        string[] buildings = dataBlocks[1].Split("|");
+        string[] buildingLocations = dataBlocks[2].Split("|");
+        string[] buildingHealths = dataBlocks[3].Split("|");
+        SpawnBuildings(buildings, buildingLocations, buildingHealths);
+        int pattern = int.Parse(dataBlocks[4]);
+        // First spawn enemies.
+        SpawnActorsInPattern(pattern, dataBlocks[5].Split("|"));
+        // Then spawn allies.
+        string[] allies = dataBlocks[6].Split("|");
+        SpawnActorsInPattern(pattern, allies, 0);
+        // Then decide whether or not to spawn the player party.
+        if ((dataBlocks[7]) == "1")
+        {
+            // Spawn the player party to help.
+            SpawnPlayersInPattern(pattern, allies.Length);
+        }
+    }
+
+    protected void SpawnBuildings(string[] buildingNames, string[] locations, string[] healths)
+    {
+        for (int i = 0; i < buildingNames.Length; i++)
+        {
+            GenerateBuilding(buildingNames[i], locations[i], healths[i]);
+        }
+    }
+
+    protected void GenerateBuilding(string buildingName, string location, string health)
+    {
+        TacticActor newBuilding = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
+        newBuilding.NullAllStats();
+        newBuilding.typeName = buildingName;
+        UpdateActorSprite(newBuilding, buildingName);
+        newBuilding.InitialLocation(int.Parse(location));
+        newBuilding.team = 0;
+        newBuilding.species = "Building";
+        newBuilding.weight = 9;
+        newBuilding.baseHealth = int.Parse(health);
+        newBuilding.SetMap(terrainMap);
+        terrainMap.AddActor(newBuilding);
+        newBuilding.QuickStart();
+    }
     
+    protected void SpawnActorsInPattern(int pattern, string[] actors, int enemies = 1)
+    {
+        int rows = terrainMap.totalRows;
+        int cols = terrainMap.totalColumns;
+        int location = -1;
+        for (int i = 0; i < actors.Length; i++)
+        {
+            if (pattern < 4)
+            {
+                if (enemies == 1)
+                {
+                    location = spawnPointLocator.SingleSideSpawnPattern(rows,cols, i, pattern);
+                }
+                else
+                {
+                    location = spawnPointLocator.SingleSideInnerSpawn(rows,cols, i, pattern);
+                }
+            }
+            GenerateActor(location, actors[i], enemies);
+        }
+    }
+
+    protected void SpawnPlayersInPattern(int pattern, int allies = 0)
+    {
+        int rows = terrainMap.totalRows;
+        int cols = terrainMap.totalColumns;
+        int location = -1;
+        for (int i = 0; i < GameManager.instance.armyData.allPartyMembers.Count; i++)
+        {
+            location = spawnPointLocator.SingleSideInnerSpawn(rows,cols, i+allies, pattern);
+            LoadActor(GameManager.instance.armyData.allPartyMembers[i].playerActor, location);
+        }
+    }
+
     public void LoadBattle(string[] dataBlocks)
     {
         SetWinReward(dataBlocks[1]);

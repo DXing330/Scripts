@@ -536,7 +536,7 @@ public class TacticActor : AllStats
             if (attackTarget == null){return;}
             if (CheckSkillActivatable())
             {
-                terrainMap.NPCActivateSkill(attackTarget.locationIndex);
+                terrainMap.NPCActivateSkill(attackTarget);
                 ActivateSkill();
                 CheckIfAttackAgain();
                 return;
@@ -551,7 +551,7 @@ public class TacticActor : AllStats
             if (attackTarget == null){return;}
             if (CheckSkillActivatable())
             {
-                terrainMap.NPCActivateSkill(attackTarget.locationIndex);
+                terrainMap.NPCActivateSkill(attackTarget);
                 ActivateSkill();
                 CheckIfAttackAgain();
                 return;
@@ -588,7 +588,7 @@ public class TacticActor : AllStats
         {
             // Support skills are always cast on oneself?
             // We can make different AI's later.
-            terrainMap.NPCActivateSkill(locationIndex);
+            terrainMap.NPCActivateSkill(this);
             ActivateSkill();
         }
     }
@@ -606,6 +606,8 @@ public class TacticActor : AllStats
     public void GetPath()
     {
         currentPath = terrainMap.pathFinder.FindPathIndex(this, destinationIndex);
+        // Cornered animals will fight back.
+        if (currentPath.Count <= 0 && AIType == 2)currentPath = terrainMap.pathFinder.FindPathIndex(this, attackTarget.locationIndex);
         turnPath.Clear();
     }
 

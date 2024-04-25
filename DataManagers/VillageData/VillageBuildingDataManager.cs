@@ -57,6 +57,10 @@ public class VillageBuildingDataManager : BasicDataManager
         }
     }
     public List<string> buildings;
+    public string ReturnBuildingNameFromIndex(int index)
+    {
+        return villageData.buildingData.ReturnBuildingName(int.Parse(buildings[index]));
+    }
     public List<string> buildingLocations;
     public int ReturnBuildingOnTile(string location)
     {

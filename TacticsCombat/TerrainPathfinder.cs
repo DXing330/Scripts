@@ -85,11 +85,10 @@ public class TerrainPathfinder : BasicPathfinder
     {
         int startIndex = actor.locationIndex;
         int moveType = actor.movementType;
-        int startDirection = actor.currentDirection;
         checkedTiles.Clear();
         savedPathList.Clear();
         // Initialize distances and previous tiles.
-        ResetDistances(startIndex, startDirection);
+        ResetDistances(startIndex, actor.currentDirection);
         // Each loop checks one tile.
         // O(n^2)
         for (int i = 0; i < bigInt; i++)
@@ -103,22 +102,17 @@ public class TerrainPathfinder : BasicPathfinder
         }
         // Get the actual path to the tile.
         actualPath.Clear();
+        if (savedPathList.Count <= 0){return actualPath;}
         int pathIndex = destIndex;
         int maxMovement = actor.MaxMovePerTurn();
         for (int i = 0; i < maxMovement * maxMovement; i++)
         {
             actualPath.Add(pathIndex);
             pathIndex = savedPathList[pathIndex];
-            if (pathIndex == startIndex)
-            {
-                break;
-            }
+            if (pathIndex == startIndex || pathIndex < 0){break;}
         }
         // Can't reach destination.
-        if (pathIndex != startIndex)
-        {
-            actualPath.Clear();
-        }
+        if (pathIndex != startIndex){actualPath.Clear();}
         return actualPath;
     }
 
@@ -173,17 +167,19 @@ public class TerrainPathfinder : BasicPathfinder
         }
     }
 
-    protected void ActorChecksClosestTile(TacticActor actor, int destination = -1, bool path = true)
+    protected bool ActorChecksClosestTile(TacticActor actor, int destination = -1, bool path = true)
     {
         int newDirection = -1;
         int directionChange = -1;
         int moveCost = 1;
         int closestDirection = heap.PeekDirection();
         int closestTile = heap.Pull();
-        if (closestTile < 0){return;}
+        if (closestTile < 0){return false;}
         if (path){checkedTiles.Add(closestTile);}
         else{reachableTiles.Add(closestTile);}
         RecursiveAdjacency(closestTile);
+        // Check if all adjacent tiles are occupied.
+        int adjacentUnpassable = 0;
         // O(n)
         for (int i = 0; i < adjacentTiles.Count; i++)
         {
@@ -191,6 +187,8 @@ public class TerrainPathfinder : BasicPathfinder
             if (occupiedTiles[adjacentTiles[i]] > 0 && adjacentTiles[i] != destination)
             {
                 moveCost = bigInt;
+                adjacentUnpassable++;
+                if (adjacentUnpassable >= adjacentTiles.Count - 1){return false;}
             }
             else
             {
@@ -203,6 +201,7 @@ public class TerrainPathfinder : BasicPathfinder
                     moveCost = AdjustMoveCostOnDirectionChange(moveCost, directionChange);
                 }
             }
+            // This is never true if all adjacent tiles are occupied/unavailable.
             if (distances[closestTile]+moveCost < distances[adjacentTiles[i]])
             {
                 // Then update the distance and the previous tile.
@@ -211,6 +210,7 @@ public class TerrainPathfinder : BasicPathfinder
                 heap.AddNodeWeight(adjacentTiles[i], distances[adjacentTiles[i]], newDirection);
             }
         }
+        return true;
     }
 
     public int DirectionBetweenLocations(int startLocation, int nextLocation)
@@ -470,14 +470,11 @@ public class TerrainPathfinder : BasicPathfinder
         int moveType = actor.movementType;
         ResetDistances(startIndex, actor.currentDirection);
         int distance = 0;
-        while (distance <= range && reachableTiles.Count < totalColumns * totalRows)
+        for (int i = 0; i < totalColumns * totalRows; i++)
         {
             distance = heap.PeekWeight();
-            if (distance > range)
-            {
-                break;
-            }
-            ActorChecksClosestTile(actor, -1, false);
+            if (distance > range){break;}
+            if(!ActorChecksClosestTile(actor, -1, false)){break;}
         }
         // Don't include your own tile in the reachable tiles.
         reachableTiles.RemoveAt(0);
@@ -496,18 +493,17 @@ public class TerrainPathfinder : BasicPathfinder
         {
             return reachableTiles;
         }
-        ResetDistances(startIndex);
+        ResetDistances(startIndex, currentActor.currentDirection);
         // Check what tiles you can move to.
         int distance = 0;
         for (int i = 0; i < totalRows * totalColumns; i++)
-        //while (reachableTiles.Count < totalColumns * totalRows)
         {
             distance = heap.PeekWeight();
             if (distance > moveRange)
             {
                 break;
             }
-            ActorChecksClosestTile(currentActor, -1, false);
+            if (!ActorChecksClosestTile(currentActor, -1, false)){break;}
         }
         // Check what tiles you can attack based on the tiles you can move to.
         // O(n).

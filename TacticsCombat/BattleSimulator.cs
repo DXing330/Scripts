@@ -194,7 +194,7 @@ public class BattleSimulator : MonoBehaviour
         NPCLoadSkill(2);
         if (tempActor.CheckSkillActivatable())
         {
-            NPCActivateSkill(tempActor.locationIndex);
+            NPCActivateSkill(tempActor);
             tempActor.ActivateSkill();
         }
     }
@@ -286,7 +286,7 @@ public class BattleSimulator : MonoBehaviour
             if (tempActor.attackTarget == null){return;}
             if (tempActor.CheckSkillActivatable())
             {
-                NPCActivateSkill(tempActor.attackTarget.locationIndex);
+                NPCActivateSkill(tempActor.attackTarget);
                 tempActor.ActivateSkill();
                 CheckIfAttackAgain();
                 return;
@@ -301,7 +301,7 @@ public class BattleSimulator : MonoBehaviour
             if (tempActor.attackTarget == null){return;}
             if (tempActor.CheckSkillActivatable())
             {
-                NPCActivateSkill(tempActor.attackTarget.locationIndex);
+                NPCActivateSkill(tempActor.attackTarget);
                 tempActor.ActivateSkill();
                 CheckIfAttackAgain();
                 return;
@@ -388,23 +388,19 @@ public class BattleSimulator : MonoBehaviour
         return null;
     }
 
-    public void NPCActivateSkill(int skillTargetLocation)
+    public void NPCActivateSkill(TacticActor target)
     {
-        UpdateOccupiedTiles();
-        // Lock == single target.
         if (actors[turnIndex].activeSkill.lockOn == 1)
         {
-            TacticActor skillTarget = ReturnActorOnTile(skillTargetLocation);
-            if (skillTarget == null){return;}
+            if (target == null){return;}
             bool specialEffect = false;
-            actionLog.AddSkillAction(actors[turnIndex], skillTarget);
-            specialEffect = skillManager.ApplySkillEffect(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);
+            actionLog.AddSkillAction(actors[turnIndex], target);
+            specialEffect = skillManager.ApplySkillEffect(target, actors[turnIndex].activeSkill, actors[turnIndex]);
             if (specialEffect)
             {
-                SpecialSkillActivation(skillTarget);
+                SpecialSkillActivation(target);
             }
         }
-        // !Lock == aoe.
     }
 
     private void SpecialSkillActivation(TacticActor target)

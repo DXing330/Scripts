@@ -52,6 +52,7 @@ public class VillageEditor : Map
         }
         if (allBuildings[tileIndex] >= 0)
         {
+            // Probably want to change this to refer to name later so that we can use the actor sprites for everything.
             terrainTiles[imageIndex].UpdateLocationImage(buildingSprites.allSprites[allBuildings[tileIndex]]);
         }
         if (newBuildings[tileIndex] >= 0)

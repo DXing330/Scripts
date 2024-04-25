@@ -25,7 +25,6 @@ public class TerrainMap : MonoBehaviour
     public int fullSize = 13;
     public int totalRows;
     public int totalColumns;
-    public int baseTerrain = 0;
     public List<TerrainTile> terrainTiles;
     public List<int> currentTiles;
     // Equivalent of allTiles in other maps.
@@ -106,8 +105,13 @@ public class TerrainMap : MonoBehaviour
         {
             terrainTiles[i].SetTileNumber(i);
         }
+        // If its a village fight then prep the village fight.
+        if (GameManager.instance.villageBattle == 1)
+        {
+            LoadVillageBattle(GameManager.instance.villageBattleDataString);
+        }
         // If you have a battle map ready then use it.
-        if (GameManager.instance.battleNumber >= 0)
+        else if (GameManager.instance.battleNumber >= 0)
         {
             LoadBattle(GameManager.instance.battleNumber);
         }
@@ -391,18 +395,19 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
-    public void NPCActivateSkill(int skillTargetLocation)
+    public void NPCActivateSkill(TacticActor target)
     {
-        UpdateOccupiedTiles();
-        // Lock == single target.
         if (actors[turnIndex].activeSkill.lockOn == 1)
         {
-            TacticActor skillTarget = ReturnActorOnTile(skillTargetLocation);
-            if (skillTarget == null){return;}
-            actionLog.AddSkillAction(actors[turnIndex], skillTarget);
-            ApplySkillEffects(skillTarget, actors[turnIndex].activeSkill, actors[turnIndex]);
+            if (target == null){return;}
+            bool specialEffect = false;
+            actionLog.AddSkillAction(actors[turnIndex], target);
+            specialEffect = skillManager.ApplySkillEffect(target, actors[turnIndex].activeSkill, actors[turnIndex]);
+            if (specialEffect)
+            {
+                SpecialSkillActivation(target);
+            }
         }
-        // !Lock == aoe.
     }
 
     protected void ApplySkillEffects(TacticActor skillTarget, TacticActiveSkill skill, TacticActor skillUser)
@@ -738,7 +743,7 @@ public class TerrainMap : MonoBehaviour
 
     public void NPCActorAttack(TacticActor attackTarget)
     {
-        if (actors[turnIndex].actionsLeft <= 1)
+        if (actors[turnIndex].actionsLeft < 1)
         {
             return;
         }
@@ -984,14 +989,18 @@ public class TerrainMap : MonoBehaviour
         actorManager.LoadBattle(dataBlocks);
     }
 
-    public void LoadMap(int mapIndex)
+    protected void LoadVillageBattle(string villageBattleData)
     {
-        string mapInfo = GameManager.instance.forestFixedTerrains[mapIndex];
-        string[] mapInfoBlocks = mapInfo.Split(",");
-        string[] fixedTerrain = mapInfoBlocks[0].Split("|");
-        // Enable backwards compatability for now.
-        totalRows = int.Parse(mapInfoBlocks[1]);
-        totalColumns = int.Parse(mapInfoBlocks[2]);
+        string[] dataBlocks = villageBattleData.Split("#");
+        string[] mapTiles = dataBlocks[0].Split("|");
+        totalRows = (int) Mathf.Sqrt(mapTiles.Length);
+        totalColumns = totalRows;
+        LoadMapFromString(mapTiles);
+        actorManager.LoadVillageBattle(dataBlocks);
+    }
+
+    protected void LoadMapFromString(string[] fixedTerrain)
+    {
         terrainInfo.Clear();
         for (int j = 0; j < fixedTerrain.Length; j++)
         {
@@ -1003,6 +1012,17 @@ public class TerrainMap : MonoBehaviour
             allUnoccupied.Add(0);
             terrainEffects.Add(-1);
         }
+    }
+
+    public void LoadMap(int mapIndex)
+    {
+        string mapInfo = GameManager.instance.forestFixedTerrains[mapIndex];
+        string[] mapInfoBlocks = mapInfo.Split(",");
+        string[] fixedTerrain = mapInfoBlocks[0].Split("|");
+        // Enable backwards compatability for now.
+        totalRows = int.Parse(mapInfoBlocks[1]);
+        totalColumns = int.Parse(mapInfoBlocks[2]);
+        LoadMapFromString(fixedTerrain);
     }
 
     protected void DetermineCurrentTiles()
@@ -1101,8 +1121,8 @@ public class TerrainMap : MonoBehaviour
         {
             for (int i = 0; i < actors.Count; i++)
             {
-                // Don't count the dead.
-                if (actors[i].health <= 0)
+                // Don't count the dead or buildings that can be moved through.
+                if (actors[i].health <= 0 || actors[i].species == "Building")
                 {
                     continue;
                 }
@@ -1113,7 +1133,7 @@ public class TerrainMap : MonoBehaviour
         for (int i = 0; i < allActors.Count; i++)
         {
             // Don't count the dead.
-            if (allActors[i].health <= 0)
+            if (allActors[i].health <= 0 || allActors[i].species == "Building")
             {
                 continue;
             }
@@ -1484,7 +1504,7 @@ public class TerrainMap : MonoBehaviour
 
     public void MoveMap(int direction)
     {
-        if (!battleStarted || !interactable){return;}
+        //if (!battleStarted || !interactable){return;}
         int previousFixedCenter = fixedCenter;
         switch (direction)
         {
