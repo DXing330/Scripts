@@ -27,7 +27,6 @@ public class GameManager : MonoBehaviour
     public ActorDataManager actorData;
     //public EquipmentData equipData;
     public UnitUpgradeData upgradeData;
-    public ScriptedBattleDataManager fixedBattleData;
     private string saveDataPath;
     public string newGameData;
     public string loadedData;
@@ -378,13 +377,5 @@ public class GameManager : MonoBehaviour
         battleName = "";
         fixedBattleTerrain.Clear();
         fixedBattleActors.Clear();
-    }
-
-    private void UpdateFixedBattleData()
-    {
-        string[] newWinCons = fixedBattleData.ReturnFixedWinCons(battleName).Split("=");
-        UpdateWinCon(int.Parse(newWinCons[0]), newWinCons[1]);
-        fixedBattleTerrain = fixedBattleData.ReturnFixedBattleTerrain(battleName);
-        fixedBattleActors = fixedBattleData.ReturnFixedBattleActors(battleName);
     }
 }

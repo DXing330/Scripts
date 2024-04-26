@@ -70,7 +70,16 @@ public class TerrainMap : MonoBehaviour
     public ActionLog actionLog;
     public ActionManager actionManager;
     public TerrainEffectManager terrainEffectManager;
-
+    public MoraleTracker moraleTracker;
+    protected void InitializeMoraleTracker()
+    {
+        int enemyCount = 0;
+        for (int i = 0; i < actors.Count; i++)
+        {
+            if (actors[i].team == 1){enemyCount++;}
+        }
+        moraleTracker.SetOriginalEnemyCount(enemyCount);
+    }
 
     public void StartBattle()
     {
@@ -90,10 +99,7 @@ public class TerrainMap : MonoBehaviour
         }
         else
         {
-            if (actors[turnIndex].team == 0)
-            {
-                NPCActorsTurn(false);
-            }
+            if (actors[turnIndex].team == 0){NPCActorsTurn(false);}
         }
     }
 
@@ -297,10 +303,7 @@ public class TerrainMap : MonoBehaviour
     {
         ViewActorClearHighlights();
         // Auto end turn when out of moves and actions.
-        if (!actors[turnIndex].Delayable() && actors[turnIndex].actionsLeft <= 0)
-        {
-            ActorEndTurn();
-        }
+        if (!actors[turnIndex].Delayable() && actors[turnIndex].actionsLeft <= 0){ActorEndTurn();}
     }
 
     public void ViewCurrentActor()
@@ -556,10 +559,7 @@ public class TerrainMap : MonoBehaviour
 
     public void SwitchTarget(bool right = true)
     {
-        if (targetableTiles.Count <= 0)
-        {
-            return;
-        }
+        if (targetableTiles.Count <= 0){return;}
         if (right)
         {
             if (targetableTiles.Count - 1 > currentTarget)
@@ -587,27 +587,15 @@ public class TerrainMap : MonoBehaviour
 
     public TacticActor ReturnCurrentTurnActor()
     {
-        if (!battleStarted)
-        {
-            return null;
-        }
-        if (turnIndex >= actors.Count)
-        {
-            return null;
-        }
+        if (!battleStarted){return null;}
+        if (turnIndex >= actors.Count){return null;}
         return actors[turnIndex];
     }
 
     public TacticActor ReturnCurrentTarget()
     {
-        if (targetableTiles.Count <= 0)
-        {
-            return null;
-        }
-        if (currentTarget >= targetableTiles.Count)
-        {
-            return null;
-        }
+        if (targetableTiles.Count <= 0){return null;}
+        if (currentTarget >= targetableTiles.Count){return null;}
         int targetLocation = targetableTiles[currentTarget];
         return ReturnActorOnTile(targetLocation);
     }
@@ -647,20 +635,7 @@ public class TerrainMap : MonoBehaviour
 
     public bool CheckTargetInRange(TacticActor actor, TacticActor target)
     {
-        int distance = 0;
-        if (actor.turnPath.Count > 0)
-        {
-            distance = pathFinder.CalculateDistance(actor.turnPath[^1], target.locationIndex);
-        }
-        else
-        {
-            distance = pathFinder.CalculateDistance(actor.locationIndex, target.locationIndex);
-        }
-        if (distance <= actor.currentAttackRange)
-        {
-            return true;
-        }
-        return false;
+        return pathFinder.CheckTargetInRange(actor, target);
     }
 
     public void ActorStopAttacking()
@@ -703,10 +678,7 @@ public class TerrainMap : MonoBehaviour
 
     public void CurrentActorAttack()
     {
-        if (targetableTiles.Count <= 0 || !actors[turnIndex].CheckActions())
-        {
-            return;
-        }
+        if (targetableTiles.Count <= 0 || !actors[turnIndex].CheckActions()){return;}
         actors[turnIndex].actionsLeft--;
         TacticActor target = ReturnCurrentTarget();
         BattleBetweenActors(actors[turnIndex], target, 0);
@@ -734,19 +706,13 @@ public class TerrainMap : MonoBehaviour
                 adjacentEnemies++;
             }
         }
-        if (adjacentEnemies >= 2)
-        {
-            return true;
-        }
+        if (adjacentEnemies >= 2){return true;}
         return false;
     }
 
     public void NPCActorAttack(TacticActor attackTarget)
     {
-        if (actors[turnIndex].actionsLeft < 1)
-        {
-            return;
-        }
+        if (actors[turnIndex].actionsLeft < 1){return;}
         BattleBetweenActors(actors[turnIndex], attackTarget, actors[turnIndex].activeSkill.basePower);
     }
 
@@ -827,11 +793,7 @@ public class TerrainMap : MonoBehaviour
         // Check if the defender is facing the right way.
         if (!pathFinder.FaceOffCheck(attacker.currentDirection, defender.currentDirection)){return false;}
         // Finally check if the attacker is in range.
-        int attackerLocation = attacker.locationIndex;
-        int defenderLocation = defender.locationIndex;
-        int range = defender.currentAttackRange;
-        int distance = pathFinder.CalculateDistance(defenderLocation, attackerLocation);
-        if (distance <= range)
+        if (pathFinder.CheckTargetInAttackRange(defender, attacker))
         {
             defender.counterAttacksLeft--;
             return true;
@@ -879,10 +841,7 @@ public class TerrainMap : MonoBehaviour
     public int RandomDestination(int currentLocation)
     {
         int randomLocation = Random.Range(0, terrainInfo.Count);
-        if (randomLocation != currentLocation && occupiedTiles[randomLocation] == 0)
-        {
-            return randomLocation;
-        }
+        if (randomLocation != currentLocation && occupiedTiles[randomLocation] == 0){return randomLocation;}
         return RandomDestination(currentLocation);
     }
 
@@ -893,15 +852,9 @@ public class TerrainMap : MonoBehaviour
 
     public bool CheckAdjacency(int location, int target)
     {
-        if (location == target)
-        {
-            return true;
-        }
+        if (location == target){return true;}
         pathFinder.RecursiveAdjacency(location);
-        if (pathFinder.adjacentTiles.Contains(target))
-        {
-            return true;
-        }
+        if (pathFinder.adjacentTiles.Contains(target)){return true;}
         return false;
     }
 
@@ -1294,10 +1247,7 @@ public class TerrainMap : MonoBehaviour
 
     private void AOEHighlightTile(int imageIndex, bool red = true)
     {
-        if (imageIndex < 0)
-        {
-            return;
-        }
+        if (imageIndex < 0){return;}
         terrainTiles[imageIndex].AoeHighlight(red);
     }
 

@@ -748,4 +748,26 @@ public class TerrainPathfinder : BasicPathfinder
         }
         return destination;
     }
+
+    public bool CheckTargetInRange(TacticActor actor, TacticActor target)
+    {
+        int distance = 0;
+        if (actor.turnPath.Count > 0)
+        {
+            distance = CalculateDistance(actor.turnPath[^1], target.locationIndex);
+        }
+        else
+        {
+            distance = CalculateDistance(actor.locationIndex, target.locationIndex);
+        }
+        if (distance <= actor.currentAttackRange){return true;}
+        return false;
+    }
+
+    public bool CheckTargetInAttackRange(TacticActor actor, TacticActor target)
+    {
+        int distance = CalculateDistance(actor.locationIndex, target.locationIndex);
+        if (distance <= actor.currentAttackRange){return true;}
+        return false;
+    }
 }

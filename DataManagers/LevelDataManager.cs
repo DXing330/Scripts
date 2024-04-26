@@ -8,6 +8,7 @@ using UnityEngine;
 public class LevelDataManager : BasicDataManager
 {
     // When you start a new game use the default levels.
+    public DataStringContainer allData;
     public string defaultAllLevels;
     // As you play make a copy and save changes made to the copy.
     // As you play levels might change; terrain/npcs/etc.
