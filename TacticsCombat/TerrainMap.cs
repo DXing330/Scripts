@@ -71,21 +71,14 @@ public class TerrainMap : MonoBehaviour
     public ActionManager actionManager;
     public TerrainEffectManager terrainEffectManager;
     public MoraleTracker moraleTracker;
-    protected void InitializeMoraleTracker()
-    {
-        int enemyCount = 0;
-        for (int i = 0; i < actors.Count; i++)
-        {
-            if (actors[i].team == 1){enemyCount++;}
-        }
-        moraleTracker.SetOriginalEnemyCount(enemyCount);
-    }
 
     public void StartBattle()
     {
         simulator.ResetWinChanceText();
         battleStarted = true;
         actorManager.ResetBattleGoalText();
+        moraleTracker.GetOriginalEnemies(allActors);
+        // Might have morale adjustments based on location/story/etc.
         NewRound();
         ActorsTurn();
     }

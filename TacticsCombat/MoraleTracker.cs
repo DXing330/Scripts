@@ -4,14 +4,34 @@ using UnityEngine;
 
 public class MoraleTracker : MonoBehaviour
 {
+    public void GetOriginalEnemies(List<TacticActor> actors)
+    {
+        int count = 0;
+        int totalHealth = 0;
+        foreach (TacticActor actor in actors)
+        {
+            if (actor.team > 0)
+            {
+                count++;
+                totalHealth += actor.baseHealth;
+            }
+        }
+        SetOriginalEnemyCount(count);
+        SetOriginalEnemyMorale(totalHealth);
+    }
+    public void AdjustMoraleByPercent(int percentage)
+    {
+        int newMorale = originalEnemyMorale*(100 + percentage)/100;
+        SetOriginalEnemyMorale(newMorale);
+    }
     protected int originalEnemyCount;
-    public void SetOriginalEnemyCount(int count){originalEnemyCount = count; currentEnemyCount = count;}
+    protected void SetOriginalEnemyCount(int count){originalEnemyCount = count; currentEnemyCount = count;}
     protected int currentEnemyCount;
     public void UpdateEnemyCount(int change = -1){currentEnemyCount += change;}
     public int ReturnCurrentEnemyCount(){return currentEnemyCount;}
     protected int originalEnemyMorale;
     // Based on the health of the whole enemy team.
-    public void SetOriginalEnemyMorale(int amount){originalEnemyMorale = amount; currentEnemyMorale = amount;}
+    protected void SetOriginalEnemyMorale(int amount){originalEnemyMorale = amount; currentEnemyMorale = amount;}
     // Whenever someone dies or takes damage update this.
     protected int currentEnemyMorale;
     public void TakeDamage(int damage, int max_health, int team)

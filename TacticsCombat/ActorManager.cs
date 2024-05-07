@@ -405,7 +405,7 @@ public class ActorManager : MonoBehaviour
 
     public int MoraleVictory()
     {
-        if (terrainMap.moraleTracker.ReturnEnemyMorale <= 0){return 1;}
+        if (terrainMap.moraleTracker.ReturnEnemyMorale() <= 0){return 1;}
         return 0;
     }
 
