@@ -306,12 +306,16 @@ public class ActorManager : MonoBehaviour
         }
     }
 
-    public void ReturnToHub(bool win = true)
+    public void ReturnToHub(bool win = true, bool morale = false)
     {
         if (win)
         {
             ClaimDrops();
             UpdatePartyHealth();
+            if (morale)
+            {
+                // Slightly different victory screen text.
+            }
         }
         else
         {
@@ -397,6 +401,12 @@ public class ActorManager : MonoBehaviour
                 break;
         }
         return -1;
+    }
+
+    public int MoraleVictory()
+    {
+        if (terrainMap.moraleTracker.ReturnEnemyMorale <= 0){return 1;}
+        return 0;
     }
 
     private bool CheckWinConditionOne()

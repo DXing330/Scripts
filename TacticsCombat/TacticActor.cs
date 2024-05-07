@@ -80,8 +80,10 @@ public class TacticActor : AllStats
             terrainMap.actionLog.AddActionLog(typeName+" takes 0 DMG.");
             return;
         }
-        health -= Mathf.Max(amount - defense, 1);
-        terrainMap.actionLog.AddActionLog(typeName+" takes "+Mathf.Max(amount - defense, 1)+" DMG.");
+        int damage = Mathf.Max(amount - defense, 1);
+        health -= damage;
+        terrainMap.moraleTracker.TakeDamage(damage, baseHealth, team);
+        terrainMap.actionLog.AddActionLog(typeName+" takes "+damage+" DMG.");
         ChangeAI();
         if (health <= 0){Death();}
     }
@@ -348,6 +350,7 @@ public class TacticActor : AllStats
         //spriteRenderer.sprite = null;
         spriteRenderer.color = tempColor;
         actionsLeft = 0;
+        terrainMap.moraleTracker.TeamMemberDies(team, baseHealth);
         //Destroy(gameObject);
     }
 

@@ -161,6 +161,14 @@ public class TerrainMap : MonoBehaviour
             actorManager.ReturnToHub(win);
             return;
         }
+        int moraleVictory = actorManager.MoraleVictory();
+        if (moraleVictory >= 0)
+        {
+            // Slightly different victory screen saying that the enemy has fled.
+            battleStarted = false;
+            actorManager.ReturnToHub(true, true);
+            return;
+        }
         if (battleStarted)
         {
             turnOrder.UpdateTurnOrder(turnIndex);
