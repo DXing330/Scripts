@@ -155,7 +155,7 @@ public class TerrainMap : MonoBehaviour
             return;
         }
         int moraleVictory = actorManager.MoraleVictory();
-        if (moraleVictory >= 0)
+        if (moraleVictory > 0)
         {
             // Slightly different victory screen saying that the enemy has fled.
             battleStarted = false;

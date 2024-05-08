@@ -29,11 +29,15 @@ public class MoraleTracker : MonoBehaviour
     protected int currentEnemyCount;
     public void UpdateEnemyCount(int change = -1){currentEnemyCount += change;}
     public int ReturnCurrentEnemyCount(){return currentEnemyCount;}
-    protected int originalEnemyMorale;
+    public int originalEnemyMorale;
     // Based on the health of the whole enemy team.
-    protected void SetOriginalEnemyMorale(int amount){originalEnemyMorale = amount; currentEnemyMorale = amount;}
+    protected void SetOriginalEnemyMorale(int amount)
+    {
+        originalEnemyMorale = amount;
+        currentEnemyMorale = amount;
+    }
     // Whenever someone dies or takes damage update this.
-    protected int currentEnemyMorale;
+    public int currentEnemyMorale;
     public void TakeDamage(int damage, int max_health, int team)
     {
         // Less enemies means they lose morale faster.

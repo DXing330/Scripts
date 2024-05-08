@@ -310,12 +310,8 @@ public class ActorManager : MonoBehaviour
     {
         if (win)
         {
-            ClaimDrops();
+            ClaimDrops(morale);
             UpdatePartyHealth();
-            if (morale)
-            {
-                // Slightly different victory screen text.
-            }
         }
         else
         {
@@ -346,9 +342,15 @@ public class ActorManager : MonoBehaviour
         winReward = newReward;
     }
 
-    private void ClaimDrops()
+    private void ClaimDrops(bool morale = false)
     {
         GameManager.instance.recentlyWon = 1;
+        if (morale)
+        {
+            GameManager.instance.recentlyWon = 2;
+            //ResetDrops(morale);
+            //return;
+        }
         if (winReward.Length < 5){return;}
         string[] allRewards = winReward.Split("|");
         collectedBlood = int.Parse(allRewards[1]);
@@ -362,12 +364,12 @@ public class ActorManager : MonoBehaviour
         GameManager.instance.recentlyGainedGold = collectedGold;
     }
 
-    private void ResetDrops()
+    private void ResetDrops(bool morale = false)
     {
         GameManager.instance.recentlyGainedBlood = 0;
         GameManager.instance.recentlyGainedMana = 0;
         GameManager.instance.recentlyGainedGold = 0;
-        GameManager.instance.recentlyWon = 0;
+        if (!morale){GameManager.instance.recentlyWon = 0;}
     }
 
     public int WinningTeam()

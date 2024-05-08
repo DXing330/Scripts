@@ -7,16 +7,14 @@ using TMPro;
 public class BattleResult : MonoBehaviour
 {
     public bool win = true;
+    public bool morale = false;
     public TMP_Text resultText;
     public int goldGain = 0;
     public int manaGain = 0;
     public int bloodGain = 0;
-    public TMP_Text goldText;
-    public TMP_Text manaText;
-    public TMP_Text bloodText;
-    public GameObject rewardGold;
-    public GameObject rewardMana;
-    public GameObject rewardBlood;
+    public List<GameObject> rewardObjects;
+    public List<StatImageText> rewards;
+    public SpriteContainer rewardSprites;
     public GameObject victoryReturnButton;
     public GameObject defeatReturnButton;
 
@@ -29,6 +27,7 @@ public class BattleResult : MonoBehaviour
         }
         else
         {
+            if (GameManager.instance.recentlyWon == 2){morale = true;}
             goldGain = GameManager.instance.recentlyGainedGold;
             manaGain = GameManager.instance.recentlyGainedMana;
             bloodGain = GameManager.instance.recentlyGainedBlood;
@@ -39,33 +38,46 @@ public class BattleResult : MonoBehaviour
 
     private void UpdateResults()
     {
+        GameManager.instance.utility.DisableAllObjects(rewardObjects);
+        int rewardTypes = -1;
         if (win)
         {
-            resultText.text = "Victory!!!";
-            resultText.color = Color.green;
-            goldText.text = goldGain.ToString();
-            if (goldGain <= 0)
+            if (!morale)
             {
-                rewardGold.SetActive(false);
+                resultText.text = "Victory!!!";
+                resultText.color = Color.green;
             }
-            manaText.text = manaGain.ToString();
-            if (manaGain <= 0)
+            else
             {
-                rewardMana.SetActive(false);
+                resultText.text = "Enemy Routed!";
+                resultText.color = Color.green;
             }
-            bloodText.text = bloodGain.ToString();
-            if (bloodGain <= 0)
+            if (goldGain > 0)
             {
-                rewardBlood.SetActive(false);
+                rewardTypes++;
+                rewardObjects[rewardTypes].SetActive(true);
+                rewards[rewardTypes].SetText(goldGain.ToString());
+                rewards[rewardTypes].SetSprite(rewardSprites.allSprites[0]);
+            }
+            if (bloodGain > 0)
+            {
+                rewardTypes++;
+                rewardObjects[rewardTypes].SetActive(true);
+                rewards[rewardTypes].SetText(bloodGain.ToString());
+                rewards[rewardTypes].SetSprite(rewardSprites.allSprites[1]);
+            }
+            if (manaGain > 0)
+            {
+                rewardTypes++;
+                rewardObjects[rewardTypes].SetActive(true);
+                rewards[rewardTypes].SetText(manaGain.ToString());
+                rewards[rewardTypes].SetSprite(rewardSprites.allSprites[2]);
             }
         }
         else
         {
             resultText.text = "Defeat...";
             resultText.color = Color.red;
-            rewardGold.SetActive(false);
-            rewardMana.SetActive(false);
-            rewardBlood.SetActive(false);
         }
     }
 }
