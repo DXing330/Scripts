@@ -12,6 +12,7 @@ public class PassiveSkillDataManager : MonoBehaviour
     public List<string> passiveConditionSpecifics;
     public List<string> passiveEffects;
     public List<string> passiveSpecifics;
+    public List<string> passiveFlavors;
 
     void Start()
     {
@@ -28,6 +29,7 @@ public class PassiveSkillDataManager : MonoBehaviour
         passiveConditionSpecifics = configBlocks[3].Split("|").ToList();
         passiveEffects = configBlocks[4].Split("|").ToList();
         passiveSpecifics = configBlocks[5].Split("|").ToList();
+        passiveFlavors = configBlocks[6].Split("|").ToList();
     }
 
     public void LoadDataForPassive(TacticPassiveSkill passive, string passiveName)
@@ -41,6 +43,7 @@ public class PassiveSkillDataManager : MonoBehaviour
             passive.conditionSpecifics = "";
             passive.effect = "";
             passive.effectSpecifics = "";
+            passive.flavor = "";
             return;
         }
         passive.passiveName = passiveNames[index];
@@ -49,5 +52,6 @@ public class PassiveSkillDataManager : MonoBehaviour
         passive.conditionSpecifics = passiveConditionSpecifics[index];
         passive.effect = passiveEffects[index];
         passive.effectSpecifics = passiveSpecifics[index];
+        passive.flavor = passiveFlavors[index];
     }
 }

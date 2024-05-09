@@ -55,7 +55,7 @@ public class TextList : MonoBehaviour
         for (int i = start; i < end; i++)
         {
             textObjects[i-start].SetActive(true);
-            textBoxes[i-start].text = allText[i];
+            textBoxes[i-start].text = GameManager.instance.utility.SplitStringIntoLines(allText[i]);
         }
     }
 

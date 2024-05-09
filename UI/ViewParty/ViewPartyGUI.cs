@@ -25,6 +25,7 @@ public class ViewPartyGUI : BasicGUI
     public MoreStatsSheet equipmentStats;
     public EquipmentSelectGUI equipmentSelect;
     public ViewSkillGUI skillView;
+    public ViewPassiveGUI passiveView;
     public void SelectState(int selected)
     {
         if (selected == state){state = -1;}
@@ -61,6 +62,11 @@ public class ViewPartyGUI : BasicGUI
                 skillView.SetActor(partyMemberList.partyMembers[selectedMember]);
                 skillView.UpdateSkillTextList();
                 skillView.ResetSkillView();
+                break;
+            case 2:
+                passiveView.SetActor(partyMemberList.partyMembers[selectedMember]);
+                passiveView.UpdatePassiveTextList();
+                passiveView.ResetSkillView();
                 break;
         }
     }

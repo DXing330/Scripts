@@ -9,10 +9,7 @@ public class ViewSkillGUI : MonoBehaviour
     public SkillDataManager skillData;
     public TacticActiveSkill dummySkill;
     public PlayerActor actor;
-    public void SetActor(PlayerActor nActor)
-    {
-        actor = nActor;
-    }
+    public void SetActor(PlayerActor nActor){actor = nActor;}
     public TextList skillTextList;
     public void ResetSkillView()
     {
@@ -20,7 +17,6 @@ public class ViewSkillGUI : MonoBehaviour
         detailsPanel.SetActive(false);
     }
     public GameObject detailsPanel;
-    public List<TMP_Text> skillDetails;
     public ImagePanel actionCost;
     public ImagePanel energyCost;
     public TMP_Text skillDescription;
@@ -29,20 +25,12 @@ public class ViewSkillGUI : MonoBehaviour
     public int rangeMapSize = 9;
     public ActorSprites actorSprites;
     public List<string> skillDetailStrings;
-    public void UpdateSkillTextList(bool active = true)
+    public void UpdateSkillTextList()
     {
-        if (active)
-        {
-            // Grab the currently selected actor's active list.
-            skillTextList.SetAllText(actor.ReturnActives());
-        }
-        else
-        {
-            skillTextList.SetAllText(actor.ReturnPassives());
-        }
+        skillTextList.SetAllText(actor.ReturnActives());
     }
 
-    protected void UpdateSkill(string skillName)
+    protected virtual void UpdateSkill(string skillName)
     {
         skillData.LoadDataForSkill(dummySkill, skillName);
         //skillDetailStrings = dummySkill.ReturnStatList();
@@ -96,7 +84,7 @@ public class ViewSkillGUI : MonoBehaviour
         }
     }
 
-    protected void UpdateDescription()
+    protected virtual void UpdateDescription()
     {
         skillDescription.text = "";
         int parts = GameManager.instance.utility.CountOccurencesOfCharInString(dummySkill.effect, '+');

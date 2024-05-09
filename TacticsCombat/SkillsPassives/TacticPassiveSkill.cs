@@ -11,6 +11,7 @@ public class TacticPassiveSkill : MonoBehaviour
     public string conditionSpecifics;
     public string effect;
     public string effectSpecifics;
+    public string flavor;
 
     public int AffectMoveCost(int cost)
     {

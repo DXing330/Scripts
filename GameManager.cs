@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    public GeneralUtility utility;
+    public ScriptableUtility utility;
     public int basePartySize = 2;
     public List<PlayerActor> playerActors;
     public PlayerActor player;

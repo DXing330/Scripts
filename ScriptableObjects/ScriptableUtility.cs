@@ -209,4 +209,17 @@ public class ScriptableUtility : ScriptableObject
         return stringList;
     }
 
+    public string SplitStringIntoLines(string oString, string delimiter = " ")
+    {
+        string newString = "";
+        string[] parts = oString.Split(delimiter);
+        for (int i = 0; i < parts.Length; i++)
+        {
+            if (parts[i].Length < 1){continue;}
+            newString += parts[i];
+            if (i <= parts.Length - 1){newString += "\n";}
+        }
+        return newString;
+    }
+
 }

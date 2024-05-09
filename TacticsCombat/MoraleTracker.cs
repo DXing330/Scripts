@@ -53,9 +53,9 @@ public class MoraleTracker : MonoBehaviour
         }
         else
         {
-            // Enemies lose morale according to how many members there were originally and how strong that enemy was.
-            UpdateMorale(-(originalEnemyMorale/originalEnemyCount + base_health));
+            // Enemies lose morale according to how many members there.
             UpdateEnemyCount();
+            UpdateMorale(-(originalEnemyMorale/(currentEnemyCount+originalEnemyCount)));
         }
     }
     public void UpdateMorale(int change = 0)

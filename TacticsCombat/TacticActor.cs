@@ -385,6 +385,7 @@ public class TacticActor : AllStats
 
     public void RegainHealth(int amount)
     {
+        if (health > baseHealth){return;}
         health += amount;
         terrainMap.actionLog.AddActionLog(typeName+" regains "+amount+" HP.");
         ChangeAI();
