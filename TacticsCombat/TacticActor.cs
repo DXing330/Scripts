@@ -56,6 +56,19 @@ public class TacticActor : AllStats
         return cost;
     }
     public int health;
+    public void ReceiveAttackPassives(TacticActor attacker, int distance = 1)
+    {
+        if (passiveSkillNames.Count <= 0){return;}
+        for (int i = 0; i < passiveSkillNames.Count; i++)
+        {
+            terrainMap.actorManager.LoadPassiveData(passiveSkill, passiveSkillNames[i]);
+            if (passiveSkill.timing != 3){continue;}
+            if (passiveSkill.AttackedConditions(this, attacker, distance))
+            {
+                passiveSkill.AffectActor(attacker);
+            }
+        }
+    }
     protected int ReceiveDamagePassives(int amount, int direction = -1, int type = 0)
     {
         if (passiveSkillNames.Count <= 0){return amount;}

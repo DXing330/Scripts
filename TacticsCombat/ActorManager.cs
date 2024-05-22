@@ -34,6 +34,7 @@ public class ActorManager : MonoBehaviour
     public ActorDataManager actorData;
     public SkillDataManager skillData;
     public PassiveSkillDataManager passiveData;
+    public BattleBetweenActors battleBetweenActors;
     private int tries = 0;
     public List<int> usedTiles;
     public List<int> unusableTiles;
@@ -485,37 +486,15 @@ public class ActorManager : MonoBehaviour
     public bool BattleBetweenActors(TacticActor attacker, TacticActor defender, bool counter = true, bool flanked = false, int skillPowerMultipler = 0)
     {
         int defenderLocationType = terrainMap.terrainInfo[defender.locationIndex];
-        // Encourage attacking.
-        int attackAdvantage = 1;
-        int attackPower = attacker.attackDamage;
-        // Check for flanking/ally support.
-        if (flanked){attackAdvantage++;}
-        // Calculate terrain bonuses at the end then damage each other.
         int defenderBonus = terrainTile.ReturnDefenseBonus(defenderLocationType, defender.movementType);
-        attackPower = attackPower*6/defenderBonus;
-        int attackDamage = attacker.GenerateAttackDamage(attackAdvantage, attackPower);
-        attackDamage = attacker.ApplyAttackingPassives(attackDamage, defender);
-        // Skill damage happens at the very end, making it the most powerful.
-        if (skillPowerMultipler > 10)
-        {
-            attackDamage += attackDamage*skillPowerMultipler/10 - attackDamage;
-        }
-        defender.ReceiveDamage(attackDamage, attacker.currentDirection);
+        int attackerDefenseBonus = 6;
         if (counter)
         {
             int attackerLocationType = terrainMap.terrainInfo[attacker.locationIndex];
-            int defenseBonus = terrainTile.ReturnDefenseBonus(attackerLocationType, attacker.movementType);
-            int defenderPower = defender.attackDamage*6/defenseBonus;
-            // Penalty for ranged defenders.
-            if (attacker.currentAttackRange < defender.currentAttackRange){defenderPower/=2;}
-            int attackerHealth = attacker.health;
-            int attackerDefense = attacker.defense;
-            int defenderDamageDealt = defender.GenerateAttackDamage(0, defenderPower);
-            attacker.ReceiveDamage(defenderDamageDealt, defender.currentDirection);
-            if (defenderDamageDealt - attackerDefense >= attackerHealth || attackerHealth <= 1){return true;}
-            else if (attackerHealth <= 1 && defenderDamageDealt > attackerDefense/2){return true;}
+            attackerDefenseBonus = terrainTile.ReturnDefenseBonus(attackerLocationType, attacker.movementType);
         }
-        return false;
+        int distance = terrainMap.pathFinder.CalculateDistance(attacker.locationIndex, defender.locationIndex);
+        return battleBetweenActors.ActorsBattle(attacker, defender, counter, flanked, skillPowerMultipler, defenderBonus, attackerDefenseBonus, distance);
     }
 
     private Sprite SpriteDictionary(string spriteName)

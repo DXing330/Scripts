@@ -79,6 +79,8 @@ public class ViewPassiveGUI : ViewSkillGUI
                         return "if you are facing the back of the enemy.";
                 }
                 break;
+            case "Distance":
+                return "if within "+dummyPassive.conditionSpecifics+" tile(s).";
         }
         return "";
     }
@@ -95,6 +97,8 @@ public class ViewPassiveGUI : ViewSkillGUI
                 return "decrease the damage by "+(amount)+" ";
             case "Increase%":
                 return "increase the damage by "+(amount*10)+"% ";
+            case "Damage":
+                return "deal "+amount+" damage ";
         }
         return "";
     }

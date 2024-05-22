@@ -37,6 +37,9 @@ public class TacticPassiveSkill : MonoBehaviour
             case "Health":
                 actor.RegainHealth(amount);
                 break;
+            case "Damage":
+                actor.ReceiveDamage(amount);
+                break;
         }
     }
 
@@ -104,9 +107,10 @@ public class TacticPassiveSkill : MonoBehaviour
         return false;
     }
 
-    public bool DefendingConditions(TacticActor passiveHolder, TacticActor attacker)
+    public bool AttackedConditions(TacticActor passiveHolder, TacticActor attacker, int distance = 1)
     {
         if (condition == "None"){return true;}
+        if (condition == "Distance"){return (distance <= int.Parse(conditionSpecifics));}
         return false;
     }
 

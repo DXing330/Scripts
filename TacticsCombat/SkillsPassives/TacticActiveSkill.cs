@@ -225,7 +225,12 @@ public class TacticActiveSkill : MonoBehaviour
 
     private string TerrainChangeDescription()
     {
-        string description = "The fire rises!";
+        string description = "";
+        switch (effectSpecifics)
+        {
+            case "0":
+                return "Creates fires on ignitable terrain.";
+        }
         return description;
     }
 

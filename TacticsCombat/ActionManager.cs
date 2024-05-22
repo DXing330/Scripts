@@ -49,7 +49,7 @@ public class ActionManager : MonoBehaviour
 
     public void ChangeState(int newState)
     {
-        if (!terrainMap.battleStarted)
+        if (!terrainMap.battleStarted || !terrainMap.PlayerTurn())
         {
             return;
         }

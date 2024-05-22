@@ -251,6 +251,20 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
+    public bool PlayerTurn()
+    {
+        if (actors[turnIndex].team == 0){return true;}
+        return false;
+    }
+
+    public void EndTurnButton()
+    {
+        if (actors[turnIndex].team == 0)
+        {
+            ActorEndTurn();
+        }
+    }
+
     public void ActorEndTurn()
     {
         terrainEffectManager.BaseTerrainEffect(actors[turnIndex], terrainInfo[actors[turnIndex].locationIndex]);
@@ -815,12 +829,19 @@ public class TerrainMap : MonoBehaviour
         }
     }
 
-    private void NPCActorsTurn(bool npc = true)
+    protected void NPCActorsTurn(bool npc = true)
     {
+        // Start a coroutine that will add a delay to the function.
         if (auto){npc = false;}
         actors[turnIndex].NPCStartTurn(npc);
-        ActorEndTurn();
+        StartCoroutine(DelayEndTurn());
         return;
+    }
+
+    IEnumerator DelayEndTurn()
+    {
+        yield return new WaitForSeconds(1);
+        ActorEndTurn();
     }
 
     private void UpdateAfterMovingActor()
