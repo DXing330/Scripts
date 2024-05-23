@@ -22,8 +22,6 @@ public class SceneManager : MonoBehaviour
 
     public void LoadCurrentLocationScene()
     {
-        // Based on location in GameManager.
-        // For now just return to hub.
         ReturnToHub();
     }
 

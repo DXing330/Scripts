@@ -464,7 +464,15 @@ public class TerrainMap : MonoBehaviour
                 SummonSkillActivate(targetableTiles[currentTarget]);
                 break;
             case "Displace":
-                moveManager.Displace(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower, actors[turnIndex].activeSkill.effectSpecifics);
+                if (actors[turnIndex].activeSkill.effect.Contains("+"))
+                {
+                    // If displacement is with another effect its power is always 1.
+                    moveManager.Displace(actors[turnIndex], target, 1, actors[turnIndex].activeSkill.effectSpecifics);
+                }
+                else
+                {
+                    moveManager.Displace(actors[turnIndex], target, actors[turnIndex].activeSkill.basePower, actors[turnIndex].activeSkill.effectSpecifics);
+                }
                 break;
             case "Teleport":
                 moveManager.Teleport(actors[turnIndex], targetableTiles[currentTarget]);

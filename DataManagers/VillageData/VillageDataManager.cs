@@ -72,6 +72,7 @@ public class VillageDataManager : BasicDataManager
     public VassalHiringDataManager vassalHiring;
     public GeneralPopulationDataManager generalPopulation;
     public VillageBuildingDataManager buildings;
+    public MarketDataManager market;
 
     public void NewDay(bool resources = true)
     {
