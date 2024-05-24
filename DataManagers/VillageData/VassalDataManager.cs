@@ -7,19 +7,7 @@ using UnityEngine;
 public class VassalDataManager : BasicDataManager
 {
     public VillageDataManager villageData;
-    public string fileName = "/vassals.txt";
-    public string newGameData;
-    [ContextMenu("New Game")]
-    public override void NewGame()
-    {
-        saveDataPath = Application.persistentDataPath;
-        if (File.Exists(saveDataPath+fileName))
-        {
-            File.Delete (saveDataPath+fileName);
-        }
-        File.WriteAllText(saveDataPath+fileName, newGameData);
-        Load();
-    }
+
     public List<string> vassals;
     public List<string> familySizes;
     public List<string> morales;

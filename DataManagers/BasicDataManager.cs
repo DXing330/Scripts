@@ -1,9 +1,12 @@
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BasicDataManager : MonoBehaviour
 {
+    public string fileName;
+    public string newGameData;
     protected string saveDataPath;
     protected string loadedData;
     
@@ -12,7 +15,17 @@ public class BasicDataManager : MonoBehaviour
         saveDataPath = Application.persistentDataPath;
     }
     
-    public virtual void NewGame(){}
+    [ContextMenu("New Game")]
+    public virtual void NewGame()
+    {
+        saveDataPath = Application.persistentDataPath;
+        if (File.Exists(saveDataPath+fileName))
+        {
+            File.Delete (saveDataPath+fileName);
+        }
+        File.WriteAllText(saveDataPath+fileName, newGameData);
+        Load();
+    }
 
     public virtual void Load(){}
 

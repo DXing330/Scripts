@@ -121,9 +121,9 @@ public class ArmyDataManager : BasicDataManager
     public override void NewGame()
     {
         saveDataPath = Application.persistentDataPath;
-        if (File.Exists(saveDataPath+"/fighters.txt"))
+        if (File.Exists(saveDataPath+fileName))
         {
-            File.Delete (saveDataPath+"/fighters.txt");
+            File.Delete (saveDataPath+fileName);
         }
         availableFighters.Clear();
         fighterHealths.Clear();
@@ -137,15 +137,15 @@ public class ArmyDataManager : BasicDataManager
         saveDataPath = Application.persistentDataPath;
         string fighterData = GameManager.instance.ConvertListToString(availableFighters);
         fighterData += "#"+GameManager.instance.ConvertListToString(fighterHealths);
-        File.WriteAllText(saveDataPath+"/fighters.txt", fighterData);
+        File.WriteAllText(saveDataPath+fileName, fighterData);
     }
 
     public override void Load()
     {
         saveDataPath = Application.persistentDataPath;
-        if (File.Exists(saveDataPath+"/fighters.txt"))
+        if (File.Exists(saveDataPath+fileName))
         {
-            loadedData = File.ReadAllText(saveDataPath+"/fighters.txt");
+            loadedData = File.ReadAllText(saveDataPath+fileName);
             string[] dataBlocks = loadedData.Split("#");
             if (dataBlocks.Length >= 2)
             {

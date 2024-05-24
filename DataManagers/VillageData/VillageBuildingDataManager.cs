@@ -7,19 +7,6 @@ using UnityEngine;
 public class VillageBuildingDataManager : BasicDataManager
 {
     public VillageDataManager villageData;
-    public string fileName = "/buildings.txt";
-    public string newGameData;
-    [ContextMenu("New Game")]
-    public override void NewGame()
-    {
-        saveDataPath = Application.persistentDataPath;
-        if (File.Exists(saveDataPath+fileName))
-        {
-            File.Delete (saveDataPath+fileName);
-        }
-        File.WriteAllText(saveDataPath+fileName, newGameData);
-        Load();
-    }
     public override void Save()
     {
         saveDataPath = Application.persistentDataPath;

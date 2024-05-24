@@ -63,6 +63,18 @@ public class ScriptableUtility : ScriptableObject
         return (number%3==0);
     }
 
+    public int FloorSqrt(int number)
+    {
+        int sqrt = 1;
+        if (number <= 1){return sqrt;}
+        for (int i = 0; i < number/2; i++)
+        {
+            sqrt++;
+            if (sqrt*sqrt > number){return (sqrt-1);}
+        }
+        return sqrt;
+    }
+    
     public string ConvertListToString(List<string> string_list, string delimiter = "|")
     {
         return String.Join(delimiter, string_list);

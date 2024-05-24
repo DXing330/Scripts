@@ -7,19 +7,8 @@ public class GeneralPopulationDataManager : BasicDataManager
 {
     // All the village data stuff will keep track of the main village.
     public VillageDataManager villageData;
-    public string fileName = "/generalpop.txt";
     public string population;
     public string morale;
-    public override void NewGame()
-    {
-        saveDataPath = Application.persistentDataPath;
-        if (File.Exists(saveDataPath+fileName))
-        {
-            File.Delete (saveDataPath+fileName);
-        }
-        Save();
-        Load();
-    }
 
     public override void Save()
     {

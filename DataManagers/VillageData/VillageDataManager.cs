@@ -7,7 +7,6 @@ using UnityEngine;
 public class VillageDataManager : BasicDataManager
 {
     public BuildingDataManager buildingData;
-    public string starterVillage;
     public string villageData;
     // village includes terrain info
         // terrain info needs dimensions and terrain types
@@ -108,11 +107,11 @@ public class VillageDataManager : BasicDataManager
     public override void NewGame()
     {
         saveDataPath = Application.persistentDataPath;
-        if (File.Exists(saveDataPath+"/village.txt"))
+        if (File.Exists(saveDataPath+fileName))
         {
-            File.Delete (saveDataPath+"/village.txt");
+            File.Delete (saveDataPath+fileName);
         }
-        villageData = starterVillage;
+        villageData = newGameData;
         GameManager.instance.utility.DataManagerNewGame(dataManagers);
         QuickSave();
         Load();
@@ -127,7 +126,7 @@ public class VillageDataManager : BasicDataManager
         data += GameManager.instance.ConvertListToString(resources)+"#";
         data += GameManager.instance.ConvertListToString(possibleBuildings)+"#";
         data += GameManager.instance.ConvertListToString(buildingsOnTerrainTypes)+"#";
-        File.WriteAllText(saveDataPath+"/village.txt", data);
+        File.WriteAllText(saveDataPath+fileName, data);
         GameManager.instance.utility.DataManagerSave(dataManagers);
     }
 
@@ -135,20 +134,20 @@ public class VillageDataManager : BasicDataManager
     {
         saveDataPath = Application.persistentDataPath;
         string data = villageData;
-        File.WriteAllText(saveDataPath+"/village.txt", data);
+        File.WriteAllText(saveDataPath+fileName, data);
     }
 
     public override void Load()
     {
         saveDataPath = Application.persistentDataPath;
-        if (File.Exists(saveDataPath+"/village.txt"))
+        if (File.Exists(saveDataPath+fileName))
         {
-            loadedData = File.ReadAllText(saveDataPath+"/village.txt");
+            loadedData = File.ReadAllText(saveDataPath+fileName);
             villageData = loadedData;
         }
         else
         {
-            villageData = starterVillage;
+            villageData = newGameData;
         }
         SetData();
         GameManager.instance.utility.DataManagerLoad(dataManagers);

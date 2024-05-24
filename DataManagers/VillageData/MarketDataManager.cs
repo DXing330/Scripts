@@ -7,45 +7,39 @@ using UnityEngine;
 public class MarketDataManager : BasicDataManager
 {
     public VillageDataManager villageData;
-    public string fileName = "/market.txt";
-    public string newGameData;
-    // Affects the open market.
+    // Generates equipment for the open market.
+    public EquipmentGenerator equipmentGenerator;
+    // What types of equipment are always available.
+    public List<string> regularEquipment;
+    // Affects the quality of equipment on the market.
     public int marketLevel;
     public int marketInvestment;
-    // Affects comissionable equipment and how many smiths you have.
-    public int smithLevel;
-    public int smithInvestment;
     // Randomly new equipment may be available.
     public int lastUpdateDay;
     // If you buy out the equipment it will take some time to restock.
     public List<string> availableEquipment;
+    public List<string> equipmentPrices;
+    // Affects comissionable equipment and how many smiths you have.
     // Every smith can work on one equipment at a time.
-    public List<string> comissionedEquipment;
-    public List<string> comissionedDay;
-    public List<string> comissionedTime;
+    public List<BasicDataManager> ownedBusinesses;
+    public ForgeDataManager forgeData;
+    public EnchanterDataManager enchanterData;
 
-    [ContextMenu("New Game")]
     public override void NewGame()
     {
-        saveDataPath = Application.persistentDataPath;
-        if (File.Exists(saveDataPath+fileName))
-        {
-            File.Delete (saveDataPath+fileName);
-        }
-        File.WriteAllText(saveDataPath+fileName, newGameData);
-        Load();
+        base.NewGame();
+        GameManager.instance.utility.DataManagerNewGame(ownedBusinesses);
     }
 
     public override void Save()
     {
         saveDataPath = Application.persistentDataPath;
         string data = "";
-        data += marketLevel+"#"+marketInvestment+"#"+smithLevel+"#"+smithInvestment+"#"+lastUpdateDay+"#";
-        data += GameManager.instance.ConvertListToString(availableEquipment)+"#";
-        data += GameManager.instance.ConvertListToString(comissionedEquipment)+"#";
-        data += GameManager.instance.ConvertListToString(comissionedDay)+"#";
-        data += GameManager.instance.ConvertListToString(comissionedTime)+"#";
+        data += marketLevel+"#"+marketInvestment+"#"+lastUpdateDay+"#";
+        data += GameManager.instance.ConvertListToString(availableEquipment, ",")+"#";
+        data += GameManager.instance.ConvertListToString(equipmentPrices)+"#";
         File.WriteAllText(saveDataPath+fileName, data);
+        GameManager.instance.utility.DataManagerSave(ownedBusinesses);
     }
 
     public override void Load()
@@ -57,54 +51,48 @@ public class MarketDataManager : BasicDataManager
             string[] blocks = loadedData.Split("#");
             marketLevel = int.Parse(blocks[0]);
             marketInvestment = int.Parse(blocks[1]);
-            smithLevel = int.Parse(blocks[2]);
-            smithInvestment = int.Parse(blocks[3]);
-            lastUpdateDay = int.Parse(blocks[4]);
-            availableEquipment = blocks[5].Split(",").ToList();
-            comissionedEquipment = blocks[6].Split(",").ToList();
-            comissionedDay = blocks[7].Split(",").ToList();
-            comissionedTime = blocks[8].Split(",").ToList();
-            GameManager.instance.RemoveEmptyListItems(availableEquipment,0);
-            GameManager.instance.RemoveEmptyListItems(comissionedEquipment,0);
-            GameManager.instance.RemoveEmptyListItems(comissionedDay,0);
-            GameManager.instance.RemoveEmptyListItems(comissionedTime,0);
+            lastUpdateDay = int.Parse(blocks[2]);
+            availableEquipment = blocks[3].Split(",").ToList();
+            equipmentPrices = blocks[4].Split("|").ToList();
+            GameManager.instance.utility.RemoveEmptyListItems(availableEquipment, 0);
+            GameManager.instance.utility.RemoveEmptyListItems(equipmentPrices, 0);
         }
         else
         {
             NewGame();
         }
-    }
-
-    public void Invest(int amount = 1, bool market = true)
-    {
-        if (market){marketInvestment += amount;}
-        else{smithInvestment += amount;}
-        CheckInvestmentThreshold(market);
-    }
-
-    protected void CheckInvestmentThreshold(bool market = true)
-    {
-        if (market)
-        {
-            if (marketInvestment > Mathf.Pow(2, marketLevel))
-            {
-                marketInvestment = 0;
-                marketLevel++;
-            }
-        }
-        else
-        {
-            if (smithInvestment > Mathf.Pow(2, smithLevel))
-            {
-                smithInvestment = 0;
-                smithLevel++;
-            }
-        }
+        GameManager.instance.utility.DataManagerLoad(ownedBusinesses);
     }
 
     // Generate equipment with rarity based on the market level.
-    // Can only generate basic human usable equipment.
+    public void GenerateRandomEquipment()
+    {
+        // Market updates daily I guess?
+        // Check the time first to see if you should generate equipment.
+        if (GameManager.instance.time > lastUpdateDay)
+        {
+            lastUpdateDay = GameManager.instance.time;
+            availableEquipment.Clear();
+            equipmentPrices.Clear();
+        }
+        else {return;}
+        int typeRng = 0;
+        int levelRng = 0;
+        for (int i = 0; i < marketLevel; i++)
+        {
+            typeRng = Random.Range(0, regularEquipment.Count);
+            levelRng = Random.Range(0, GameManager.instance.utility.FloorSqrt(marketLevel));
+            availableEquipment.Add(equipmentGenerator.GenerateEquipment(levelRng, regularEquipment[typeRng]));
+            // Need to generate a cost for the equipment.
+            equipmentPrices.Add(((levelRng+1)*(levelRng+1)*50 + Random.Range(-50,50)).ToString());
+        }
+    }
 
-    // Can comission rarer equipment for other creatures.
-    // Have some degree of choice over special effects.
+    public void BuyEquipment(int index)
+    {
+        // Check if you have the money.
+        // Remove the money.
+        // Add the equipment.
+        // Remove it from the market.
+    }
 }
