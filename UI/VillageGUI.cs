@@ -165,7 +165,7 @@ public class VillageGUI : BasicGUI
     {
         int wantedIndex = newWorkerStatSheet.currentIndex;
         int cost = villageData.vassalHiring.ReturnHiringCost(wantedIndex);
-        if (villageData.PayGold(cost))
+        if (villageData.PayResource(cost))
         {
             villageData.vassals.GainVassal(villageData.vassalHiring.HireVassal(wantedIndex));
             newWorkerStatSheet.StartViewingApplicants();

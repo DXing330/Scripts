@@ -18,7 +18,6 @@ public class MarketDataManager : BasicDataManager
     // Randomly new equipment may be available.
     public int lastUpdateDay;
     // If you buy out the equipment it will take some time to restock.
-    public List<string> allAvailableEquipment;
     public List<string> currentAvailable;
     public List<string> currentQuantity;
     public List<string> currentPrices;

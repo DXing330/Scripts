@@ -7,7 +7,7 @@ using TMPro;
 public class VillageStats : MonoBehaviour
 {
     public VillageDataManager villageData;
-    public List<TMP_Text> resourceStats;
+    public List<StatImageText> resourceStats;
     public List<TMP_Text> projectedResourceChange;
     protected List<int> projectedOutputs;
     public TMP_Text workerPop;
@@ -24,14 +24,13 @@ public class VillageStats : MonoBehaviour
     {
         for (int i = 0; i < Mathf.Min(resourceStats.Count, statString.Count); i++)
         {
-            resourceStats[i].text = statString[i];
+            resourceStats[i].SetText(statString[i]);
         }
     }
 
     protected void UpdatePopulationStats()
     {
-        workerPop.text = villageData.DetermineWorkerPopulation().ToString();
-        housing.text = villageData.DetermineHousingLimit().ToString();
+        housing.text = villageData.DetermineWorkerPopulation()+"/"+villageData.DetermineHousingLimit();
     }
 
     protected void UpdateProjectedResources()

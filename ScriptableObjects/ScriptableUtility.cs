@@ -48,6 +48,12 @@ public class ScriptableUtility : ScriptableObject
         }
     }
 
+    public void EnableSelectedObject(List<GameObject> objects, int index = 0)
+    {
+        DisableAllObjects(objects);
+        if (index >= 0 && i < objects.Count){objects[index].SetActive(true);}
+    }
+
     public bool DivisibleNumber(int input, int check = 2)
     {
         return (input%check==0);

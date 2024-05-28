@@ -13,19 +13,16 @@ public class VillageDataManager : BasicDataManager
     public int totalRows; // 9
     public int totalColumns; // 9
     public List<string> villageTiles; // figure it out
-    // Keep track of resources I guess.
-        // money|food|wood|stone|woman
-        // women can be married to increase loyalty and make it harder to for workers to leave.
+    // money|food|wood|stone|mana
     public List<string> resources; // 0|2|0|0|0
-
-    public bool PayGold(int amount)
+    public bool PayResource(int amount, int type = 0)
     {
-        int currentGold = int.Parse(resources[0]);
-        if (amount > currentGold){return false;}
+        int currentAmount = int.Parse(resources[type]);
+        if (amount > currentAmount){return false;}
         else
         {
-            currentGold -= amount;
-            resources[0] = currentGold.ToString();
+            currentAmount -= amount;
+            resources[type] = currentAmount.ToString();
             return true;
         }
     }
