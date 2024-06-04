@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class MarketPanelGUI : MonoBehaviour
 {
+    public GameObject panel;
     // List of equipment.
     public virtual void ActivatePanel()
     {
 
     }
 
-    public virtual void DeactivatePanel()
-    {
-
-    }
+    public virtual void DeactivatePanel(){panel.SetActive(false);}
 }

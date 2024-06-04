@@ -51,7 +51,7 @@ public class ScriptableUtility : ScriptableObject
     public void EnableSelectedObject(List<GameObject> objects, int index = 0)
     {
         DisableAllObjects(objects);
-        if (index >= 0 && i < objects.Count){objects[index].SetActive(true);}
+        if (index >= 0 && index < objects.Count){objects[index].SetActive(true);}
     }
 
     public bool DivisibleNumber(int input, int check = 2)
@@ -240,4 +240,41 @@ public class ScriptableUtility : ScriptableObject
         return newString;
     }
 
+    public List<TacticActor> QuickSortActorsByIntList(List<TacticActor> actors, List<int> stats, int leftIndex, int rightIndex)
+    {
+        int i = leftIndex;
+        int j = rightIndex;
+        int pivotStat = stats[leftIndex];
+        while (i <= j)
+        {
+            while (stats[i] > pivotStat)
+            {
+                i++;
+            }
+            while (stats[j] < pivotStat)
+            {
+                j--;
+            }
+            if (i <= j)
+            {
+                int temp = stats[i];
+                stats[i] = stats[j];
+                stats[j] = temp;
+                TacticActor tempActor = actors[i];
+                actors[i] = actors[j];
+                actors[j] = tempActor;
+                i++;
+                j--;
+            }
+        }
+        if (leftIndex < j)
+        {
+            QuickSortByStat(actors, stats, leftIndex, j);
+        }
+        if (i < rightIndex)
+        {
+            QuickSortByStat(actors, stats, i, rightIndex);
+        }
+        return actors;
+    }
 }

@@ -142,52 +142,13 @@ public class TurnOrderPanel : MonoBehaviour
         return sortedActors;
     }
 
-    private List<TacticActor> SortByInitiative(List<TacticActor> actors)
+    protected List<TacticActor> SortByInitiative(List<TacticActor> actors)
     {
         List<int> initiatives = new List<int>();
         for (int i = 0; i < actors.Count; i++)
         {
             initiatives.Add(actors[i].baseInitiative);
         }
-        return QuickSortByStat(actors, initiatives, 0, actors.Count-1);
-    }
-
-    // Highest to lowest, since highest initiative goes first.
-    private List<TacticActor> QuickSortByStat(List<TacticActor> actors, List<int> stats, int leftIndex, int rightIndex)
-    {
-        int i = leftIndex;
-        int j = rightIndex;
-        int pivotStat = stats[leftIndex];
-        while (i <= j)
-        {
-            while (stats[i] > pivotStat)
-            {
-                i++;
-            }
-            while (stats[j] < pivotStat)
-            {
-                j--;
-            }
-            if (i <= j)
-            {
-                int temp = stats[i];
-                stats[i] = stats[j];
-                stats[j] = temp;
-                TacticActor tempActor = actors[i];
-                actors[i] = actors[j];
-                actors[j] = tempActor;
-                i++;
-                j--;
-            }
-        }
-        if (leftIndex < j)
-        {
-            QuickSortByStat(actors, stats, leftIndex, j);
-        }
-        if (i < rightIndex)
-        {
-            QuickSortByStat(actors, stats, i, rightIndex);
-        }
-        return actors;
+        return GameManager.instance.utility.QuickSortActorsByIntList(actors, initiatives, 0, actors.Count - 1);
     }
 }

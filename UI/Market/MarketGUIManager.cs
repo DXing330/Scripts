@@ -5,8 +5,11 @@ using TMPro;
 
 public class MarketGUIManager : MonoBehaviour
 {
+    public SpriteContainer equipSprites;
+    public MarketDataManager marketData;
     void Start()
     {
+        marketData = GameManager.instance.villageData.market;
         UpdateGUI();
     }
     protected void UpdateGUI()
@@ -36,9 +39,13 @@ public class MarketGUIManager : MonoBehaviour
             marketButtonTexts[i].color = Color.black;
         }
     }
-    public List<GameObject> marketPanels;
+    public List<MarketPanelGUI> marketPanels;
     protected void ActivateSelectedPanel()
     {
-        GameManager.instance.utility.EnableSelectedObject(marketPanels, selectedMarket);
+        for (int i = 0; i < marketPanels.Count; i++)
+        {
+            marketPanels[i].DeactivatePanel();
+            if (i == selectedMarket){marketPanels[i].ActivatePanel();}
+        }
     }
 }
