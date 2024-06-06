@@ -69,8 +69,13 @@ public class MarketDataManager : BasicDataManager
         GameManager.instance.utility.DataManagerLoad(ownedBusinesses);
     }
 
+    public override void NewDay()
+    {
+        GenerateRandomEquipment();
+    }
+
     // Generate equipment with rarity based on the market level.
-    public void GenerateRandomEquipment()
+    protected void GenerateRandomEquipment()
     {
         int timeDifference = 0;
         // Market updates daily I guess?

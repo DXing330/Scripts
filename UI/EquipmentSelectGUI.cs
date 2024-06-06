@@ -9,7 +9,7 @@ using TMPro;
 public class EquipmentSelectGUI : BasicGUI
 {
     public EquipmentInventory equipInventory;
-    public EquipmentSprites equipSprites;
+    public SpriteContainer equipSprites;
     public PlayerActor selectedActor;
     public void GetViewedActor()
     {

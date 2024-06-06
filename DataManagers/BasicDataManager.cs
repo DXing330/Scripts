@@ -30,4 +30,6 @@ public class BasicDataManager : MonoBehaviour
     public virtual void Load(){}
 
     public virtual void Save(){}
+
+    public virtual void NewDay(){}
 }

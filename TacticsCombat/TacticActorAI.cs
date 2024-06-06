@@ -43,5 +43,6 @@ public class TacticActorAI : MonoBehaviour
     public TacticActor ReturnBiggestBully()
     {
         if (bullies.Count >= 0){return bullies[0];}
+        return null;
     }    
 }

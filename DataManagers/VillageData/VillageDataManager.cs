@@ -84,6 +84,10 @@ public class VillageDataManager : BasicDataManager
         {
             IncreaseWorkerSkillLevel(i);
         }
+        for (int i = 0; i < dataManagers.Count; i++)
+        {
+            dataManagers[i].NewDay();
+        }
     }
 
     public void NewYear()

@@ -269,12 +269,39 @@ public class ScriptableUtility : ScriptableObject
         }
         if (leftIndex < j)
         {
-            QuickSortByStat(actors, stats, leftIndex, j);
+            QuickSortActorsByIntList(actors, stats, leftIndex, j);
         }
         if (i < rightIndex)
         {
-            QuickSortByStat(actors, stats, i, rightIndex);
+            QuickSortActorsByIntList(actors, stats, i, rightIndex);
         }
         return actors;
+    }
+
+    public int ChangePage(int currentPage, bool right, List<GameObject> pageLength, List<string> dataList)
+    {
+        int maxPage = dataList.Count/pageLength.Count - 1;
+        if (right)
+        {
+            if (currentPage < maxPage){currentPage++;}
+            else{currentPage = 0;}
+        }
+        else
+        {
+            if (currentPage > 0){currentPage--;}
+            else{currentPage = maxPage;}
+        }
+        return currentPage;
+    }
+    
+    public List<int> GetNewPageIndices(int currentPage, List<GameObject> pageLength, List<string> dataList)
+    {
+        List<int> newPageIndices = new List<int>();
+        int startIndex = currentPage*pageLength.Count;
+        for (int i = 0; i < Mathf.Min(pageLength.Count, dataList.Count - startIndex); i++)
+        {
+            newPageIndices.Add(startIndex + i);
+        }
+        return newPageIndices;
     }
 }

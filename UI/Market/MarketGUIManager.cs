@@ -26,7 +26,14 @@ public class MarketGUIManager : MonoBehaviour
         }
     }
     public List<TMP_Text> marketButtonTexts;
-    public int selectedMarket = 0;
+    public int selectedMarket = -1;
+    public void selectMarket(int index)
+    {
+        if (selectedMarket == index){selectedMarket = -1;}
+        else{selectedMarket = index;}
+        HighlightSelectedMarket();
+        ActivateSelectedPanel();
+    }
     protected void HighlightSelectedMarket()
     {
         for (int i = 0; i < marketButtonTexts.Count; i++)

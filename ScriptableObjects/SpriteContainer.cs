@@ -6,6 +6,8 @@ using UnityEngine;
 public class SpriteContainer : ScriptableObject
 {
     public List<Sprite> allSprites;
+    public List<string> specialNameKeys;
+    public List<string> specialNameValues;
 
     public Sprite SpriteDictionary(string spriteName)
     {
@@ -16,6 +18,8 @@ public class SpriteContainer : ScriptableObject
                 return allSprites[i];
             }
         }
+        int indexOf = specialNameKeys.IndexOf(spriteName);
+        if (indexOf >= 0){return SpriteDictionary(specialNameValues[indexOf]);}
         return null;
     }
 
