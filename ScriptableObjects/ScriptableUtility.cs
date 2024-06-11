@@ -280,7 +280,8 @@ public class ScriptableUtility : ScriptableObject
 
     public int ChangePage(int currentPage, bool right, List<GameObject> pageLength, List<string> dataList)
     {
-        int maxPage = dataList.Count/pageLength.Count - 1;
+        int maxPage = dataList.Count/pageLength.Count;
+        if (dataList.Count%pageLength.Count == 0){maxPage--;}
         if (right)
         {
             if (currentPage < maxPage){currentPage++;}

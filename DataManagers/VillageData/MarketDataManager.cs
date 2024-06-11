@@ -38,7 +38,7 @@ public class MarketDataManager : BasicDataManager
         saveDataPath = Application.persistentDataPath;
         string data = "";
         data += marketLevel+"#"+marketInvestment+"#"+lastUpdateDay+"#";
-        data += GameManager.instance.ConvertListToString(currentAvailable, ",")+"#";
+        data += GameManager.instance.ConvertListToString(currentAvailable, "_")+"#";
         data += GameManager.instance.ConvertListToString(currentQuantity)+"#";
         data += GameManager.instance.ConvertListToString(currentPrices)+"#";
         File.WriteAllText(saveDataPath+fileName, data);
@@ -55,9 +55,9 @@ public class MarketDataManager : BasicDataManager
             marketLevel = int.Parse(blocks[0]);
             marketInvestment = int.Parse(blocks[1]);
             lastUpdateDay = int.Parse(blocks[2]);
-            currentAvailable = blocks[3].Split(",").ToList();
+            currentAvailable = blocks[3].Split("_").ToList();
             currentQuantity = blocks[4].Split("|").ToList();
-            currentPrices = blocks[4].Split("|").ToList();
+            currentPrices = blocks[5].Split("|").ToList();
             GameManager.instance.utility.RemoveEmptyListItems(currentAvailable, 0);
             GameManager.instance.utility.RemoveEmptyListItems(currentQuantity, 0);
             GameManager.instance.utility.RemoveEmptyListItems(currentPrices, 0);
@@ -72,6 +72,7 @@ public class MarketDataManager : BasicDataManager
     public override void NewDay()
     {
         GenerateRandomEquipment();
+        AdjustPrices();
     }
 
     // Generate equipment with rarity based on the market level.
@@ -163,11 +164,22 @@ public class MarketDataManager : BasicDataManager
         currentPrices[index] = averagePrice.ToString();
     }
 
-    public void BuyEquipment(int index)
+    protected void AdjustPrices()
+    {
+        // Prices go down if no one is buying.
+        for (int i = 0; i < currentPrices.Count; i++)
+        {
+            currentPrices[i] = Mathf.Max(int.Parse(currentPrices[i])-int.Parse(currentQuantity[i]), basePrice*marketLevel).ToString();
+        }
+    }
+
+    public bool BuyEquipment(int index)
     {
         // Check if you have the money.
+        int cost = int.Parse(currentPrices[index]);
         // Remove the money.
         // Add the equipment.
         // Remove it from the market.
+        return false;
     }
 }

@@ -15,33 +15,105 @@ public class OpenMarketGUI : MarketPanelGUI
     public override void ActivatePanel()
     {
         panel.SetActive(true);
-        ChangePage(true);
-        ChangePage(false);
+        currentPage = 0;
+        selectedItem = -1;
+        ResetStatTexts();
+        UpdateCurrentPage();
     }
     public MarketGUIManager marketGUI;
     public MarketDataManager marketData;
     public SpriteContainer equipSprites;
     public List<GameObject> itemButtons;
+    public int selectedItem = -1;
+    protected void ResetSelectedItem()
+    {
+        selectedItem = -1;
+        ResetStatTexts();
+    }
+    public void SelectItem(int index)
+    {
+        if (index == selectedItem){ResetSelectedItem();}
+        else
+        {
+            selectedItem = index;
+            UpdateStatTexts(marketData.currentAvailable[selectedItem+(currentPage*itemButtons.Count)]);
+        }
+    }
     public List<GameObject> changePageButtons;
     int currentPage = 0;
     public void ChangePage(bool right = true)
     {
+        ResetSelectedItem();
         currentPage = GameManager.instance.utility.ChangePage(currentPage, right, itemButtons, marketData.currentAvailable);
+        UpdateCurrentPage();
+    }
+    protected void UpdateCurrentPage()
+    {
         List<int> newPageIndices = GameManager.instance.utility.GetNewPageIndices(currentPage, itemButtons, marketData.currentAvailable);
         GameManager.instance.utility.DisableAllObjects(itemButtons);
         for (int i = 0; i < newPageIndices.Count; i++)
         {
             string[] equipmentInfo = marketData.currentAvailable[newPageIndices[i]].Split("|");
             UpdateMarketItems(equipmentInfo, i, marketData.currentPrices[newPageIndices[i]], marketData.currentQuantity[newPageIndices[i]]);
-            // Update the market item images.
-            // Update things like stats/price/quantity.
         }
     }
     public List<HighlightableImage> marketItems;
+    public List<StatImageText> itemStats;
     protected void UpdateMarketItems(string[] equipmentInfo, int i, string price, string quantity)
     {
         itemButtons[i].SetActive(true);
         marketItems[i].UpdateSprite(equipSprites.SpriteDictionary(equipmentInfo[^1]));
-        // Update things like stats/price/quantity.
+    }
+
+    protected void ResetStatTexts()
+    {
+        for (int i = 0; i < itemStats.Count; i++)
+        {
+            itemStats[i].SetText("");
+        }
+    }
+
+    protected void UpdateStatTexts(string equipmentInfo)
+    {
+        ResetStatTexts();
+        string[] blocks = equipmentInfo.Split("|");
+        for (int i = 0; i < 3; i++)
+        {
+            itemStats[i].SetText(blocks[i+1]);
+        }
+        itemStats[3].SetText(blocks[0]);
+        string[] equipStats = blocks[4].Split(",");
+        string skills = "";
+        for (int i = 0; i < equipStats.Length; i++)
+        {
+            if (equipStats[i].Length <= 1){continue;}
+            skills += equipStats[i]+"\n";
+        }
+        itemStats[4].SetText(skills);
+        equipStats = blocks[5].Split(",");
+        skills = "";
+        for (int i = 0; i < equipStats.Length; i++)
+        {
+            if (equipStats[i].Length <= 1){continue;}
+            skills += equipStats[i]+"\n";
+        }
+        itemStats[5].SetText(skills);
+        //selectedItem+(currentPage*itemButtons.Count)
+        itemStats[6].SetText(marketData.currentPrices[selectedItem+(currentPage*itemButtons.Count)]);
+        itemStats[7].SetText(marketData.currentQuantity[selectedItem+(currentPage*itemButtons.Count)]);
+    }
+
+    public void BuyButton()
+    {
+        if (selectedItem < 0){return;}
+        // Try to buy.
+        if (marketData.BuyEquipment(selectedItem+(currentPage*itemButtons.Count)))
+        {
+            // If quantity now zero then reset, otherwise just update the quantity.
+        }
+        else
+        {
+            // Error message about lack of funds?
+        }
     }
 }
