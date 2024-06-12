@@ -175,10 +175,14 @@ public class MarketDataManager : BasicDataManager
 
     public bool BuyEquipment(int index)
     {
-        // Check if you have the money.
         int cost = int.Parse(currentPrices[index]);
-        // Remove the money.
-        // Add the equipment.
+        // Check if you have the money.
+        if (villageData.PayResource(cost))
+        {
+            GameManager.instance.equipInventory.GainEquipment(currentAvailable[index]);
+            AdjustQuantity(index, -1);
+            return true;
+        }
         // Remove it from the market.
         return false;
     }

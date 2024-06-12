@@ -98,7 +98,6 @@ public class OpenMarketGUI : MarketPanelGUI
             skills += equipStats[i]+"\n";
         }
         itemStats[5].SetText(skills);
-        //selectedItem+(currentPage*itemButtons.Count)
         itemStats[6].SetText(marketData.currentPrices[selectedItem+(currentPage*itemButtons.Count)]);
         itemStats[7].SetText(marketData.currentQuantity[selectedItem+(currentPage*itemButtons.Count)]);
     }
@@ -106,10 +105,15 @@ public class OpenMarketGUI : MarketPanelGUI
     public void BuyButton()
     {
         if (selectedItem < 0){return;}
+        int currentQuantity = int.Parse(marketData.currentQuantity[selectedItem+(currentPage*itemButtons.Count)]);
         // Try to buy.
         if (marketData.BuyEquipment(selectedItem+(currentPage*itemButtons.Count)))
         {
-            // If quantity now zero then reset, otherwise just update the quantity.
+            if (currentQuantity == 1){ActivatePanel();}
+            else
+            {
+                itemStats[7].SetText(marketData.currentQuantity[selectedItem+(currentPage*itemButtons.Count)]);
+            }
         }
         else
         {
