@@ -241,7 +241,7 @@ public class VillageEditor : Map
     public void TryToBuildNew(int buildingType)
     {
         List<int> allCosts = buildingData.ReturnBuildCostInOrder(buildingType);
-        if (villageData.TryToConsumeResources(allCosts))
+        if (villageData.PayResources(allCosts))
         {
             int buildTime = buildingData.ReturnBuildTime(buildingType);
             villageData.StartBuilding(selectedTile, buildingType, buildTime);
@@ -256,7 +256,7 @@ public class VillageEditor : Map
         string loc = villageData.buildings.buildingLocations[selectedBuilding];
         if (villageData.buildings.buildingPhaseLocations.Contains(loc)){return;}
         List<int> allCosts = buildingData.ReturnBuildCostInOrder(buildingType, buildingLevel);
-        if (villageData.TryToConsumeResources(allCosts))
+        if (villageData.PayResources(allCosts))
         {
             // Try to upgrade that tile.
             int buildTime = buildingData.ReturnBuildTime(buildingType, buildingLevel);

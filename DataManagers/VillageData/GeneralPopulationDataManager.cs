@@ -7,13 +7,14 @@ public class GeneralPopulationDataManager : BasicDataManager
 {
     // All the village data stuff will keep track of the main village.
     public VillageDataManager villageData;
-    public string population;
-    public string morale;
+    public int population;
+    public int morale;
 
     public override void Save()
     {
         saveDataPath = Application.persistentDataPath;
         string data = "";
+        data += population+"|"+morale;
         File.WriteAllText(saveDataPath+fileName, data);
     }
 
@@ -23,10 +24,23 @@ public class GeneralPopulationDataManager : BasicDataManager
         if (File.Exists(saveDataPath+fileName))
         {
             loadedData = File.ReadAllText(saveDataPath+fileName);
+            string[] blocks = loadedData.Split("|");
+            population = int.Parse(blocks[0]);
+            morale = int.Parse(blocks[1]);
         }
         else
         {
             NewGame();
         }
+    }
+
+    public override void NewDay()
+    {
+        GainPopulation();
+    }
+
+    protected void GainPopulation(int amount = 1)
+    {
+        population += amount;
     }
 }

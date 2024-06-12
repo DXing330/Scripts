@@ -26,6 +26,26 @@ public class VillageDataManager : BasicDataManager
             return true;
         }
     }
+    public bool PayResources(List<int> costs)
+    {
+        List<string> updatedResources = new List<string>(resources);
+        int specificAmount = 0;
+        // Check all the costs.
+        // O(1), constant amount of different resource costs.
+        for (int i = 0; i < resources.Count; i++)
+        {
+            specificAmount = int.Parse(resources[i]);
+            if (specificAmount < costs[i])
+            {
+                // Fail a specific requirement.
+                return false;
+            }
+            updatedResources[i] = (specificAmount - costs[i]).ToString();
+        }
+        // Meet all the requirements.
+        resources = updatedResources;
+        return true;
+    }
     public void UpdateResources(List<int> changes)
     {
         for (int i = 0; i < resources.Count; i++)
@@ -355,26 +375,5 @@ public class VillageDataManager : BasicDataManager
     protected void Build(string location, int workerIndex)
     {
         buildings.Build(location, workerIndex);
-    }
-
-    public bool TryToConsumeResources(List<int> costs)
-    {
-        List<string> updatedResources = new List<string>(resources);
-        int specificAmount = 0;
-        // Check all the costs.
-        // O(1), constant amount of different resource costs.
-        for (int i = 0; i < resources.Count; i++)
-        {
-            specificAmount = int.Parse(resources[i]);
-            if (specificAmount < costs[i])
-            {
-                // Fail a specific requirement.
-                return false;
-            }
-            updatedResources[i] = (specificAmount - costs[i]).ToString();
-        }
-        // Meet all the requirements.
-        resources = updatedResources;
-        return true;
     }
 }
