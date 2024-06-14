@@ -7,6 +7,7 @@ using UnityEngine;
 public class VillageDataManager : BasicDataManager
 {
     public BuildingDataManager buildingData;
+    public int basePrice = 5;
     public string villageData;
     // village includes terrain info
         // terrain info needs dimensions and terrain types
@@ -26,7 +27,7 @@ public class VillageDataManager : BasicDataManager
             return true;
         }
     }
-    public bool PayResources(List<int> costs)
+    public bool PayResources(List<int> costs, bool building = true)
     {
         List<string> updatedResources = new List<string>(resources);
         int specificAmount = 0;
@@ -35,6 +36,11 @@ public class VillageDataManager : BasicDataManager
         for (int i = 0; i < resources.Count; i++)
         {
             specificAmount = int.Parse(resources[i]);
+            if (i == 0 && building)
+            {
+                // Building's cost more gold than normal.
+                costs[i] *= basePrice;
+            }
             if (specificAmount < costs[i])
             {
                 // Fail a specific requirement.
@@ -92,7 +98,7 @@ public class VillageDataManager : BasicDataManager
 
     public void NewDay(bool resources = true)
     {
-        // Get outputs every other day.
+        // Get outputs every week.
         if (resources)
         {
             UpdateResources(ReturnOutputs());
@@ -329,6 +335,8 @@ public class VillageDataManager : BasicDataManager
         projectedOutputs.Add(0);
         projectedOutputs.Add(0);
         projectedOutputs.Add(0);
+        // Gain taxes from you citizens.
+        projectedOutputs[0] += generalPopulation.ReturnTaxIncome();
         // No projections without workers.
         if (vassals.vassals.Count <= 0){return projectedOutputs;}
         int buildingType = -1;

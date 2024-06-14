@@ -18,6 +18,7 @@ public class LevelDataManager : BasicDataManager
     [ContextMenu("New Game")]
     public override void NewGame()
     {
+        saveDataPath = Application.persistentDataPath;
         allLevels = defaultAllLevels;
         Save();
     }

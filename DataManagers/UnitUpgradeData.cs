@@ -16,6 +16,7 @@ public class UnitUpgradeData : BasicDataManager
 
     public override void NewGame()
     {
+        saveDataPath = Application.persistentDataPath;
         upgradedUnits.Clear();
         bonusHealth.Clear();
         bonusAttack.Clear();

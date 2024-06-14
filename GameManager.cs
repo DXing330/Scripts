@@ -265,7 +265,8 @@ public class GameManager : MonoBehaviour
     public void NewDay()
     {
         time++;
-        villageData.NewDay(utility.DivisibleThree(time));
+        // Gain Resources Weekly.
+        villageData.NewDay(utility.DivisibleNumber(time, 6));
         if (utility.DivisibleNumber(time,yearLength))
         {
             villageData.NewYear();

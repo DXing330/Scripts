@@ -43,4 +43,14 @@ public class GeneralPopulationDataManager : BasicDataManager
     {
         population += amount;
     }
+
+    public int DeterminePopulationLimit()
+    {
+        return (villageData.DetermineHousingLimit() + 1)*100;
+    }
+
+    public int ReturnTaxIncome()
+    {
+        return Mathf.Max(0, morale+(population/100));
+    }
 }

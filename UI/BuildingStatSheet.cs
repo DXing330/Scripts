@@ -92,6 +92,7 @@ public class BuildingStatSheet : MonoBehaviour
             string[] costSpecifics = allCosts[i].Split("=");
             costObjects[costTypes].SetActive(true);
             specificCost = int.Parse(costSpecifics[1]);
+            if (int.Parse(costSpecifics[0]) == 0){specificCost *= villageData.basePrice;}
             specificCost *= (level+1);
             costs[costTypes].SetText(specificCost.ToString());
             costs[costTypes].SetSprite(resourceSprites[int.Parse(costSpecifics[0])]);

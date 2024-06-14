@@ -78,12 +78,13 @@ public class EquipmentInventory : BasicDataManager
         allTools.Add(equip);
     }
 
+    [ContextMenu("New Game")]
     public override void NewGame()
     {
         saveDataPath = Application.persistentDataPath;
         if (File.Exists(saveDataPath+fileName))
         {
-            File.Delete (saveDataPath+fileName);
+            File.Delete(saveDataPath+fileName);
         }
         allEquipment = starterEquipment;
         allEquippedEquipment.Clear();

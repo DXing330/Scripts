@@ -91,6 +91,7 @@ public class NewBuildingStatSheet : MonoBehaviour
     protected void UpdateStats()
     {
         if (selectedBuildingType < 0){return;}
+        statSheet.villageData = villageData;
         statSheet.UpdateBasicStats(selectedBuildingType);
     }
 

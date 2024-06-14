@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class MarketDataManager : BasicDataManager
 {
-    public int basePrice = 50;
     public VillageDataManager villageData;
     // Generates equipment for the open market.
     public EquipmentGenerator equipmentGenerator;
@@ -118,7 +117,7 @@ public class MarketDataManager : BasicDataManager
     {
         int price = 0;
         // Increase price for rarity.
-        price += (rarity+1)*(rarity+1)*basePrice;
+        price += (rarity+1)*(rarity+1)*villageData.basePrice;
         // Increase price for special abilities.
         string[] equipStats = equip.Split("|");
         // 0-1 abilities is free.
@@ -134,7 +133,7 @@ public class MarketDataManager : BasicDataManager
             if (equipStats[8].Length > 1){rareAbilities++;}
         }
         int totalAbilites = baseAbilities+(2*rareAbilities);
-        price += totalAbilites*basePrice*(rarity+1);
+        price += totalAbilites*villageData.basePrice*(rarity+1);
         if (volatility > 0)
         {
             int maxVolatility = Mathf.Max(volatility, price*volatility/100);
@@ -169,7 +168,7 @@ public class MarketDataManager : BasicDataManager
         // Prices go down if no one is buying.
         for (int i = 0; i < currentPrices.Count; i++)
         {
-            currentPrices[i] = Mathf.Max(int.Parse(currentPrices[i])-int.Parse(currentQuantity[i]), basePrice*marketLevel).ToString();
+            currentPrices[i] = Mathf.Max(int.Parse(currentPrices[i])-int.Parse(currentQuantity[i]), villageData.basePrice*marketLevel).ToString();
         }
     }
 
