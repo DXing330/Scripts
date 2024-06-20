@@ -80,6 +80,19 @@ public class ScriptableUtility : ScriptableObject
         }
         return sqrt;
     }
+
+    public int FloorLog(int number, int BASE = 2)
+    {
+        if (number < BASE){return 1;}
+        int log = 1;
+        for (int i = 0; i < number/BASE; i++)
+        {
+            if (number < BASE){break;}
+            number /= BASE;
+            log++;
+        }
+        return log;
+    }
     
     public string ConvertListToString(List<string> string_list, string delimiter = "|")
     {
