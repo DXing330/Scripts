@@ -384,4 +384,9 @@ public class VillageDataManager : BasicDataManager
     {
         buildings.Build(location, workerIndex);
     }
+
+    public void ChangeTerrain(int tileNumber, int newTerrain)
+    {
+        villageTiles[tileNumber] = newTerrain.ToString();   
+    }
 }

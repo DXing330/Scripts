@@ -56,12 +56,14 @@ public class VillageGUI : BasicGUI
     public NewBuildingStatSheet newBuildingStatSheet;
     public void ChangeTerrainType(int newType)
     {
-        newBuildingStatSheet.SetTerrainType(newType);
+        if (state == 2){newBuildingStatSheet.SetTerrainType(newType);}
+        else if (state == 4){changeTerrainSheet.SetTerrainType(newType);}
     }
     public void CheckUnbuiltBuilding(int tileNumber)
     {
         newBuildingStatSheet.CheckOnUnBuilt(tileNumber);
     }
+    public ChangeVillageTerrain changeTerrainSheet;
     public List<GameObject> panels;
     public GameObject returnPanel;
     protected void ActivateReturnPanel()
@@ -99,6 +101,9 @@ public class VillageGUI : BasicGUI
             case 3:
                 villageData.vassalHiring.StartHiring();
                 newWorkerStatSheet.StartViewingApplicants();
+                break;
+            case 4:
+                changeTerrainSheet.SetTerrainType(-1);
                 break;
         }
     }
@@ -171,5 +176,10 @@ public class VillageGUI : BasicGUI
             newWorkerStatSheet.StartViewingApplicants();
         }
         else{newWorkerStatSheet.PoorError();}
+    }
+
+    public void TryChangeTerrain()
+    {
+        if (villageManager.TryChangeTerrain(changeTerrainSheet.changedTerrainType)){changeTerrainSheet.SetTerrainType(-1);}
     }
 }

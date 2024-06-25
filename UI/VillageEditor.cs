@@ -190,6 +190,9 @@ public class VillageEditor : Map
             case 2:
                 SelectTerrain(tileNumber);
                 break;
+            case 4:
+                SelectTerrainToChange(tileNumber);
+                break;
         }
         GUI.UpdatePanels();
     }
@@ -238,6 +241,15 @@ public class VillageEditor : Map
         }
     }
 
+    protected void SelectTerrainToChange(int tileNumber)
+    {
+        // Can only change the terrain of empty tiles.
+        if (villageData.buildings.buildingLocations.Contains(tileNumber.ToString())){return;}
+        if (villageData.buildings.buildingPhaseLocations.Contains(tileNumber.ToString())){return;}
+        HighlightSelectedTile(tileNumber);
+        GUI.ChangeTerrainType(int.Parse(allTiles[tileNumber]));
+    }
+
     public void TryToBuildNew(int buildingType)
     {
         List<int> allCosts = buildingData.ReturnBuildCostInOrder(buildingType);
@@ -264,5 +276,17 @@ public class VillageEditor : Map
             UpdateNewBuildings(villageData.buildings.buildingPhaseBuildings, villageData.buildings.buildingPhaseLocations);
             UpdateMap();
         }
+    }
+
+    public bool TryChangeTerrain(int newTerrainType)
+    {
+        // Check the mana cost.
+        if (villageData.PayResource(int.Parse(GUI.changeTerrainSheet.cost.text), 4))
+        {
+            villageData.ChangeTerrain(selectedTile, newTerrainType);
+            UpdateMap();
+            return true;
+        }
+        return false;
     }
 }
