@@ -180,6 +180,6 @@ public class VillageGUI : BasicGUI
 
     public void TryChangeTerrain()
     {
-        if (villageManager.TryChangeTerrain(changeTerrainSheet.changedTerrainType)){changeTerrainSheet.SetTerrainType(-1);}
+        if (villageManager.TryChangeTerrain(changeTerrainSheet.ChangedTerrainIndex())){changeTerrainSheet.SetTerrainType(-1);}
     }
 }

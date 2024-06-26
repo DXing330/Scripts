@@ -27,7 +27,16 @@ public class SceneManager : MonoBehaviour
 
     public void MoveScenes(string sceneName)
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+        StartCoroutine(LoadAsyncScene(sceneName));
+    }
+
+    IEnumerator LoadAsyncScene(string sceneName)
+    {
+        AsyncOperation asyncLoad = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName);
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
+        }
     }
 
     public void SetBattleDifficulty(int difficulty)

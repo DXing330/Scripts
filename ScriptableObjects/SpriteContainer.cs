@@ -31,4 +31,16 @@ public class SpriteContainer : ScriptableObject
         }
         return null;
     }
+
+    public int IndexBySprite(string spriteName)
+    {
+        for (int i = 0; i < allSprites.Count; i++)
+        {
+            if (allSprites[i].name == spriteName)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

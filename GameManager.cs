@@ -77,13 +77,22 @@ public class GameManager : MonoBehaviour
 
     public void ReturnToVillage()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Village");
+        StartCoroutine(LoadAsyncScene("Village"));
         SaveData();
+    }
+
+    IEnumerator LoadAsyncScene(string sceneName)
+    {
+        AsyncOperation asyncLoad = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName);
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
+        }
     }
 
     public void MoveScenes(string sceneName)
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+        StartCoroutine(LoadAsyncScene(sceneName));
     }
 
     void Start()

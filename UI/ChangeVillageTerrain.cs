@@ -83,4 +83,10 @@ public class ChangeVillageTerrain : MonoBehaviour
         cost.text = DetermineCost(newType).ToString();
         UpdateHighlights(newType);
     }
+
+    public int ChangedTerrainIndex()
+    {
+        if (changedTerrainType < 0){return -1;}
+        return terrainSprites.IndexBySprite(possibleTerrainNames[changedTerrainType]);
+    }
 }
