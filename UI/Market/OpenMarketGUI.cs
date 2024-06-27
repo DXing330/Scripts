@@ -17,7 +17,7 @@ public class OpenMarketGUI : MarketPanelGUI
         panel.SetActive(true);
         currentPage = 0;
         selectedItem = -1;
-        ResetStatTexts();
+        itemStats.ResetStatTexts();
         UpdateCurrentPage();
     }
     public MarketGUIManager marketGUI;
@@ -28,7 +28,7 @@ public class OpenMarketGUI : MarketPanelGUI
     protected void ResetSelectedItem()
     {
         selectedItem = -1;
-        ResetStatTexts();
+        itemStats.ResetStatTexts();
     }
     public void SelectItem(int index)
     {
@@ -58,48 +58,19 @@ public class OpenMarketGUI : MarketPanelGUI
         }
     }
     public List<HighlightableImage> marketItems;
-    public List<StatImageText> itemStats;
+    public EquipmentStatsUI itemStats;
+    public List<StatImageText> marketStats;
     protected void UpdateMarketItems(string[] equipmentInfo, int i, string price, string quantity)
     {
         itemButtons[i].SetActive(true);
         marketItems[i].UpdateSprite(equipSprites.SpriteDictionary(equipmentInfo[^1]));
     }
 
-    protected void ResetStatTexts()
-    {
-        for (int i = 0; i < itemStats.Count; i++)
-        {
-            itemStats[i].SetText("");
-        }
-    }
-
     protected void UpdateStatTexts(string equipmentInfo)
     {
-        ResetStatTexts();
-        string[] blocks = equipmentInfo.Split("|");
-        for (int i = 0; i < 3; i++)
-        {
-            itemStats[i].SetText(blocks[i+1]);
-        }
-        itemStats[3].SetText(blocks[0]);
-        string[] equipStats = blocks[4].Split(",");
-        string skills = "";
-        for (int i = 0; i < equipStats.Length; i++)
-        {
-            if (equipStats[i].Length <= 1){continue;}
-            skills += equipStats[i]+"\n";
-        }
-        itemStats[4].SetText(skills);
-        equipStats = blocks[5].Split(",");
-        skills = "";
-        for (int i = 0; i < equipStats.Length; i++)
-        {
-            if (equipStats[i].Length <= 1){continue;}
-            skills += equipStats[i]+"\n";
-        }
-        itemStats[5].SetText(skills);
-        itemStats[6].SetText(marketData.currentPrices[selectedItem+(currentPage*itemButtons.Count)]);
-        itemStats[7].SetText(marketData.currentQuantity[selectedItem+(currentPage*itemButtons.Count)]);
+        itemStats.UpdateStatTextsFromString(equipmentInfo);
+        marketStats[0].SetText(marketData.currentPrices[selectedItem+(currentPage*itemButtons.Count)]);
+        marketStats[1].SetText(marketData.currentQuantity[selectedItem+(currentPage*itemButtons.Count)]);
     }
 
     public void BuyButton()
@@ -112,7 +83,7 @@ public class OpenMarketGUI : MarketPanelGUI
             if (currentQuantity == 1){ActivatePanel();}
             else
             {
-                itemStats[7].SetText(marketData.currentQuantity[selectedItem+(currentPage*itemButtons.Count)]);
+                marketStats[1].SetText(marketData.currentQuantity[selectedItem+(currentPage*itemButtons.Count)]);
             }
         }
         else
