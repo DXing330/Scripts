@@ -36,9 +36,6 @@ public class EnchanterDataManager : BasicDataManager
     public List<string> weaponEnchantments;
     public List<string> armorEnchantments;
     public List<string> accessoryEnchantments;
-    public List<string> enchanters;
-    public List<string> levels;
-    public List<string> experiences;
     public List<string> enchantEquipment;
     public List<string> enchantDay;
     public List<string> enchantTime;
@@ -48,9 +45,6 @@ public class EnchanterDataManager : BasicDataManager
         saveDataPath = Application.persistentDataPath;
         string data = "";
         data += GameManager.instance.ConvertListToString(knownEnchantments)+"#";
-        data += GameManager.instance.ConvertListToString(enchanters)+"#";
-        data += GameManager.instance.ConvertListToString(levels)+"#";
-        data += GameManager.instance.ConvertListToString(experiences)+"#";
         data += GameManager.instance.ConvertListToString(enchantEquipment, ",")+"#";
         data += GameManager.instance.ConvertListToString(enchantDay)+"#";
         data += GameManager.instance.ConvertListToString(enchantTime)+"#";
@@ -65,12 +59,9 @@ public class EnchanterDataManager : BasicDataManager
             loadedData = File.ReadAllText(saveDataPath+fileName);
             string[] blocks = loadedData.Split("#");
             knownEnchantments = blocks[0].Split("|").ToList();
-            enchanters = blocks[1].Split("|").ToList();
-            levels = blocks[2].Split("|").ToList();
-            experiences = blocks[3].Split("|").ToList();
-            enchantEquipment = blocks[4].Split(",").ToList();
-            enchantDay = blocks[5].Split("|").ToList();
-            enchantTime = blocks[6].Split("|").ToList();
+            enchantEquipment = blocks[1].Split(",").ToList();
+            enchantDay = blocks[2].Split("|").ToList();
+            enchantTime = blocks[3].Split("|").ToList();
             SortEnchantments();
         }
         else

@@ -148,6 +148,10 @@ public class GameManager : MonoBehaviour
         return false;
     }
     public int time = 0;
+    public int timeDifference(int oTime)
+    {
+        return Math.Abs(time - oTime);
+    }
     public int yearLength = 300;
     public List<string> playerPassives;
     public List<string> playerActives;

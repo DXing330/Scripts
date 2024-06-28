@@ -8,7 +8,7 @@ public class MarketPanelGUI : MonoBehaviour
     // List of equipment.
     public virtual void ActivatePanel()
     {
-
+        panel.SetActive(true);
     }
 
     public virtual void DeactivatePanel(){panel.SetActive(false);}

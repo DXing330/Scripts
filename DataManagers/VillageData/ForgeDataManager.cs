@@ -7,9 +7,6 @@ using UnityEngine;
 public class ForgeDataManager : BasicDataManager
 {
     public List<string> craftableEquipment;
-    public List<string> forgeWorkers;
-    public List<string> levels;
-    public List<string> experiences;
     public List<string> craftEquipment;
     public List<string> craftDay;
     public List<string> craftTime;
@@ -19,9 +16,6 @@ public class ForgeDataManager : BasicDataManager
         saveDataPath = Application.persistentDataPath;
         string data = "";
         data += GameManager.instance.ConvertListToString(craftableEquipment)+"#";
-        data += GameManager.instance.ConvertListToString(forgeWorkers)+"#";
-        data += GameManager.instance.ConvertListToString(levels)+"#";
-        data += GameManager.instance.ConvertListToString(experiences)+"#";
         data += GameManager.instance.ConvertListToString(craftEquipment, ",")+"#";
         data += GameManager.instance.ConvertListToString(craftDay)+"#";
         data += GameManager.instance.ConvertListToString(craftTime)+"#";
@@ -36,16 +30,36 @@ public class ForgeDataManager : BasicDataManager
             loadedData = File.ReadAllText(saveDataPath+fileName);
             string[] blocks = loadedData.Split("#");
             craftableEquipment = blocks[0].Split("|").ToList();
-            forgeWorkers = blocks[1].Split("|").ToList();
-            levels = blocks[2].Split("|").ToList();
-            experiences = blocks[3].Split("|").ToList();
-            craftEquipment = blocks[4].Split(",").ToList();
-            craftDay = blocks[5].Split("|").ToList();
-            craftTime = blocks[6].Split("|").ToList();
+            craftEquipment = blocks[1].Split(",").ToList();
+            craftDay = blocks[2].Split("|").ToList();
+            craftTime = blocks[3].Split("|").ToList();
+            GameManager.instance.RemoveEmptyListItems(craftEquipment,0);
+            GameManager.instance.RemoveEmptyListItems(craftDay,0);
+            GameManager.instance.RemoveEmptyListItems(craftTime,0);
         }
         else
         {
             NewGame();
         }
+    }
+
+    public void StartCrafting(string equip, string craftingTime = "30")
+    {
+        craftEquipment.Add(equip);
+        craftDay.Add(GameManager.instance.time.ToString());
+        craftTime.Add(craftingTime);
+    }
+
+    public bool FinishedCrafting(int index)
+    {
+        if (int.Parse(craftDay[index])+int.Parse(craftTime[index]) > GameManager.instance.time)
+        {
+            GameManager.instance.equipInventory.GainEquipment(craftEquipment[index]);
+            craftEquipment.RemoveAt(index);
+            craftDay.RemoveAt(index);
+            craftTime.RemoveAt(index);
+            return true;
+        }
+        return false;
     }
 }
