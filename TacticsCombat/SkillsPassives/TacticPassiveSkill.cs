@@ -130,6 +130,11 @@ public class TacticPassiveSkill : MonoBehaviour
                     return SameDirection(cDirection, damageDirection);
             }
         }
+        switch (condition)
+        {
+            case "DamageType":
+                return (int.Parse(conditionSpecifics) == damageType);
+        }
         return false;
     }
 

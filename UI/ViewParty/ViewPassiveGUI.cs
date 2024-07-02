@@ -9,6 +9,7 @@ public class ViewPassiveGUI : ViewSkillGUI
 {
     public PassiveSkillDataManager passiveData;
     public TacticPassiveSkill dummyPassive;
+    public ScriptableDictionary damageTypes;
     public TMP_Text passiveFlavorText;
 
     public void UpdatePassiveTextList()
@@ -69,7 +70,7 @@ public class ViewPassiveGUI : ViewSkillGUI
         switch (dummyPassive.condition)
         {
             case "None":
-                return "";
+                return ".";
             case "Direction":
                 switch (dummyPassive.conditionSpecifics)
                 {
@@ -81,8 +82,10 @@ public class ViewPassiveGUI : ViewSkillGUI
                 break;
             case "Distance":
                 return "if within "+dummyPassive.conditionSpecifics+" tile(s).";
+            case "Type":
+                return "if the damage is "+damageTypes.ReturnValue(dummyPassive.conditionSpecifics)+".";
         }
-        return "";
+        return ".";
     }
 
     protected string DetermineEffectText()

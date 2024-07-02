@@ -15,6 +15,9 @@ public class ForgeGUI : MarketPanelGUI
     }
     public GameObject viewCraftingObject;
     public EquipmentStatsUI viewedCrafting;
+    public List<StatImageText> otherInfo;
+    public int currentQuality = 1;
+    public TMP_Text qualityText;
     public TMP_Text viewedIndexText;
     public TMP_Text viewedTimeLeftText;
     public List<GameObject> changePageButtons;
@@ -33,6 +36,13 @@ public class ForgeGUI : MarketPanelGUI
             else{currentIndex = maxIndex;}
         }
         UpdateViewed();
+    }
+
+    public void ChangeQuality(bool increase = true)
+    {
+        // Check if the quality is less than market level.
+        // Change the time and price.
+        // Change the quality text.
     }
 
     protected void ResetViewed()
