@@ -144,7 +144,7 @@ public class EquipmentContainer : AllStats
             for (int i = 0; i < bonusPassives.Count; i++)
             {
                 if (bonusPassives[i].Length <= 1){continue;}
-                actor.activeSkillNames.Add(bonusPassives[i]);
+                actor.passiveSkillNames.Add(bonusPassives[i]);
             }
         }
     }

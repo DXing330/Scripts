@@ -132,7 +132,7 @@ public class TacticPassiveSkill : MonoBehaviour
         }
         switch (condition)
         {
-            case "DamageType":
+            case "Type":
                 return (int.Parse(conditionSpecifics) == damageType);
         }
         return false;

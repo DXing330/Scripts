@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour
 
     public void StartFromMenu(bool newGame = false)
     {
+        armyData.UpdatePartyStats();
         if (newGame)
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene("NameSelect");
