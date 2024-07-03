@@ -12,4 +12,6 @@ public class MarketPanelGUI : MonoBehaviour
     }
 
     public virtual void DeactivatePanel(){panel.SetActive(false);}
+
+    public virtual void ResetPanel(){}
 }

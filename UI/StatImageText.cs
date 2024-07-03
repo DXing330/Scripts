@@ -7,6 +7,7 @@ using TMPro;
 public class StatImageText : MonoBehaviour
 {
     public Image image;
+    public GameObject imageObject;
     public Color highlightColor;
     public Color normalColor;
     public TMP_Text stat;
@@ -19,6 +20,12 @@ public class StatImageText : MonoBehaviour
     public void SetSprite(Sprite newSprite)
     {
         image.sprite = newSprite;
+        imageObject.SetActive(true);
+    }
+
+    public void DisableSprite()
+    {
+        imageObject.SetActive(false);
     }
 
     public void HighlightText()

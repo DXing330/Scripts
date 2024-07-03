@@ -307,6 +307,21 @@ public class ScriptableUtility : ScriptableObject
         }
         return currentPage;
     }
+
+    public int ChangeIndex(int currentIndex, bool right, int length)
+    {
+        if (right)
+        {
+            if (currentIndex < length){currentIndex++;}
+            else{currentIndex = 0;}
+        }
+        else
+        {
+            if (currentIndex > 0){currentIndex--;}
+            else{currentIndex = length;}
+        }
+        return currentIndex;
+    }
     
     public List<int> GetNewPageIndices(int currentPage, List<GameObject> pageLength, List<string> dataList)
     {
