@@ -18,6 +18,7 @@ public class ForgeGUI : MarketPanelGUI
     public EquipmentStatsUI viewedCrafting;
     public StatImageText viewedEquipIcon;
     public List<StatImageText> otherInfo;
+    public EquipmentStatsUI viewedOrder;
     public StatImageText orderedEquipIcon;
     public int currentOrder = 0;
     public int currentQuality = 0;
@@ -38,6 +39,10 @@ public class ForgeGUI : MarketPanelGUI
         // Generate the equipment based on what your ordering.
         string orderedEquip = forgeData.craftableEquipment[currentOrder];
         orderedEquipIcon.SetSprite(equipSprites.SpriteDictionary(orderedEquip));
+        string equipStats = forgeData.equipmentGenerator.GenerateEquipment(currentQuality, orderedEquip);
+        viewedOrder.UpdateStatTextsFromString(equipStats);
+        otherInfo[0].SetText(forgeData.ReturnCost(currentOrder, currentQuality).ToString());
+        otherInfo[1].SetText(forgeData.ReturnTime(currentOrder, currentQuality).ToString());
     }
     
     public void ChangeOrder(bool right = true)
@@ -82,5 +87,10 @@ public class ForgeGUI : MarketPanelGUI
         viewedIndexText.text = (currentIndex+1)+"/"+forgeData.craftEquipment.Count;
         int timePassed = GameManager.instance.timeDifference(int.Parse(forgeData.craftDay[currentIndex]));
         viewedTimeLeftText.text = Mathf.Max(0, int.Parse(forgeData.craftTime[currentIndex]) - timePassed)+" Day(s) Left";
+    }
+
+    public void FinalizeOrder()
+    {
+        
     }
 }

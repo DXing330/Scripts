@@ -43,7 +43,7 @@ public class EquipmentGenerator : MonoBehaviour
         if (baseStat == 0){return "0";}
         if (baseStat < 0){return baseStat.ToString();}
         string stat = "";
-        int iStat = Random.Range(baseStat, baseStat+rarity);
+        int iStat = baseStat*(rarity+1);
         stat = iStat.ToString();
         return stat;
     }

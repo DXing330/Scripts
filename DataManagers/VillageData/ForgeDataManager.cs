@@ -6,7 +6,10 @@ using UnityEngine;
 
 public class ForgeDataManager : BasicDataManager
 {
+    public EquipmentGenerator equipmentGenerator;
     public List<string> craftableEquipment;
+    public List<string> baseCraftTime;
+    public List<string> baseCraftCost;
     public List<string> craftEquipment;
     public List<string> craftDay;
     public List<string> craftTime;
@@ -19,6 +22,8 @@ public class ForgeDataManager : BasicDataManager
         data += GameManager.instance.ConvertListToString(craftEquipment, ",")+"#";
         data += GameManager.instance.ConvertListToString(craftDay)+"#";
         data += GameManager.instance.ConvertListToString(craftTime)+"#";
+        data += GameManager.instance.ConvertListToString(baseCraftTime)+"#";
+        data += GameManager.instance.ConvertListToString(baseCraftCost)+"#";
         File.WriteAllText(saveDataPath+fileName, data);
     }
 
@@ -33,6 +38,8 @@ public class ForgeDataManager : BasicDataManager
             craftEquipment = blocks[1].Split(",").ToList();
             craftDay = blocks[2].Split("|").ToList();
             craftTime = blocks[3].Split("|").ToList();
+            baseCraftTime = blocks[4].Split("|").ToList();
+            baseCraftCost = blocks[5].Split("|").ToList();
             GameManager.instance.RemoveEmptyListItems(craftEquipment,0);
             GameManager.instance.RemoveEmptyListItems(craftDay,0);
             GameManager.instance.RemoveEmptyListItems(craftTime,0);
@@ -43,6 +50,16 @@ public class ForgeDataManager : BasicDataManager
         }
     }
 
+    public int ReturnCost(int index, int quality)
+    {
+        return int.Parse(baseCraftCost[index])*((quality+1)*(quality+1)*(quality+1));
+    }
+
+    public int ReturnTime(int index, int quality)
+    {
+        return int.Parse(baseCraftTime[index])*(int)(Mathf.Pow(2, quality));
+    }
+    
     public void StartCrafting(string equip, string craftingTime = "30")
     {
         craftEquipment.Add(equip);

@@ -24,8 +24,8 @@ public class BasicDataManager : MonoBehaviour
             File.Delete (saveDataPath+fileName);
         }
         File.WriteAllText(saveDataPath+fileName, newGameData);
-        Save();
         Load();
+        Save();
     }
 
     public virtual void Load(){}
