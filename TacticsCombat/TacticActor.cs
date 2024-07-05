@@ -78,7 +78,7 @@ public class TacticActor : AllStats
             if (passiveSkill.timing != 4){continue;}
             if (passiveSkill.DamagedConditions(this, amount, direction, type))
             {
-                amount = passiveSkill.AffectDamage(amount);
+                amount = passiveSkill.AffectDamage(amount, this);
             }
         }
         return amount;
@@ -115,7 +115,7 @@ public class TacticActor : AllStats
             if (passiveSkill.timing != 2){continue;}
             if (passiveSkill.AttackingConditions(this, defender))
             {
-                damage = passiveSkill.AffectDamage(damage);
+                damage = passiveSkill.AffectDamage(damage, defender);
             }
         }
         return damage;

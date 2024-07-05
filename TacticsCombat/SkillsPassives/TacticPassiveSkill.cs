@@ -43,7 +43,7 @@ public class TacticPassiveSkill : MonoBehaviour
         }
     }
 
-    public int AffectDamage(int damage)
+    public int AffectDamage(int damage, TacticActor damagedActor)
     {
         int amount = int.Parse(effectSpecifics);
         switch (effect)
@@ -59,6 +59,10 @@ public class TacticPassiveSkill : MonoBehaviour
                 break;
             case "Decrease%":
                 damage -= damage * amount / 10;
+                break;
+            // Armor ignore/penetration.
+            case "Ignore%":
+                damage += damagedActor.defense * amount / 10;
                 break;
         }
         return damage;

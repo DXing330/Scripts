@@ -18,7 +18,7 @@ public class MarketGUIManager : MonoBehaviour
         HighlightSelectedMarket();
     }
     public List<StatImageText> resources;
-    protected void UpdateResources()
+    public void UpdateResources()
     {
         for (int i = 0; i < GameManager.instance.villageData.resources.Count; i++)
         {

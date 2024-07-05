@@ -60,11 +60,11 @@ public class ForgeDataManager : BasicDataManager
         return int.Parse(baseCraftTime[index])*(int)(Mathf.Pow(2, quality));
     }
     
-    public void StartCrafting(string equip, string craftingTime = "30")
+    public void StartCrafting(string equip, int index, int quality)
     {
         craftEquipment.Add(equip);
         craftDay.Add(GameManager.instance.time.ToString());
-        craftTime.Add(craftingTime);
+        craftTime.Add(ReturnTime(index, quality).ToString());
     }
 
     public bool FinishedCrafting(int index)
@@ -75,6 +75,7 @@ public class ForgeDataManager : BasicDataManager
             craftEquipment.RemoveAt(index);
             craftDay.RemoveAt(index);
             craftTime.RemoveAt(index);
+            // Maybe send a message or something that the equipment is done crafting.
             return true;
         }
         return false;

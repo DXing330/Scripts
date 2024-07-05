@@ -75,15 +75,15 @@ public class ViewPassiveGUI : ViewSkillGUI
                 switch (dummyPassive.conditionSpecifics)
                 {
                     case "Opposing":
-                        return "if you are facing the enemy.";
+                        return " if you are facing the enemy.";
                     case "Identical":
-                        return "if you are facing the back of the enemy.";
+                        return " if you are facing the back of the enemy.";
                 }
                 break;
             case "Distance":
-                return "if within "+dummyPassive.conditionSpecifics+" tile(s).";
+                return " if within "+dummyPassive.conditionSpecifics+" tile(s).";
             case "Type":
-                return "if the damage is "+damageTypes.ReturnValue(dummyPassive.conditionSpecifics)+".";
+                return " if the damage is "+damageTypes.ReturnValue(dummyPassive.conditionSpecifics)+".";
         }
         return ".";
     }
@@ -97,11 +97,13 @@ public class ViewPassiveGUI : ViewSkillGUI
                 if (amount > 0){return "regain "+amount+" health.";}
                 else{return "lose "+Math.Abs(amount)+" health.";}
             case "Decrease":
-                return "decrease the damage by "+(amount)+" ";
+                return "decrease the damage by "+(amount)+"";
             case "Increase%":
-                return "increase the damage by "+(amount*10)+"% ";
+                return "increase the damage by "+amount+"0%";
             case "Damage":
-                return "deal "+amount+" damage ";
+                return "deal "+amount+" damage";
+            case "Ignore%":
+                return "ignore "+amount+"0% defense";
         }
         return "";
     }
