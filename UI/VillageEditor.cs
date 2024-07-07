@@ -181,6 +181,9 @@ public class VillageEditor : Map
         if (tileNumber < 0){return;}
         switch (state)
         {
+            case -1:
+                // Enter the building if possible.
+                break;
             case 0:
                 AssignSelectedWorker(tileNumber);
                 break;

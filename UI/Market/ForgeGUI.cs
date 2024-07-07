@@ -86,6 +86,7 @@ public class ForgeGUI : MarketPanelGUI
             ResetViewed();
             return;
         }
+        viewCraftingObject.SetActive(true);
         string viewedEquip = forgeData.craftEquipment[currentIndex];
         string[] blocks = viewedEquip.Split("|");
         viewedEquipIcon.SetSprite(equipSprites.SpriteDictionary(blocks[^1]));
@@ -100,7 +101,8 @@ public class ForgeGUI : MarketPanelGUI
         // Pay the cost.
         if (GameManager.instance.villageData.PayResource(forgeData.ReturnCost(currentOrder, currentQuality)))
         {
-            forgeData.StartCrafting(orderedStats, currentIndex, currentQuality);
+            forgeData.StartCrafting(orderedStats, currentOrder, currentQuality);
+            UpdateViewed();
         }
     }
 }
