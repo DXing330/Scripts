@@ -66,6 +66,7 @@ public class EnchanterDataManager : BasicDataManager
             enchantEquipment = blocks[2].Split(",").ToList();
             enchantDay = blocks[3].Split("|").ToList();
             enchantTime = blocks[4].Split("|").ToList();
+            GameManager.instance.utility.RemoveEmptyListItems(enchantEquipment);
             SortEnchantments();
         }
         else

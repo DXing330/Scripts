@@ -40,6 +40,18 @@ public class TacticPassiveSkill : MonoBehaviour
             case "Damage":
                 actor.ReceiveDamage(amount);
                 break;
+            case "BATK":
+                actor.baseAttack += amount;
+                break;
+            case "BDEF":
+                actor.baseDefense += amount;
+                break;
+            case "Attack":
+                actor.attackDamage += amount;
+                break;
+            case "Defense":
+                actor.defense += amount;
+                break;
         }
     }
 

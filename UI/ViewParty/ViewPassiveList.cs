@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,9 +12,14 @@ public class ViewPassiveList : MonoBehaviour
     }
     public ScriptableDetailsViewer passiveDetails;
     public List<string> passiveNames;
+    public void SetPassiveNamesFromString(string passiveNames, string delimiter = ",")
+    {
+        SetPassiveNames(passiveNames.Split(delimiter).ToList());
+    }
     public void SetPassiveNames(List<string> newNames)
     {
         passiveNames = newNames;
+        GameManager.instance.utility.RemoveEmptyListItems(passiveNames);
         currentPage = 0;
         UpdateCurrentPage();
     }
@@ -33,15 +39,31 @@ public class ViewPassiveList : MonoBehaviour
         ChangeState();
     }
 
+    public int ReturnCurrentViewedIndex()
+    {
+        return currentViewed;
+    }
+
     protected void UpdateViewedPassive()
     {
         passiveName.text = passiveNames[currentViewed];
         passiveEffect.text = passiveDetails.ReturnSkillDescription(passiveNames[currentViewed]);
     }
 
+    public void ResetState()
+    {
+        state = 0;
+        UpdateState();
+    }
+
     public void ChangeState()
     {
         state = (state+1)%2;
+        UpdateState();
+    }
+
+    protected void UpdateState()
+    {
         if (state == 0)
         {
             GameManager.instance.utility.DisableAllObjects(viewModeObjects);
@@ -73,6 +95,7 @@ public class ViewPassiveList : MonoBehaviour
     protected void UpdateCurrentPage()
     {
         GameManager.instance.utility.DisableAllObjects(passiveButtons);
+        if (passiveNames.Count <= 0){return;}
         List<int> currentPageIndices = GameManager.instance.utility.GetNewPageIndices(currentPage, passiveButtons, passiveNames);
         for (int i = 0; i < currentPageIndices.Count; i++)
         {

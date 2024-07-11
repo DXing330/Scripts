@@ -46,6 +46,8 @@ public class ScriptableDetailsViewer : ScriptableObject
                 return "When you attack ";
             case 8:
                 return "When you die ";
+            case 11:
+                return "At the start of battle ";
         }
         return "";
     }
@@ -89,6 +91,15 @@ public class ScriptableDetailsViewer : ScriptableObject
                 return "deal "+amount+" damage";
             case "Ignore%":
                 return "ignore "+amount+"0% defense";
+            case "BATK":
+                return "increase your attack by "+amount;
+            case "BDEF":
+                return "increase your defense by "+amount;
+            case "Attack":
+                return "increase your attack by "+amount;
+            case "Defense":
+                return "increase your defense by "+amount;
+
         }
         return "";
     }

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,9 +18,8 @@ public class EnchanterGUI : MarketPanelGUI
     public EquipmentInventory allEquipment;
     public EnchanterDataManager enchanterData;
     public ScriptableDetailsViewer skillDetailsUtil;
-    public TMP_Text newEnchantmentName;
-    public TMP_Text newEnchantmentEffect;
     public ViewPassiveList currentPassives;
+    public ViewPassiveList newPassives;
     public TMP_Text currentUserName;
     public StatImageText currentUserSprite;
     public StatImageText currentEnchanting;
@@ -30,6 +30,7 @@ public class EnchanterGUI : MarketPanelGUI
         selectedEnchantment = 0;
         selectedUser = GameManager.instance.utility.ChangeIndex(selectedUser, right, allEquipment.allEquippedEquipment.Count, -1);
         UpdateUser();
+        UpdateEquip();
     }
     protected void UpdateUser()
     {
@@ -37,34 +38,79 @@ public class EnchanterGUI : MarketPanelGUI
         {
             currentUserName.text = "";
             currentUserSprite.DisableSprite();
-            // Get the unequipped equipment.
+            possibleEquipment = new List<string>(allEquipment.allEquipment);
         }
         else
         {
             currentUserName.text = GameManager.instance.ReturnPartyMemberName(selectedUser);
             currentUserSprite.SetSprite(actorSprites.SpriteDictionary(GameManager.instance.ReturnPartyMemberType(selectedUser)));
-            // Get the equipped equipment of that user.
+            possibleEquipment = new List<string>(allEquipment.allEquippedEquipment[selectedUser].Split("@"));
+            GameManager.instance.utility.RemoveEmptyListItems(possibleEquipment);
         }
+        UpdateEquip();
     }
     public List<string> possibleEquipment;
+    public List<string> equipData;
     public int selectedEquip = 0;
     public int selectedEquipType = 0;
     public void ChangeEquip(bool right = true)
     {
         selectedEnchantment = 0;
+        selectedEquip = GameManager.instance.utility.ChangeIndex(selectedEquip, right, possibleEquipment.Count);
         // TODO, change to the next equipment. Do we need to unequip the equipment first? Can pick the user of the equipment when deciding what to enchant
+        UpdateEquip();
     }
+    protected void UpdateEquip()
+    {
+        ResetEnchantments();
+        if (possibleEquipment.Count <= 0)
+        {
+            currentEnchanting.DisableSprite();
+            return;
+        }
+        else
+        {
+            equipData = possibleEquipment[selectedEquip].Split("|").ToList();
+            // Get the equip name.
+            string equipName = equipData[^1];
+            // Update the sprite.
+            currentEnchanting.SetSprite(equipSprites.SpriteDictionary(equipName));
+            // Get the equip type.
+            selectedEquipType = Mathf.Max(0, int.Parse(equipData[6]));
+            // Get the current equip passives.
+            currentPassives.SetPassiveNamesFromString(equipData[5]);
+        }
+        UpdateEnchantments();
+    }
+    public List<string> possibleEnchantments;
     public int selectedEnchantment = 0;
-    
-
-    protected void ResetNewEnchantment()
+    protected void ResetEnchantments()
     {
-        newEnchantmentName.text = "None";
-        newEnchantmentEffect.text = "There are currently no enchantments available for this equipment.";
+        possibleEnchantments.Clear();
+        newPassives.SetPassiveNames(possibleEnchantments);
+        newPassives.ResetState();
     }
-
-    protected void UpdateEnchantment()
+    protected void UpdateEnchantments()
     {
-
+        // Get the possible enchantments.
+        switch (selectedEquipType)
+        {
+            case 0:
+                possibleEnchantments = new List<string>(enchanterData.weaponEnchantments);
+                break;
+            case 1:
+                possibleEnchantments = new List<string>(enchanterData.armorEnchantments);
+                break;
+            case 2:
+                possibleEnchantments = new List<string>(enchanterData.accessoryEnchantments);
+                break;
+        }
+        // Remove any enchantments that are already on the weapon.
+        newPassives.SetPassiveNames(possibleEnchantments.Except(equipData[5].Split("|").ToList()).ToList());
+    }
+    public void SelectEnchantment()
+    {
+        selectedEnchantment = newPassives.ReturnCurrentViewedIndex();
+        // Try to pay and add the enchantment if possible.
     }
 }
