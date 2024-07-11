@@ -11,13 +11,13 @@ public class VillageBuildingDataManager : BasicDataManager
     {
         saveDataPath = Application.persistentDataPath;
         string data = "";
-        data += GameManager.instance.ConvertListToString(buildings)+"#";
-        data += GameManager.instance.ConvertListToString(buildingLocations)+"#";
-        data += GameManager.instance.ConvertListToString(buildingLevels)+"#";
-        data += GameManager.instance.ConvertListToString(buildingHealths)+"#";
-        data += GameManager.instance.ConvertListToString(buildingPhaseBuildings)+"#";
-        data += GameManager.instance.ConvertListToString(buildingPhaseLocations)+"#";
-        data += GameManager.instance.ConvertListToString(buildTimes)+"#";
+        data += GameManager.instance.utility.ConvertListToString(buildings)+"#";
+        data += GameManager.instance.utility.ConvertListToString(buildingLocations)+"#";
+        data += GameManager.instance.utility.ConvertListToString(buildingLevels)+"#";
+        data += GameManager.instance.utility.ConvertListToString(buildingHealths)+"#";
+        data += GameManager.instance.utility.ConvertListToString(buildingPhaseBuildings)+"#";
+        data += GameManager.instance.utility.ConvertListToString(buildingPhaseLocations)+"#";
+        data += GameManager.instance.utility.ConvertListToString(buildTimes)+"#";
         File.WriteAllText(saveDataPath+fileName, data);
     }
     public override void Load()
@@ -34,9 +34,9 @@ public class VillageBuildingDataManager : BasicDataManager
             buildingPhaseBuildings = blocks[4].Split("|").ToList();
             buildingPhaseLocations = blocks[5].Split("|").ToList();
             buildTimes = blocks[6].Split("|").ToList();
-            GameManager.instance.RemoveEmptyListItems(buildingPhaseBuildings,0);
-            GameManager.instance.RemoveEmptyListItems(buildingPhaseLocations,0);
-            GameManager.instance.RemoveEmptyListItems(buildTimes,0);
+            GameManager.instance.utility.RemoveEmptyListItems(buildingPhaseBuildings,0);
+            GameManager.instance.utility.RemoveEmptyListItems(buildingPhaseLocations,0);
+            GameManager.instance.utility.RemoveEmptyListItems(buildTimes,0);
         }
         else
         {

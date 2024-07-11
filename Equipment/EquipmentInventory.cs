@@ -55,7 +55,7 @@ public class EquipmentInventory : BasicDataManager
         allArmors.Clear();
         allAccessories.Clear();
         if (allEquipment.Count <= 0){return;}
-        GameManager.instance.RemoveEmptyListItems(allEquipment);
+        GameManager.instance.utility.RemoveEmptyListItems(allEquipment);
         for (int i = 0; i < allEquipment.Count; i++)
         {
             string[] data = allEquipment[i].Split("|");
@@ -96,8 +96,8 @@ public class EquipmentInventory : BasicDataManager
     {
         saveDataPath = Application.persistentDataPath;
         string data = "";
-        data += GameManager.instance.ConvertListToString(allEquipment, "+")+"#";
-        data += GameManager.instance.ConvertListToString(allEquippedEquipment, "+");
+        data += GameManager.instance.utility.ConvertListToString(allEquipment, "+")+"#";
+        data += GameManager.instance.utility.ConvertListToString(allEquippedEquipment, "+");
         File.WriteAllText(saveDataPath+fileName, data);
     }
 
@@ -168,8 +168,8 @@ public class EquipmentInventory : BasicDataManager
             // Can't use | or # obviously.
             allEquipment = blocks[0].Split("+").ToList();
             allEquippedEquipment = blocks[1].Split("+").ToList();
-            GameManager.instance.RemoveEmptyListItems(allEquipment);
-            GameManager.instance.RemoveEmptyListItems(allEquippedEquipment);
+            GameManager.instance.utility.RemoveEmptyListItems(allEquipment);
+            GameManager.instance.utility.RemoveEmptyListItems(allEquippedEquipment);
         }
         else
         {

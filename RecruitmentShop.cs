@@ -63,7 +63,7 @@ public class RecruitmentShop : MonoBehaviour
         fighterFlavor.text = fighterFlavorTexts[currentlyViewedFighter];
         investmentFlavor.text = investmentFlavorTexts[currentlyViewedFighter];
         fighterImage.sprite = fighterSprites[currentlyViewedFighter];
-        currentCurrency.text = GameManager.instance.ReturnCurrency(acceptedCurrency).ToString();
+        //currentCurrency.text = GameManager.instance.ReturnCurrency(acceptedCurrency).ToString();
     }
 
     private bool AffordFighter(int cost, int type = 2)

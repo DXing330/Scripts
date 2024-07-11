@@ -18,12 +18,12 @@ public class ForgeDataManager : BasicDataManager
     {
         saveDataPath = Application.persistentDataPath;
         string data = "";
-        data += GameManager.instance.ConvertListToString(craftableEquipment)+"#";
-        data += GameManager.instance.ConvertListToString(craftEquipment, ",")+"#";
-        data += GameManager.instance.ConvertListToString(craftDay)+"#";
-        data += GameManager.instance.ConvertListToString(craftTime)+"#";
-        data += GameManager.instance.ConvertListToString(baseCraftTime)+"#";
-        data += GameManager.instance.ConvertListToString(baseCraftCost)+"#";
+        data += GameManager.instance.utility.ConvertListToString(craftableEquipment)+"#";
+        data += GameManager.instance.utility.ConvertListToString(craftEquipment, ",")+"#";
+        data += GameManager.instance.utility.ConvertListToString(craftDay)+"#";
+        data += GameManager.instance.utility.ConvertListToString(craftTime)+"#";
+        data += GameManager.instance.utility.ConvertListToString(baseCraftTime)+"#";
+        data += GameManager.instance.utility.ConvertListToString(baseCraftCost)+"#";
         File.WriteAllText(saveDataPath+fileName, data);
     }
 
@@ -40,9 +40,9 @@ public class ForgeDataManager : BasicDataManager
             craftTime = blocks[3].Split("|").ToList();
             baseCraftTime = blocks[4].Split("|").ToList();
             baseCraftCost = blocks[5].Split("|").ToList();
-            GameManager.instance.RemoveEmptyListItems(craftEquipment,0);
-            GameManager.instance.RemoveEmptyListItems(craftDay,0);
-            GameManager.instance.RemoveEmptyListItems(craftTime,0);
+            GameManager.instance.utility.RemoveEmptyListItems(craftEquipment,0);
+            GameManager.instance.utility.RemoveEmptyListItems(craftDay,0);
+            GameManager.instance.utility.RemoveEmptyListItems(craftTime,0);
         }
         else
         {

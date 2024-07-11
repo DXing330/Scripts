@@ -37,6 +37,6 @@ public class InfoMenu : MonoBehaviour
 
     public void TryToLevel()
     {
-        GameManager.instance.LevelUp();
+        //GameManager.instance.LevelUp();
     }
 }

@@ -51,13 +51,13 @@ public class VillageToBattleMapConverter : MapUtility
         // Convert locations to row,columns, then add a row and column to each then convert back.
         ConvertBuildingLocations();
         // Later spawn your garrison accordingly.
-        allData += GameManager.instance.ConvertListToString(battleTiles)+"#";
-        allData += GameManager.instance.ConvertListToString(buildings)+"#";
-        allData += GameManager.instance.ConvertListToString(buildingLocations)+"#";
-        allData += GameManager.instance.ConvertListToString(buildingHealths)+"#";
+        allData += GameManager.instance.utility.ConvertListToString(battleTiles)+"#";
+        allData += GameManager.instance.utility.ConvertListToString(buildings)+"#";
+        allData += GameManager.instance.utility.ConvertListToString(buildingLocations)+"#";
+        allData += GameManager.instance.utility.ConvertListToString(buildingHealths)+"#";
         allData += pattern+"#";
-        allData += GameManager.instance.ConvertListToString(testEnemies)+"#";
-        allData += GameManager.instance.ConvertListToString(testAllies)+"#";
+        allData += GameManager.instance.utility.ConvertListToString(testEnemies)+"#";
+        allData += GameManager.instance.utility.ConvertListToString(testAllies)+"#";
         if (GameManager.instance.AtVillage())
         {
             // Player party will help fight.

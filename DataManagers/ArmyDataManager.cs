@@ -135,8 +135,8 @@ public class ArmyDataManager : BasicDataManager
     public override void Save()
     {
         saveDataPath = Application.persistentDataPath;
-        string fighterData = GameManager.instance.ConvertListToString(availableFighters);
-        fighterData += "#"+GameManager.instance.ConvertListToString(fighterHealths);
+        string fighterData = GameManager.instance.utility.ConvertListToString(availableFighters);
+        fighterData += "#"+GameManager.instance.utility.ConvertListToString(fighterHealths);
         File.WriteAllText(saveDataPath+fileName, fighterData);
     }
 
@@ -152,8 +152,8 @@ public class ArmyDataManager : BasicDataManager
                 availableFighters = dataBlocks[0].Split("|").ToList();
                 fighterHealths = dataBlocks[1].Split("|").ToList();
             }
-            GameManager.instance.RemoveEmptyListItems(availableFighters);
-            GameManager.instance.RemoveEmptyListItems(fighterHealths);
+            GameManager.instance.utility.RemoveEmptyListItems(availableFighters);
+            GameManager.instance.utility.RemoveEmptyListItems(fighterHealths);
         }
         LoadAvailableFighters();
         //GetAllPartyMembers();

@@ -13,7 +13,7 @@ public class EquipmentContainer : AllStats
 
     public string ReturnEquippedString()
     {
-        return GameManager.instance.ConvertListToString(allEquipment,"@");
+        return GameManager.instance.utility.ConvertListToString(allEquipment,"@");
     }
 
     public bool Equipable(string equipment, int slot)
@@ -78,6 +78,7 @@ public class EquipmentContainer : AllStats
 
     public void LoadEquipSet(string newSet)
     {
+        // Simply LMAO at the "@" symbol, my code is probably relying way too much on delimiters and strings.
         List<string> newEquips = newSet.Split("@").ToList();
         if (newEquips.Count < allEquipment.Count){return;}
         for (int i = 0; i < allEquipment.Count; i++)

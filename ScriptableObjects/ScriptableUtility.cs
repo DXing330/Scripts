@@ -308,17 +308,17 @@ public class ScriptableUtility : ScriptableObject
         return currentPage;
     }
 
-    public int ChangeIndex(int currentIndex, bool right, int length)
+    public int ChangeIndex(int currentIndex, bool right, int length, int minIndex = 0)
     {
         if (right)
         {
-            if (currentIndex < length){currentIndex++;}
-            else{currentIndex = 0;}
+            if (currentIndex < length - 1){currentIndex++;}
+            else{currentIndex = minIndex;}
         }
         else
         {
-            if (currentIndex > 0){currentIndex--;}
-            else{currentIndex = length;}
+            if (currentIndex > minIndex){currentIndex--;}
+            else{currentIndex = length - 1;}
         }
         return currentIndex;
     }

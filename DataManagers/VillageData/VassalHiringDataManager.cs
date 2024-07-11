@@ -51,7 +51,7 @@ public class VassalHiringDataManager : BasicDataManager
             lastHiringDate = int.Parse(dataBlocks[0]);
             hiringCooldown = int.Parse(dataBlocks[1]);
             currentlyAvailable = dataBlocks[2].Split(dividingCharacter).ToList();
-            GameManager.instance.RemoveEmptyListItems(currentlyAvailable);
+            GameManager.instance.utility.RemoveEmptyListItems(currentlyAvailable);
         }
         else
         {

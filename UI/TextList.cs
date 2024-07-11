@@ -33,17 +33,7 @@ public class TextList : MonoBehaviour
     }
     public void ChangePage(bool right = true)
     {
-        int lastPage = allText.Count/textBoxes.Count;
-        if (right)
-        {
-            if (currentPage < lastPage){currentPage++;}
-            else{currentPage = 0;}
-        }
-        else
-        {
-            if (currentPage > 0){currentPage--;}
-            else{currentPage = lastPage;}
-        }
+        currentPage = GameManager.instance.utility.ChangePage(currentPage, right, textObjects, allText);
         UpdateCurrentPage();
     }
 

@@ -7,25 +7,17 @@ using UnityEngine;
 public class EnchanterDataManager : BasicDataManager
 {
     // To learn enchantment you need to pay mana for research at a chance to learn or destroy and enchanted equipment to learn its enchantment.
-    public List<string> knownEnchantments;
+    public List<string> allKnownEnchantments;
     public List<string> enchantCosts;
-    protected int ReturnEnchantCost(string enchantment)
-    {
-        int indexOf = knownEnchantments.IndexOf(enchantment);
-        if (indexOf >= 0)
-        {
-            return int.Parse(enchantCosts[indexOf]);
-        }
-        return 0;
-    }
+    // TODO: protected int ReturnEnchantCost
     protected void SortEnchantments()
     {
         weaponEnchantments.Clear();
         armorEnchantments.Clear();
         accessoryEnchantments.Clear();
-        for (int i = 0; i < knownEnchantments.Count; i++)
+        for (int i = 0; i < allKnownEnchantments.Count; i++)
         {
-            string[] enchantments = knownEnchantments[i].Split('=');
+            string[] enchantments = allKnownEnchantments[i].Split('=');
             switch (enchantments[0])
             {
                 case "-1":
@@ -54,11 +46,11 @@ public class EnchanterDataManager : BasicDataManager
     {
         saveDataPath = Application.persistentDataPath;
         string data = "";
-        data += GameManager.instance.ConvertListToString(knownEnchantments)+"#";
-        data += GameManager.instance.ConvertListToString(enchantCosts)+"#";
-        data += GameManager.instance.ConvertListToString(enchantEquipment, ",")+"#";
-        data += GameManager.instance.ConvertListToString(enchantDay)+"#";
-        data += GameManager.instance.ConvertListToString(enchantTime)+"#";
+        data += GameManager.instance.utility.ConvertListToString(allKnownEnchantments)+"#";
+        data += GameManager.instance.utility.ConvertListToString(enchantCosts)+"#";
+        data += GameManager.instance.utility.ConvertListToString(enchantEquipment, ",")+"#";
+        data += GameManager.instance.utility.ConvertListToString(enchantDay)+"#";
+        data += GameManager.instance.utility.ConvertListToString(enchantTime)+"#";
         File.WriteAllText(saveDataPath+fileName, data);
     }
 
@@ -69,7 +61,7 @@ public class EnchanterDataManager : BasicDataManager
         {
             loadedData = File.ReadAllText(saveDataPath+fileName);
             string[] blocks = loadedData.Split("#");
-            knownEnchantments = blocks[0].Split("|").ToList();
+            allKnownEnchantments = blocks[0].Split("|").ToList();
             enchantCosts = blocks[1].Split("|").ToList();
             enchantEquipment = blocks[2].Split(",").ToList();
             enchantDay = blocks[3].Split("|").ToList();

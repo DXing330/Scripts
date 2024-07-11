@@ -29,10 +29,10 @@ public class UnitUpgradeData : BasicDataManager
     {
         saveDataPath = Application.persistentDataPath;
         string upgradeData = "";
-        upgradeData += GameManager.instance.ConvertListToString(upgradedUnits)+"#";
-        upgradeData += GameManager.instance.ConvertListToString(bonusHealth)+"#";
-        upgradeData += GameManager.instance.ConvertListToString(bonusAttack)+"#";
-        upgradeData += GameManager.instance.ConvertListToString(bonusDefense)+"#";
+        upgradeData += GameManager.instance.utility.ConvertListToString(upgradedUnits)+"#";
+        upgradeData += GameManager.instance.utility.ConvertListToString(bonusHealth)+"#";
+        upgradeData += GameManager.instance.utility.ConvertListToString(bonusAttack)+"#";
+        upgradeData += GameManager.instance.utility.ConvertListToString(bonusDefense)+"#";
         File.WriteAllText(saveDataPath+"/upgradeData.txt", upgradeData);
     }
 

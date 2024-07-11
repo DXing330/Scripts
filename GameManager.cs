@@ -23,9 +23,18 @@ public class GameManager : MonoBehaviour
     public VillageDataManager villageData;
     public LevelDataManager levelData;
     public ArmyDataManager armyData;
+    public string ReturnPartyMemberName(int index)
+    {
+        if (index >= armyData.allPartyMembers.Count){return "";}
+        return armyData.allPartyMembers[index].ReturnName();
+    }
+    public string ReturnPartyMemberType(int index)
+    {
+        if (index >= armyData.allPartyMembers.Count){return "";}
+        return armyData.allPartyMembers[index].ReturnType();
+    }
     public EquipmentInventory equipInventory;
     public ActorDataManager actorData;
-    //public EquipmentData equipData;
     public UnitUpgradeData upgradeData;
     private string saveDataPath;
     public string newGameData;
@@ -102,28 +111,6 @@ public class GameManager : MonoBehaviour
         LoadData();
     }
 
-    public string ConvertListToString(List<string> string_list, string delimiter = "|")
-    {
-        return String.Join(delimiter, string_list);
-    }
-
-    public void RemoveEmptyListItems(List<string> listToRemoveFrom, int minLength = 1)
-    {
-        for (int i = 0; i < listToRemoveFrom.Count; i++)
-        {
-            if (listToRemoveFrom[i].Length <= minLength)
-            {
-                listToRemoveFrom.RemoveAt(i);
-            }
-        }
-    }
-
-    public int CountOccurencesOfStringInList(List<string> listToCountFrom, string stringToCount)
-    {
-        int count = listToCountFrom.Count(s => s == stringToCount);
-        return count;
-    }
-
     public string playerName = "";
     public void UpdatePlayerName(string newName)
     {
@@ -186,10 +173,10 @@ public class GameManager : MonoBehaviour
         string data = playerLevel+"|"+bloodCrystals+"|"+manaCrystals+"|"+goldCoins+"|"+time+"|"+currentLevel+"|"+currentLocation+"|"+playerName+"|"+villageLevel+"|"+villageLocation;
         File.WriteAllText(saveDataPath+"/saveData.txt", data);
         string activesPassives = "";
-        activesPassives += ConvertListToString(playerPassives)+"#";
-        activesPassives += ConvertListToString(playerActives)+"#";
-        activesPassives += ConvertListToString(familiarPassives)+"#";
-        activesPassives += ConvertListToString(familiarActives)+"#";
+        activesPassives += utility.ConvertListToString(playerPassives)+"#";
+        activesPassives += utility.ConvertListToString(playerActives)+"#";
+        activesPassives += utility.ConvertListToString(familiarPassives)+"#";
+        activesPassives += utility.ConvertListToString(familiarActives)+"#";
         File.WriteAllText(saveDataPath+"/skillData.txt", activesPassives);
         utility.DataManagerSave(gameData);
     }
@@ -318,35 +305,8 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public int ReturnCurrency(int type)
-    {
-        switch (type)
-        {
-            case 0:
-                return bloodCrystals;
-            case 1:
-                return manaCrystals;
-            case 2:
-                return goldCoins;
-        }
-        return 0;
-    }
-
-    public void LevelUp()
-    {
-        if (bloodCrystals >= playerLevel * playerLevel)
-        {
-            bloodCrystals -= playerLevel * playerLevel;
-            playerLevel++;
-            player.UpdateStats();
-            familiar.UpdateStats();
-            SaveData();
-        }
-    }
-
     public void ResetParty()
     {
-        //if (playerActors.Count <= basePartySize){return;}
         playerActors.Clear();
         playerActors.Add(player);
         playerActors.Add(familiar);

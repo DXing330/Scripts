@@ -17,17 +17,7 @@ public class NewBuildingStatSheet : MonoBehaviour
     public int currentPage = 0;
     public void ChangePage(bool right = true)
     {
-        int lastPage = (possibleBuildingTypes.Count - 1)/possibleObjects.Count;
-        if (right)
-        {
-            if (currentPage < lastPage){currentPage++;}
-            else{currentPage = 0;}
-        }
-        else
-        {
-            if (currentPage > 0){currentPage--;}
-            else{currentPage = lastPage;}
-        }
+        currentPage = GameManager.instance.utility.ChangePage(currentPage, right, possibleObjects, possibleBuildingTypes);
         statSheet.ResetBasicStats();
         UpdatePossibleSprites();
     }

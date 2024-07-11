@@ -37,9 +37,9 @@ public class MarketDataManager : BasicDataManager
         saveDataPath = Application.persistentDataPath;
         string data = "";
         data += marketLevel+"#"+marketInvestment+"#"+lastUpdateDay+"#";
-        data += GameManager.instance.ConvertListToString(currentAvailable, "_")+"#";
-        data += GameManager.instance.ConvertListToString(currentQuantity)+"#";
-        data += GameManager.instance.ConvertListToString(currentPrices)+"#";
+        data += GameManager.instance.utility.ConvertListToString(currentAvailable, "_")+"#";
+        data += GameManager.instance.utility.ConvertListToString(currentQuantity)+"#";
+        data += GameManager.instance.utility.ConvertListToString(currentPrices)+"#";
         File.WriteAllText(saveDataPath+fileName, data);
         GameManager.instance.utility.DataManagerSave(ownedBusinesses);
     }

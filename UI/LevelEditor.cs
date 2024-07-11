@@ -472,7 +472,7 @@ public class LevelEditor : Map
         else
         {
             allDataList[levelIndex] = currentLevelData;
-            allData = GameManager.instance.ConvertListToString(allDataList, "#");
+            allData = GameManager.instance.utility.ConvertListToString(allDataList, "#");
         }
         File.WriteAllText(saveDataPath+"/Levels.txt", allData);
     }
@@ -502,10 +502,10 @@ public class LevelEditor : Map
     protected void SaveCurrentLevel()
     {
         currentLevelData = "";
-        currentLevelData += GameManager.instance.ConvertListToString(allTiles)+","+totalRows+","+totalColumns;
-        currentLevelData += ","+GameManager.instance.ConvertListToString(currentEncounters);
-        currentLevelData += ","+GameManager.instance.ConvertListToString(currentEncounterSpecifics);
-        currentLevelData += ","+GameManager.instance.ConvertListToString(currentEncounterRespawnFreq);
+        currentLevelData += GameManager.instance.utility.ConvertListToString(allTiles)+","+totalRows+","+totalColumns;
+        currentLevelData += ","+GameManager.instance.utility.ConvertListToString(currentEncounters);
+        currentLevelData += ","+GameManager.instance.utility.ConvertListToString(currentEncounterSpecifics);
+        currentLevelData += ","+GameManager.instance.utility.ConvertListToString(currentEncounterRespawnFreq);
         currentLevelData += ","+spawnPoint;
     }
 

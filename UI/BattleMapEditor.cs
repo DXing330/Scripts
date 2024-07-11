@@ -150,7 +150,7 @@ public class BattleMapEditor : Map
     {
         List<string> allRewards = currentReward.Split("|").ToList();
         allRewards[type] = (int.Parse(allRewards[type]) + 1).ToString();
-        currentReward = GameManager.instance.ConvertListToString(allRewards);
+        currentReward = GameManager.instance.utility.ConvertListToString(allRewards);
         UpdatePageOfRewards();
     }
     public void DecreaseReward(int type)
@@ -159,7 +159,7 @@ public class BattleMapEditor : Map
         int currentRewardAmount = int.Parse(allRewards[type]);
         if (currentRewardAmount <= 0){return;}
         allRewards[type] = (currentRewardAmount - 1).ToString();
-        currentReward = GameManager.instance.ConvertListToString(allRewards);
+        currentReward = GameManager.instance.utility.ConvertListToString(allRewards);
         UpdatePageOfRewards();
     }
     public List<TerrainTile> possibleEnemyButtons;
@@ -393,7 +393,7 @@ public class BattleMapEditor : Map
         else
         {
             allBattlesList[currentBattleIndex] = currentBattleData;
-            allBattles = GameManager.instance.ConvertListToString(allBattlesList, "#");
+            allBattles = GameManager.instance.utility.ConvertListToString(allBattlesList, "#");
         }
         File.WriteAllText(saveDataPath+"/BattleMaps_"+baseTerrain+".txt", allBattles);
     }
@@ -421,7 +421,7 @@ public class BattleMapEditor : Map
         if (allBattlesList.Count <= 1){return;}
         if (currentBattleIndex < 0){return;}
         allBattlesList.RemoveAt(currentBattleIndex);
-        allBattles = GameManager.instance.ConvertListToString(allBattlesList, "#");
+        allBattles = GameManager.instance.utility.ConvertListToString(allBattlesList, "#");
         File.WriteAllText(saveDataPath+"/BattleMaps_"+baseTerrain+".txt", allBattles);
         ChangeIndex();
     }
@@ -525,7 +525,7 @@ public class BattleMapEditor : Map
 
     public bool SaveCurrentBattle()
     {
-        currentBattleData = currentMap+","+currentReward+","+GameManager.instance.ConvertListToString(currentEnemies)+","+GameManager.instance.ConvertListToString(currentEnemyLocations)+","+GameManager.instance.ConvertListToString(currentSpawnPoints)+","+GameManager.instance.ConvertListToString(currentRandomEnemies)+","+GameManager.instance.ConvertListToString(currentRandomEnemySpawnPoints);
+        currentBattleData = currentMap+","+currentReward+","+GameManager.instance.utility.ConvertListToString(currentEnemies)+","+GameManager.instance.utility.ConvertListToString(currentEnemyLocations)+","+GameManager.instance.utility.ConvertListToString(currentSpawnPoints)+","+GameManager.instance.utility.ConvertListToString(currentRandomEnemies)+","+GameManager.instance.utility.ConvertListToString(currentRandomEnemySpawnPoints);
         // Need to check some conditions to see if it's a valid battle.
         // Battle needs enemies.
         if (currentEnemies.Count <= 0 && currentRandomEnemies.Count <= 0){return false;}
@@ -537,7 +537,7 @@ public class BattleMapEditor : Map
 
     public void SaveCurrentBattleVoid()
     {
-        currentBattleData = currentMap+","+currentReward+","+GameManager.instance.ConvertListToString(currentEnemies)+","+GameManager.instance.ConvertListToString(currentEnemyLocations)+","+GameManager.instance.ConvertListToString(currentSpawnPoints)+","+GameManager.instance.ConvertListToString(currentRandomEnemies)+","+GameManager.instance.ConvertListToString(currentRandomEnemySpawnPoints);
+        currentBattleData = currentMap+","+currentReward+","+GameManager.instance.utility.ConvertListToString(currentEnemies)+","+GameManager.instance.utility.ConvertListToString(currentEnemyLocations)+","+GameManager.instance.utility.ConvertListToString(currentSpawnPoints)+","+GameManager.instance.utility.ConvertListToString(currentRandomEnemies)+","+GameManager.instance.utility.ConvertListToString(currentRandomEnemySpawnPoints);
     }
 
     public void UndoEdits()
@@ -554,15 +554,15 @@ public class BattleMapEditor : Map
         currentReward = previousData[1];
         currentEnemies = previousData[2].Split("|").ToList();
         currentEnemyLocations = previousData[3].Split("|").ToList();
-        GameManager.instance.RemoveEmptyListItems(currentEnemies);
-        GameManager.instance.RemoveEmptyListItems(currentEnemyLocations);
+        GameManager.instance.utility.RemoveEmptyListItems(currentEnemies);
+        GameManager.instance.utility.RemoveEmptyListItems(currentEnemyLocations);
         currentSpawnPoints = previousData[4].Split("|").ToList();
         if (previousData.Length > 5)
         {
             currentRandomEnemies = previousData[5].Split("|").ToList();
             currentRandomEnemySpawnPoints = previousData[6].Split("|").ToList();
-            GameManager.instance.RemoveEmptyListItems(currentRandomEnemies);
-            GameManager.instance.RemoveEmptyListItems(currentRandomEnemySpawnPoints);
+            GameManager.instance.utility.RemoveEmptyListItems(currentRandomEnemies);
+            GameManager.instance.utility.RemoveEmptyListItems(currentRandomEnemySpawnPoints);
         }
         LoadBaseMap();
     }

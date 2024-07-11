@@ -15,6 +15,10 @@ public class PlayerActor : AllStats
         if (personalName.Length < 2){return typeName;}
         return personalName;
     }
+    public string ReturnType()
+    {
+        return typeName;
+    }
     public int currentLevel;
     public int currentHealth = -1;
     public int ReturnCurrentHealth()
@@ -136,10 +140,6 @@ public class PlayerActor : AllStats
             playerActor.baseHealth = currentHealth;
         }
         playerActor.species = species;
-        /*if (learntSkills.Count <= 0)
-        {
-            return;
-        }*/
         UpdateActives();
         UpdatePassives();
         allEquipment.UpdateActorStats(playerActor);

@@ -15,7 +15,7 @@ public class PlayerSettings : BasicDataManager
     public override void Save()
     {
         saveDataPath = Application.persistentDataPath;
-        allSettings = GameManager.instance.ConvertListToString(settingsList);
+        allSettings = GameManager.instance.utility.ConvertListToString(settingsList);
         File.WriteAllText(saveDataPath+"/PlayerSettings.txt", allSettings);
     }
 
@@ -33,7 +33,7 @@ public class PlayerSettings : BasicDataManager
     private void AdjustSettings()
     {
         // Make sure you don't have any useless settings.
-        GameManager.instance.RemoveEmptyListItems(settingsList, 0);
+        GameManager.instance.utility.RemoveEmptyListItems(settingsList, 0);
     }
 
     public string ReturnSetting(int index)

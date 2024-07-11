@@ -22,15 +22,15 @@ public class VassalDataManager : BasicDataManager
     {
         saveDataPath = Application.persistentDataPath;
         string data = "";
-        data += GameManager.instance.ConvertListToString(vassals)+"#";
-        data += GameManager.instance.ConvertListToString(familySizes)+"#";
-        data += GameManager.instance.ConvertListToString(morales)+"#";
-        data += GameManager.instance.ConvertListToString(skills)+"#";
-        data += GameManager.instance.ConvertListToString(locations)+"#";
-        data += GameManager.instance.ConvertListToString(plots)+"#";
-        data += GameManager.instance.ConvertListToString(plotSpecifics)+"#";
-        data += GameManager.instance.ConvertListToString(plotTimings)+"#";
-        data += GameManager.instance.ConvertListToString(timingSpecifics)+"#";
+        data += GameManager.instance.utility.ConvertListToString(vassals)+"#";
+        data += GameManager.instance.utility.ConvertListToString(familySizes)+"#";
+        data += GameManager.instance.utility.ConvertListToString(morales)+"#";
+        data += GameManager.instance.utility.ConvertListToString(skills)+"#";
+        data += GameManager.instance.utility.ConvertListToString(locations)+"#";
+        data += GameManager.instance.utility.ConvertListToString(plots)+"#";
+        data += GameManager.instance.utility.ConvertListToString(plotSpecifics)+"#";
+        data += GameManager.instance.utility.ConvertListToString(plotTimings)+"#";
+        data += GameManager.instance.utility.ConvertListToString(timingSpecifics)+"#";
         File.WriteAllText(saveDataPath+fileName, data);
     }
 
@@ -42,15 +42,15 @@ public class VassalDataManager : BasicDataManager
             loadedData = File.ReadAllText(saveDataPath+fileName);
             string[] blocks = loadedData.Split("#");
             vassals = blocks[0].Split("|").ToList();
-            GameManager.instance.RemoveEmptyListItems(vassals);
+            GameManager.instance.utility.RemoveEmptyListItems(vassals);
             familySizes = blocks[1].Split("|").ToList();
-            GameManager.instance.RemoveEmptyListItems(familySizes,0);
+            GameManager.instance.utility.RemoveEmptyListItems(familySizes,0);
             morales = blocks[2].Split("|").ToList();
-            GameManager.instance.RemoveEmptyListItems(morales,0);
+            GameManager.instance.utility.RemoveEmptyListItems(morales,0);
             skills = blocks[3].Split("|").ToList();
-            GameManager.instance.RemoveEmptyListItems(skills);
+            GameManager.instance.utility.RemoveEmptyListItems(skills);
             locations = blocks[4].Split("|").ToList();
-            GameManager.instance.RemoveEmptyListItems(locations,0);
+            GameManager.instance.utility.RemoveEmptyListItems(locations,0);
         }
         else
         {

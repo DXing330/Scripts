@@ -149,10 +149,10 @@ public class VillageDataManager : BasicDataManager
         saveDataPath = Application.persistentDataPath;
         string data = "";
         data += totalRows+"#"+totalColumns+"#";
-        data += GameManager.instance.ConvertListToString(villageTiles)+"#";
-        data += GameManager.instance.ConvertListToString(resources)+"#";
-        data += GameManager.instance.ConvertListToString(possibleBuildings)+"#";
-        data += GameManager.instance.ConvertListToString(buildingsOnTerrainTypes)+"#";
+        data += GameManager.instance.utility.ConvertListToString(villageTiles)+"#";
+        data += GameManager.instance.utility.ConvertListToString(resources)+"#";
+        data += GameManager.instance.utility.ConvertListToString(possibleBuildings)+"#";
+        data += GameManager.instance.utility.ConvertListToString(buildingsOnTerrainTypes)+"#";
         File.WriteAllText(saveDataPath+fileName, data);
         GameManager.instance.utility.DataManagerSave(dataManagers);
     }
@@ -305,7 +305,7 @@ public class VillageDataManager : BasicDataManager
             if (int.Parse(specificSkill[0]) == buildingType)
             {
                 allWorkerSkills[i] = specificSkill[0]+"="+(int.Parse(specificSkill[1])+1);
-                vassals.skills[workerIndex] = GameManager.instance.ConvertListToString(allWorkerSkills, ",");
+                vassals.skills[workerIndex] = GameManager.instance.utility.ConvertListToString(allWorkerSkills, ",");
                 return;
             }
         }
@@ -323,7 +323,7 @@ public class VillageDataManager : BasicDataManager
             skillLevels.Add(int.Parse(allWorkerSkills[i].Split("=")[1]));
         }
         allWorkerSkills = GameManager.instance.utility.QuickSortListbyIntList(allWorkerSkills, skillLevels, 0, allWorkerSkills.Count - 1);
-        vassals.skills[workerIndex] = GameManager.instance.ConvertListToString(allWorkerSkills, ",");
+        vassals.skills[workerIndex] = GameManager.instance.utility.ConvertListToString(allWorkerSkills, ",");
     }
     
     public List<int> ReturnOutputs()

@@ -117,7 +117,7 @@ public class MapEditor : Map
             allMaps = "";
         }
         SaveMap();
-        string savedMapText = GameManager.instance.ConvertListToString(mapToEdit)+","+totalRows+","+totalColumns;
+        string savedMapText = GameManager.instance.utility.ConvertListToString(mapToEdit)+","+totalRows+","+totalColumns;
         // If its a new map then add it to the rest.
         if (mapIndex < 0)
         {
@@ -130,7 +130,7 @@ public class MapEditor : Map
         else
         {
             allMapsList[mapIndex] = savedMapText;
-            allMaps = GameManager.instance.ConvertListToString(allMapsList, "#");
+            allMaps = GameManager.instance.utility.ConvertListToString(allMapsList, "#");
         }
         File.WriteAllText(saveDataPath+"/Maps_"+baseTerrain+".txt", allMaps);
     }
@@ -141,7 +141,7 @@ public class MapEditor : Map
         if (allMapsList.Count <= 1){return;}
         if (mapIndex < 0){return;}
         allMapsList.RemoveAt(mapIndex);
-        allMaps = GameManager.instance.ConvertListToString(allMapsList, "#");
+        allMaps = GameManager.instance.utility.ConvertListToString(allMapsList, "#");
         File.WriteAllText(saveDataPath+"/Maps_"+baseTerrain+".txt", allMaps);
         ChangeIndex();
     }
