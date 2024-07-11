@@ -44,6 +44,11 @@ public class ViewPassiveList : MonoBehaviour
         return currentViewed;
     }
 
+    public string ReturnCurrentViewedPassiveName()
+    {
+        return passiveNames[currentViewed];
+    }
+
     protected void UpdateViewedPassive()
     {
         passiveName.text = passiveNames[currentViewed];
