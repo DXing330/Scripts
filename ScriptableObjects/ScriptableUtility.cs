@@ -93,6 +93,17 @@ public class ScriptableUtility : ScriptableObject
         }
         return log;
     }
+
+    public int IntExponent(int expPow, int expBase = 2)
+    {
+        if (expPow == 0){return 1;}
+        int value = 1;
+        for (int i = 0; i < expPow; i++)
+        {
+            value *= expBase;
+        }
+        return value;
+    }
     
     public string ConvertListToString(List<string> string_list, string delimiter = "|")
     {
@@ -101,7 +112,7 @@ public class ScriptableUtility : ScriptableObject
 
     public void RemoveEmptyListItems(List<string> listToRemoveFrom, int minLength = 1)
     {
-        for (int i = 0; i < listToRemoveFrom.Count; i++)
+        for (int i = listToRemoveFrom.Count - 1; i > -1; i--)
         {
             if (listToRemoveFrom[i].Length <= minLength)
             {

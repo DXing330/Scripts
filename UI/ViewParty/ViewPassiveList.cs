@@ -46,6 +46,7 @@ public class ViewPassiveList : MonoBehaviour
 
     public string ReturnCurrentViewedPassiveName()
     {
+        if (currentViewed == -1){return "";}
         return passiveNames[currentViewed];
     }
 
@@ -58,6 +59,7 @@ public class ViewPassiveList : MonoBehaviour
     public void ResetState()
     {
         state = 0;
+        currentViewed = -1;
         UpdateState();
     }
 

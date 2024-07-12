@@ -27,7 +27,7 @@ public class EnchanterGUI : MarketPanelGUI
     public void ChangeUser(bool right = true)
     {
         selectedEquip = 0;
-        selectedEnchantment = 0;
+        selectedEnchantment = "";
         selectedUser = GameManager.instance.utility.ChangeIndex(selectedUser, right, allEquipment.allEquippedEquipment.Count, -1);
         UpdateUser();
         UpdateEquip();
@@ -53,11 +53,17 @@ public class EnchanterGUI : MarketPanelGUI
     public List<string> equipData;
     public int selectedEquip = 0;
     public int selectedEquipType = 0;
+    public int selectedCost = 0;
+    public TMP_Text costText;
+    protected void UpdateCost(int newCost)
+    {
+        selectedCost = newCost;
+        costText.text = newCost.ToString();
+    }
     public void ChangeEquip(bool right = true)
     {
-        selectedEnchantment = 0;
+        selectedEnchantment = "";
         selectedEquip = GameManager.instance.utility.ChangeIndex(selectedEquip, right, possibleEquipment.Count);
-        // TODO, change to the next equipment. Do we need to unequip the equipment first? Can pick the user of the equipment when deciding what to enchant
         UpdateEquip();
     }
     protected void UpdateEquip()
@@ -66,6 +72,7 @@ public class EnchanterGUI : MarketPanelGUI
         if (possibleEquipment.Count <= 0)
         {
             currentEnchanting.DisableSprite();
+            UpdateCost(0);
             return;
         }
         else
@@ -78,12 +85,14 @@ public class EnchanterGUI : MarketPanelGUI
             // Get the equip type.
             selectedEquipType = Mathf.Max(0, int.Parse(equipData[6]));
             // Get the current equip passives.
-            currentPassives.SetPassiveNamesFromString(equipData[5]);
+            List<string> currentPassiveNames = equipData[5].Split("|").ToList();
+            currentPassives.SetPassiveNames(currentPassiveNames);
+            UpdateCost(GameManager.instance.utility.IntExponent(currentPassiveNames.Count));
         }
         UpdateEnchantments();
     }
     public List<string> possibleEnchantments;
-    public int selectedEnchantment = 0;
+    public string selectedEnchantment;
     protected void ResetEnchantments()
     {
         possibleEnchantments.Clear();
@@ -110,7 +119,10 @@ public class EnchanterGUI : MarketPanelGUI
     }
     public void SelectEnchantment()
     {
-        selectedEnchantment = newPassives.ReturnCurrentViewedIndex();
-        // Try to pay and add the enchantment if possible.
+        selectedEnchantment = newPassives.ReturnCurrentViewedPassiveName();
+        if (selectedEnchantment == ""){return;}
+        // Try to pay cost.
+        // Determine what equipment to add it to.
+        // Add the enchantment.
     }
 }
