@@ -338,7 +338,7 @@ public class TacticActor : AllStats
         movement = 0;
     }
 
-    protected void TurnPassives(int timing = 0)
+    public void TurnPassives(int timing = 0)
     {
         if (passiveSkillNames.Count <= 0){return;}
         // Go through all the passives.

@@ -9,7 +9,15 @@ public class EnchanterDataManager : BasicDataManager
     // To learn enchantment you need to pay mana for research at a chance to learn or destroy and enchanted equipment to learn its enchantment.
     public List<string> allKnownEnchantments;
     public List<string> enchantCosts;
-    // TODO: protected int ReturnEnchantCost
+    public void LearnEnchantment(string newEnchantment)
+    {
+        int indexOf = allKnownEnchantments.IndexOf(newEnchantment);
+        if (indexOf < 0)
+        {
+            allKnownEnchantments.Add(newEnchantment);
+            Save();
+        }
+    }
     protected void SortEnchantments()
     {
         weaponEnchantments.Clear();
@@ -46,11 +54,7 @@ public class EnchanterDataManager : BasicDataManager
     {
         saveDataPath = Application.persistentDataPath;
         string data = "";
-        data += GameManager.instance.utility.ConvertListToString(allKnownEnchantments)+"#";
-        data += GameManager.instance.utility.ConvertListToString(enchantCosts)+"#";
-        data += GameManager.instance.utility.ConvertListToString(enchantEquipment, ",")+"#";
-        data += GameManager.instance.utility.ConvertListToString(enchantDay)+"#";
-        data += GameManager.instance.utility.ConvertListToString(enchantTime)+"#";
+        data += GameManager.instance.utility.ConvertListToString(allKnownEnchantments);
         File.WriteAllText(saveDataPath+fileName, data);
     }
 
@@ -62,11 +66,6 @@ public class EnchanterDataManager : BasicDataManager
             loadedData = File.ReadAllText(saveDataPath+fileName);
             string[] blocks = loadedData.Split("#");
             allKnownEnchantments = blocks[0].Split("|").ToList();
-            enchantCosts = blocks[1].Split("|").ToList();
-            enchantEquipment = blocks[2].Split(",").ToList();
-            enchantDay = blocks[3].Split("|").ToList();
-            enchantTime = blocks[4].Split("|").ToList();
-            GameManager.instance.utility.RemoveEmptyListItems(enchantEquipment);
             SortEnchantments();
         }
         else

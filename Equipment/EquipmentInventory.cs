@@ -8,6 +8,23 @@ public class EquipmentInventory : BasicDataManager
 {
     public List<string> starterEquipment;
     public List<string> allEquipment;
+    public string ReturnEquipment(int slot, int user = -1)
+    {
+        if (user == -1)
+        {
+            // Get it from all equipment.
+            if (slot < allEquipment.Count)
+            {
+                return allEquipment[slot];
+            }
+        }
+        else
+        {
+            string[] userEquips = allEquippedEquipment[user].Split("@");
+            if (slot < userEquips.Length){return userEquips[slot];}
+        }
+        return "";
+    }
     public void GainEquipment(string newEquip)
     {
         allEquipment.Add(newEquip);
@@ -25,6 +42,23 @@ public class EquipmentInventory : BasicDataManager
     {
         allEquipment.Remove(equipment);
         SortEquipmentIntoLists();
+    }
+    public void EnchantEquipment(string enchantment, int slot, int user = -1)
+    {
+        if (user == -1 && slot < allEquipment.Count)
+        {
+            List<string> equipToEnchant = allEquipment[slot].Split("|").ToList();
+            equipToEnchant[5] += ","+enchantment;
+            allEquipment[slot] = GameManager.instance.utility.ConvertListToString(equipToEnchant);
+        }
+        else
+        {
+            List<string> usersEquips = allEquippedEquipment[user].Split("@").ToList();
+            List<string> equipToEnchant = usersEquips[slot].Split("|").ToList();
+            equipToEnchant[5] += ","+enchantment;
+            usersEquips[slot] = GameManager.instance.utility.ConvertListToString(equipToEnchant);
+            allEquippedEquipment[user] = GameManager.instance.utility.ConvertListToString(usersEquips, "@");
+        }
     }
     public List<string> allEquippedEquipment;
     public void LoseEquipSets(int index)

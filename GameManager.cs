@@ -196,14 +196,16 @@ public class GameManager : MonoBehaviour
             utility.DataManagerLoad(gameData);
         }
         else{NewGame();}
-        // First load the current party.
-        armyData.GetAllPartyMembers();
-        // Then load their equipment.
-        equipInventory.LoadEquipSets();
-        // Then load their stats.
-        armyData.UpdatePartyStats();
+        ReloadPartyEquipment();
         RefreshMaps();
         RefreshBattles();
+    }
+
+    public void ReloadPartyEquipment()
+    {
+        armyData.GetAllPartyMembers();
+        equipInventory.LoadEquipSets();
+        armyData.UpdatePartyStats();
     }
 
     protected void LoadDataString()

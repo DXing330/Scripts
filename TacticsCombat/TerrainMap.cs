@@ -78,6 +78,11 @@ public class TerrainMap : MonoBehaviour
         battleStarted = true;
         actorManager.ResetBattleGoalText();
         moraleTracker.GetOriginalEnemies(allActors);
+        // Start battle passives.
+        foreach (TacticActor actor in allActors)
+        {
+            actor.TurnPassives(11);
+        }
         // Might have morale adjustments based on location/story/etc.
         NewRound();
         ActorsTurn();

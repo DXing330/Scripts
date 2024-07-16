@@ -44,7 +44,7 @@ public class EnchanterGUI : MarketPanelGUI
         {
             currentUserName.text = GameManager.instance.ReturnPartyMemberName(selectedUser);
             currentUserSprite.SetSprite(actorSprites.SpriteDictionary(GameManager.instance.ReturnPartyMemberType(selectedUser)));
-            possibleEquipment = new List<string>(allEquipment.allEquippedEquipment[selectedUser].Split("@"));
+            possibleEquipment = allEquipment.allEquippedEquipment[selectedUser].Split("@").ToList();
             GameManager.instance.utility.RemoveEmptyListItems(possibleEquipment);
         }
         UpdateEquip();
@@ -85,9 +85,10 @@ public class EnchanterGUI : MarketPanelGUI
             // Get the equip type.
             selectedEquipType = Mathf.Max(0, int.Parse(equipData[6]));
             // Get the current equip passives.
-            List<string> currentPassiveNames = equipData[5].Split("|").ToList();
+            List<string> currentPassiveNames = equipData[5].Split(",").ToList();
             currentPassives.SetPassiveNames(currentPassiveNames);
-            UpdateCost(GameManager.instance.utility.IntExponent(currentPassiveNames.Count));
+            // Take the rarity into account when enchanting.
+            UpdateCost(GameManager.instance.utility.IntExponent(currentPassiveNames.Count) + int.Parse(equipData[9]));
         }
         UpdateEnchantments();
     }
@@ -115,14 +116,20 @@ public class EnchanterGUI : MarketPanelGUI
                 break;
         }
         // Remove any enchantments that are already on the weapon.
-        newPassives.SetPassiveNames(possibleEnchantments.Except(equipData[5].Split("|").ToList()).ToList());
+        newPassives.SetPassiveNames(possibleEnchantments.Except(equipData[5].Split(",").ToList()).ToList());
     }
     public void SelectEnchantment()
     {
         selectedEnchantment = newPassives.ReturnCurrentViewedPassiveName();
         if (selectedEnchantment == ""){return;}
         // Try to pay cost.
-        // Determine what equipment to add it to.
-        // Add the enchantment.
+        if (GameManager.instance.villageData.PayResource(selectedCost, 4))
+        {
+            // Get the equipment from the inventory.
+            // Add the selected passive.
+            allEquipment.EnchantEquipment(selectedEnchantment, selectedEquip, selectedUser);
+            GameManager.instance.ReloadPartyEquipment();
+            UpdateUser();
+        }
     }
 }
