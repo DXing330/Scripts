@@ -344,4 +344,77 @@ public class ScriptableUtility : ScriptableObject
         }
         return newPageIndices;
     }
+
+    public int GetRow(int location, int size)
+    {
+        int row = 0;
+        while (location >= size)
+        {
+            location -= size;
+            row++;
+        }
+        return row;
+    }
+
+    public int GetCol(int location, int size)
+    {
+        return location%size;
+    }
+
+    public int GetHexQ(int location, int size)
+    {
+        return GetCol(location, size);
+    }
+
+    public int GetHexR(int location, int size)
+    {
+        return GetRow(location, size) - (GetColumn(location, size) - (GetColumn(location, size)%2)) / 2;
+    }
+
+    public int GetHexS(int location, int size)
+    {
+        return -GetHexQ(location, size)-GetHexR(location, size);
+    }
+
+    public int PointInDirection(int location, int direction, int size)
+    {
+        switch (direction)
+        {
+            // Up.
+            case 0:
+                return location - size;
+            // UpRight.
+            case 1:
+                if (GetColumn(location)%2 == 1)
+                {
+                    return location + 1;
+                }
+                return (location - size + 1);
+            // DownRight.
+            case 2:
+                if (GetColumn(location)%2 == 0)
+                {
+                    return location + 1;
+                }
+                return (location + size + 1);
+            // Down.
+            case 3:
+                return location + size;
+            // DownLeft.
+            case 4:
+                if (GetColumn(location)%2 == 0)
+                {
+                    return location - 1;
+                }
+                return (location + size - 1);
+            // UpLeft.
+            case 5:
+                if (GetColumn(location)%2 == 1)
+                {
+                    return location - 1;
+                }
+                return (location - size - 1);
+        }
+        return location;
+    }    
 }
