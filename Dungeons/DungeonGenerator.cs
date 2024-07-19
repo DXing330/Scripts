@@ -6,15 +6,17 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DungeonGen", menuName = "ScriptableObjects/DungeonGen", order = 1)]
 public class DungeonGenerator : ScriptableObject
 {
+    public ScriptableUtility utility;
     public int size;
     protected int minSize = 36;
-    protected int minRoomSize = 3;
-    public List<int> allTiles;
-    public List<int> rooms;
-    public List<string> roomDetails;
-    public List<int> unconnectedRooms;
-    public List<int> impassableTiles;
-    public List<string> GenerateDungeon(int newSize)
+    public int GetMinSize(){return minSize;}
+    public int minRoomSize = 6;
+    public List<int> allTiles = new List<int>();
+    public List<int> rooms = new List<int>();
+    public List<string> roomDetails = new List<string>();
+    public List<int> unconnectedRooms = new List<int>();
+    //public List<int> impassableTiles = new List<int>();
+    public List<string> GenerateDungeon(int newSize = 36)
     {
         size = newSize;
         if (size < minSize){size = minSize;}
@@ -28,20 +30,32 @@ public class DungeonGenerator : ScriptableObject
         MakeRooms();
         // Get a starting point.
             // Inside a randomly selected room.
+        int start = GetRandomPointInRoom(Random.Range(0, rooms.Count));
         // Get an exit.
             // Inside a randomly selected room.
+        int end = GetRandomPointInRoom(Random.Range(0, rooms.Count));
         // Get treasure locations.
             // Inside 1+ randomly selected room(s).
         // Get enemies.
             // Starting amount equal to size or sqrt(size)?
             // Enemies moves every turn and spawn every X turns.
+        dungeonData.Add(utility.ConvertIntListToString(allTiles));
+        dungeonData.Add(start.ToString());
+        dungeonData.Add(end.ToString());
         return dungeonData;
+    }
+
+    protected int GetRandomPointInRoom(int roomNum)
+    {
+        List<int> roomTiles = GetRoomTiles(roomDetails[roomNum]);
+        int start = roomTiles[Random.Range(0, roomTiles.Count)];
+        allTiles[start] = 0;
+        return start;
     }
 
     protected void Reset()
     {
         allTiles.Clear();
-        impassableTiles.Clear();
     }
 
     protected void GetTiles()
@@ -49,7 +63,6 @@ public class DungeonGenerator : ScriptableObject
         for (int i = 0; i < size * size; i++)
         {
             allTiles.Add(1);
-            impassableTiles.Add(i);
         }
     }
 
@@ -66,7 +79,6 @@ public class DungeonGenerator : ScriptableObject
         // If you fail to make any rooms then the whole floor is one big room.
         if (rooms.Count <= 1)
         {
-            impassableTiles.Clear();
             for (int i = 0; i < size*size; i++)
             {
                 allTiles[i] = 0;
@@ -75,13 +87,15 @@ public class DungeonGenerator : ScriptableObject
         // Otherwise try to connect all the rooms.
         else
         {
-            List<int> roomsToConnect = new List<int>();
-            roomsToConnect.Add(0);
-            roomsToConnect.Add(rooms.Count);
-            for (int i = 0; i < rooms.Count*3/2; i++)
+            for (int i = 0; i < rooms.Count; i++)
             {
-                ConnectRooms(roomsToConnect[i], roomsToConnect[i+1]);
-                roomsToConnect.Add(Mathf.Abs(roomsToConnect[i+1]-roomsToConnect[i])-1);
+                int roomOne = rooms[Random.Range(0, rooms.Count)];
+                int roomTwo = rooms[Random.Range(0, rooms.Count)];
+                while (roomOne == roomTwo)
+                {
+                    roomTwo = rooms[Random.Range(0, rooms.Count)];
+                }
+                ConnectRooms(roomOne, roomTwo);
             }
         }
     }
@@ -129,12 +143,33 @@ public class DungeonGenerator : ScriptableObject
             }
             if (startCol < endCol) // Move Right
             {
-                
+                // Odd (1,3,5,...) columns can always move up.
+                if (startRow > 0 || (startCol%2 == 1 && startCol < size - 1))
+                {
+                    possibleNextPoints.Add(PointInDirection(startPoint, 1));
+                }
+                // Even (0,2,4,...) columns can always move down.
+                if (startRow < size - 1 || (startCol%2 == 0 && startCol < size - 1))
+                {
+                    possibleNextPoints.Add(PointInDirection(startPoint, 2));
+                }
             }
             else if (startCol > endCol) // Move Left
             {
-
+                if (startRow > 0 || (startCol%2 == 1))
+                {
+                    possibleNextPoints.Add(PointInDirection(startPoint, 5));
+                }
+                if (startRow < size - 1 || (startCol%2 == 0 && startCol > 0))
+                {
+                    possibleNextPoints.Add(PointInDirection(startPoint, 4));
+                }
             }
+            // Move to the next point.
+            if (possibleNextPoints.Count <= 0){break;}
+            startPoint = possibleNextPoints[Random.Range(0, possibleNextPoints.Count)];
+            // Make it passable.
+            allTiles[startPoint] = 0;
         }
     }
 
@@ -145,44 +180,7 @@ public class DungeonGenerator : ScriptableObject
 
     protected int PointInDirection(int location, int direction)
     {
-        switch (direction)
-        {
-            // Up.
-            case 0:
-                return location - size;
-            // UpRight.
-            case 1:
-                if (GetColumn(location)%2 == 1)
-                {
-                    return location + 1;
-                }
-                return (location - size + 1);
-            // DownRight.
-            case 2:
-                if (GetColumn(location)%2 == 0)
-                {
-                    return location + 1;
-                }
-                return (location + size + 1);
-            // Down.
-            case 3:
-                return location + size;
-            // DownLeft.
-            case 4:
-                if (GetColumn(location)%2 == 0)
-                {
-                    return location - 1;
-                }
-                return (location + size - 1);
-            // UpLeft.
-            case 5:
-                if (GetColumn(location)%2 == 1)
-                {
-                    return location - 1;
-                }
-                return (location - size - 1);
-        }
-        return location;
+        return utility.PointInDirection(location, direction, size);
     }
 
     protected void TryToMakeRoom()
@@ -191,8 +189,8 @@ public class DungeonGenerator : ScriptableObject
         // Start: 0 - top left, 1 - top right, 2 - bottom left, 3 - bottom right
         int direction = Random.Range(0, 4);
         // Size is random but rectangular.
-        int width = Random.Range(minRoomSize, size/minRoomSize);
-        int height = Random.Range(minSize, size/minRoomSize);
+        int width = Random.Range(minRoomSize, minRoomSize + size/minRoomSize);
+        int height = Random.Range(minRoomSize, minRoomSize + size/minRoomSize);
         List<int> roomTiles = new List<int>();
         if (CheckRoomTiles(roomTiles, startPoint, direction, width, height))
         {
@@ -203,10 +201,23 @@ public class DungeonGenerator : ScriptableObject
             string roomDets = startPoint+"|"+direction+"|"+width+"|"+height;
             roomDetails.Add(roomDets);
             // Make the tiles in the room passable.
-            for (int i = 0; i < roomTiles.Count; i++)
+            int i = 0;
+            for (int j = 0; j < width; j++)
             {
-                allTiles[roomTiles[i]] = 0;
-                impassableTiles.Remove(roomTiles[i]);
+                for (int k = 0; k < height; k++)
+                {
+                    if (j == 0 || j == width-1 || k == 0 || k == height-1)
+                    {
+                        allTiles[roomTiles[i]] = 1;
+                        //impassableTiles.Add(roomTiles[i]);
+                    }
+                    else
+                    {
+                        allTiles[roomTiles[i]] = 0;
+                        //impassableTiles.Remove(roomTiles[i]);
+                    }
+                    i++;
+                }
             }
         }
     }

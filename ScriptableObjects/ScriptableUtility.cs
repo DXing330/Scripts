@@ -110,6 +110,26 @@ public class ScriptableUtility : ScriptableObject
         return String.Join(delimiter, string_list);
     }
 
+    public string ConvertIntListToString(List<int> int_list, string delimiter = "|")
+    {
+        List<string> string_list = new List<string>();
+        for (int i = 0; i < int_list.Count; i++)
+        {
+            string_list.Add(int_list[i].ToString());
+        }
+        return ConvertListToString(string_list, delimiter);
+    }
+
+    public List<int> StringListToIntList(List<string> string_list)
+    {
+        List<int> int_list = new List<int>();
+        for (int i = 0; i < string_list.Count; i++)
+        {
+            int_list.Add(int.Parse(string_list[i]));
+        }
+        return int_list;
+    }
+    
     public void RemoveEmptyListItems(List<string> listToRemoveFrom, int minLength = 1)
     {
         for (int i = listToRemoveFrom.Count - 1; i > -1; i--)
@@ -356,14 +376,14 @@ public class ScriptableUtility : ScriptableObject
         return row;
     }
 
-    public int GetCol(int location, int size)
+    public int GetColumn(int location, int size)
     {
         return location%size;
     }
 
     public int GetHexQ(int location, int size)
     {
-        return GetCol(location, size);
+        return GetColumn(location, size);
     }
 
     public int GetHexR(int location, int size)
@@ -385,14 +405,14 @@ public class ScriptableUtility : ScriptableObject
                 return location - size;
             // UpRight.
             case 1:
-                if (GetColumn(location)%2 == 1)
+                if (GetColumn(location, size)%2 == 1)
                 {
                     return location + 1;
                 }
                 return (location - size + 1);
             // DownRight.
             case 2:
-                if (GetColumn(location)%2 == 0)
+                if (GetColumn(location, size)%2 == 0)
                 {
                     return location + 1;
                 }
@@ -402,14 +422,14 @@ public class ScriptableUtility : ScriptableObject
                 return location + size;
             // DownLeft.
             case 4:
-                if (GetColumn(location)%2 == 0)
+                if (GetColumn(location, size)%2 == 0)
                 {
                     return location - 1;
                 }
                 return (location + size - 1);
             // UpLeft.
             case 5:
-                if (GetColumn(location)%2 == 1)
+                if (GetColumn(location, size)%2 == 1)
                 {
                     return location - 1;
                 }
