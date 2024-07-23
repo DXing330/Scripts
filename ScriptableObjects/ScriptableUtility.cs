@@ -110,6 +110,25 @@ public class ScriptableUtility : ScriptableObject
         return String.Join(delimiter, string_list);
     }
 
+    public List<string> SplitStringIntoGroups(string input, int length, string delimiter = "|")
+    {
+        List<string> string_list = new List<string>();
+        string[] string_array = input.Split(delimiter);
+        string new_string = "";
+        int index = 0;
+        for (int i = 0; i < string_array.Length/length; i++)
+        {
+            new_string = "";
+            for (int j = 0; j < length; j++)
+            {
+                new_string += string_array[index]+"|";
+                index++;
+            }
+            string_list.Add(new_string);
+        }
+        return string_list;
+    }
+
     public string ConvertIntListToString(List<int> int_list, string delimiter = "|")
     {
         List<string> string_list = new List<string>();
