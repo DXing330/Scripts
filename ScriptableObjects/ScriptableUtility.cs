@@ -456,4 +456,14 @@ public class ScriptableUtility : ScriptableObject
         }
         return location;
     }    
+
+    public int DistanceBetweenPoints(int p1, int p2, int size)
+    {
+        int q1 = GetHexQ(p1, size);
+        int r1 = GetHexR(p1, size);
+        int q2 = GetHexQ(p2, size);
+        int r2 = GetHexR(p2, size);
+        int distance = (Mathf.Abs(q1-q2) + Mathf.Abs(q1+r1-q2-r2) + Mathf.Abs(r1-r2))/2;
+        return distance;
+    }
 }

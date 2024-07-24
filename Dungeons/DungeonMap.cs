@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DungeonGenTester : Map
+public class DungeonMap : Map
 {
     protected override void Start()
     {
@@ -22,12 +22,12 @@ public class DungeonGenTester : Map
         allTiles = dungeonData[0].Split("|").ToList();
         currentLocation = int.Parse(dungeonData[1]);
         startIndex = currentLocation;
-        DetermineCornerRowColumn();
         // Find the center.
         totalColumns = dungeonGenerator.GetMinSize();
         totalRows = dungeonGenerator.GetMinSize();
         pathfinder.SetTotalRowsColumns(totalRows, totalColumns);
         pathfinder.SetAllTiles(allTiles);
+        DetermineCornerRowColumn();
     }
 
     public void UpdateMap()
