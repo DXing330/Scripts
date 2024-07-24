@@ -135,7 +135,7 @@ public class BasicPathfinder : MonoBehaviour
         }
     }
     // Can be easily adjusted to return the path to a destination.
-    public List<int> DestReachable(int start, int dest, List<int> newTiles)
+    public List<int> DestReachable(int start, int dest, List<int> newTiles, string impassable = "2")
     {
         List<int> path = new List<int>();
         ResetHeap();
@@ -155,7 +155,7 @@ public class BasicPathfinder : MonoBehaviour
         }
         for (int i = 0; i < allTiles.Count; i++)
         {
-            CheckTile();
+            CheckTile(impassable);
             if (checkedTiles.Contains(dest))
             {
                 break;
@@ -174,7 +174,7 @@ public class BasicPathfinder : MonoBehaviour
         if (totalDistance >= bigInt){path.Clear();}
         return path;
     }
-    protected virtual void CheckTile()
+    protected virtual void CheckTile(string impassable)
     {
         int moveCost = 1;
         int closestTile = heap.Pull();
@@ -185,7 +185,7 @@ public class BasicPathfinder : MonoBehaviour
         {
 
             moveCost = 1;
-            if (allTiles[adjacentTiles[i]] == "2")
+            if (allTiles[adjacentTiles[i]] == impassable)
             {
                 moveCost = bigInt;
             }

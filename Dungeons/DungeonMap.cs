@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class DungeonMap : Map
 {
+    protected bool interactable = true;
     protected override void Start()
     {
         MakeDungeon();
@@ -68,6 +69,7 @@ public class DungeonMap : Map
 
     public override void MoveMap(int direction)
     {
+        if (!interactable){return;}
         int nextTile = pathfinder.GetDestination(currentLocation, direction);
         if (allTiles[nextTile] == "1"){return;}
         currentLocation = nextTile;
@@ -107,5 +109,27 @@ public class DungeonMap : Map
         int startColumn = GetColumn(start);
         cornerRow = startRow - (gridSize/2);
         cornerColumn = startColumn - (gridSize/2);
+    }
+
+    public override void ClickOnTile(int tileNumber)
+    {
+        if (!interactable){return;}
+        if (currentLocation == currentTiles[tileNumber]){return;}
+        if (currentTiles[tileNumber] < 0){return;}
+        List<int> path = new List<int>(pathfinder.DestReachable(currentLocation, currentTiles[tileNumber], currentTiles, "1"));
+        if (path.Count <= 0){return;}
+        StartCoroutine(MoveAlongPath(path));
+    }
+
+    IEnumerator MoveAlongPath(List<int> path)
+    {
+        interactable = false;
+        for (int i = path.Count - 1; i > -1; i--)
+        {
+            currentLocation = path[i];
+            UpdateMap();
+            yield return new WaitForSeconds(0.1f);
+        }
+        interactable = true;
     }
 }
