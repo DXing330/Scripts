@@ -11,6 +11,7 @@ public class DungeonGenerator : ScriptableObject
     protected int minSize = 36;
     public int GetMinSize(){return minSize;}
     public int minRoomSize = 6;
+    public int maxRooms = 6;
     public List<int> allTiles = new List<int>();
     public List<string> roomDetails = new List<string>();
     //public List<int> impassableTiles = new List<int>();
@@ -71,6 +72,7 @@ public class DungeonGenerator : ScriptableObject
         for (int i = 0; i < tries; i++)
         {
             TryToMakeRoom();
+            if (roomDetails.Count >= maxRooms){break;}
         }
         if (roomDetails.Count <= 1)
         {

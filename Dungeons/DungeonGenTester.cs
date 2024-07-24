@@ -13,7 +13,6 @@ public class DungeonGenTester : Map
     public DungeonGenerator dungeonGenerator;
     public List<string> dungeonData = new List<string>();
     public int currentLocation;
-    public int centeredSpot;
 
     [ContextMenu("Make Dungeon")]
     public void MakeDungeon()
@@ -30,7 +29,7 @@ public class DungeonGenTester : Map
         pathfinder.SetAllTiles(allTiles);
     }
 
-    public void UpdateMap()
+    public virtual void UpdateMap()
     {
         UpdateCenterTile(currentLocation);
         for (int i = 0; i < terrainTiles.Count; i++)
