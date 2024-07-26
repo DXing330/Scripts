@@ -15,10 +15,10 @@ public class DungeonGenerator : ScriptableObject
     public List<int> allTiles = new List<int>();
     public List<string> roomDetails = new List<string>();
     //public List<int> impassableTiles = new List<int>();
-    public List<string> GenerateDungeon(int newSize = 36)
+    public List<string> GenerateDungeon(int newSize = -1, int newMaxRooms = -1)
     {
-        size = newSize;
-        if (size < minSize){size = minSize;}
+        size = Mathf.Max(minSize, newSize);
+        maxRooms = Mathf.Max(size/minRoomSize, newMaxRooms);
         Reset();
         List<string> dungeonData = new List<string>();
         // Get base size.
@@ -33,7 +33,7 @@ public class DungeonGenerator : ScriptableObject
         int end = GetRandomPointInRoom(Random.Range(0, roomDetails.Count));
         // Get treasure locations.
             // Inside 1+ randomly selected room(s).
-        int treasure = GetRandomPointInRoom(Random.Range(0, roomDetails.Count));
+        int treasure = GetRandomPointInRoom(Random.Range(0, roomDetails.Count), end);
         // Get enemies.
             // Starting amount equal to size or sqrt(size)?
             // Enemies moves every turn and spawn every X turns.
@@ -45,10 +45,11 @@ public class DungeonGenerator : ScriptableObject
         return dungeonData;
     }
 
-    protected int GetRandomPointInRoom(int roomNum)
+    protected int GetRandomPointInRoom(int roomNum, int except = -1)
     {
         List<int> roomTiles = GetRoomTiles(roomDetails[roomNum]);
         int start = roomTiles[Random.Range(0, roomTiles.Count)];
+        if (start == except){return GetRandomPointInRoom(roomNum, except);}
         allTiles[start] = 0;
         return start;
     }
@@ -92,11 +93,8 @@ public class DungeonGenerator : ScriptableObject
         }
     }
 
-    protected void ConnectRooms(int roomOne, int roomTwo)
+    protected void ConnectPoints(int startPoint, int endPoint)
     {
-        // Go from one room to the other.
-        int startPoint = int.Parse(roomDetails[roomOne].Split("|")[0]);
-        int endPoint = int.Parse(roomDetails[roomTwo].Split("|")[0]);
         int startRow = (startPoint/size);
         int startCol = GetColumn(startPoint);
         int endRow = (endPoint/size);
@@ -163,6 +161,14 @@ public class DungeonGenerator : ScriptableObject
             allTiles[startPoint] = 0;
             if (startPoint == endPoint){break;}
         }
+    }
+
+    protected void ConnectRooms(int roomOne, int roomTwo)
+    {
+        // Go from one room to the other.
+        int startPoint = int.Parse(roomDetails[roomOne].Split("|")[0]);
+        int endPoint = int.Parse(roomDetails[roomTwo].Split("|")[0]);
+        ConnectPoints(startPoint, endPoint);
     }
 
     protected int GetColumn(int location)
@@ -312,7 +318,10 @@ public class DungeonGenerator : ScriptableObject
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        roomTiles.Add(nextTile);
+                        if (!(j == 0 || j == width - 1))
+                        {
+                            roomTiles.Add(nextTile);
+                        }
                         nextTile++;
                     }
                     nextTile -= width;
@@ -324,7 +333,10 @@ public class DungeonGenerator : ScriptableObject
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        roomTiles.Add(nextTile);
+                        if (!(j == 0 || j == width - 1))
+                        {
+                            roomTiles.Add(nextTile);
+                        }
                         nextTile--;
                     }
                     nextTile += width;
@@ -336,7 +348,10 @@ public class DungeonGenerator : ScriptableObject
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        roomTiles.Add(nextTile);
+                        if (!(j == 0 || j == width - 1))
+                        {
+                            roomTiles.Add(nextTile);
+                        }
                         nextTile++;
                     }
                     nextTile -= width;
@@ -348,7 +363,10 @@ public class DungeonGenerator : ScriptableObject
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        roomTiles.Add(nextTile);
+                        if (!(j == 0 || j == width - 1))
+                        {
+                            roomTiles.Add(nextTile);
+                        }
                         nextTile--;
                     }
                     nextTile += width;
