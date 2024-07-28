@@ -7,13 +7,23 @@ using UnityEngine;
 
 public class ArmyDataManager : BasicDataManager
 {
+    // Extra party members, excluding player and familiar.
     public List<PlayerActor> partyMembers;
+    // All party members, including PC and familiar.
     public List<PlayerActor> allPartyMembers;
     public void GetAllPartyMembers()
     {
         allPartyMembers.Clear();
+        // First add the PC and their familiar.
         allPartyMembers.Add(GameManager.instance.player);
         allPartyMembers.Add(GameManager.instance.familiar);
+        // Update the PC health if possible.
+        if (pchealths.Count > 1)
+        {
+            allPartyMembers[0].UpdateCurrentHealth(int.Parse(pchealths[0]));
+            allPartyMembers[1].UpdateCurrentHealth(int.Parse(pchealths[1]));
+        }
+        // Then all all other party members.
         for (int i = 0; i < partyMembers.Count; i++)
         {
             if (partyMembers[i].typeName.Length <= 0 || partyMembers[i].currentHealth <= 0){continue;}
@@ -63,6 +73,7 @@ public class ArmyDataManager : BasicDataManager
         }
         UpdateAvailableHealths();
     }
+    public List<string> pchealths = new List<string>(0);
     public List<string> availableFighters = new List<string>(0);
     public List<string> fighterHealths = new List<string>(0);
     public PlayerActor viewStatsActor;
@@ -82,12 +93,17 @@ public class ArmyDataManager : BasicDataManager
     // This function should remove party members that have no more health.
     protected void UpdateAvailableHealths()
     {
+        pchealths.Clear();
         availableFighters.Clear();
         fighterHealths.Clear();
         List<int> deadMembers = new List<int>();
         for (int i = 0; i < allPartyMembers.Count; i++)
         {
-            if (allPartyMembers[i].typeName == "Player" || allPartyMembers[i].typeName == "Familiar"){continue;}
+            if (allPartyMembers[i].typeName == "Player" || allPartyMembers[i].typeName == "Familiar")
+            {
+                pchealths.Add(Mathf.Max(1, allPartyMembers[i].ReturnCurrentHealth()).ToString());
+                continue;
+            }
             int currentHealth = allPartyMembers[i].ReturnCurrentHealth();
             if (currentHealth <= 0)
             {
@@ -137,6 +153,7 @@ public class ArmyDataManager : BasicDataManager
         saveDataPath = Application.persistentDataPath;
         string fighterData = GameManager.instance.utility.ConvertListToString(availableFighters);
         fighterData += "#"+GameManager.instance.utility.ConvertListToString(fighterHealths);
+        fighterData += "#"+GameManager.instance.utility.ConvertListToString(pchealths);
         File.WriteAllText(saveDataPath+fileName, fighterData);
     }
 
@@ -151,9 +168,11 @@ public class ArmyDataManager : BasicDataManager
             {
                 availableFighters = dataBlocks[0].Split("|").ToList();
                 fighterHealths = dataBlocks[1].Split("|").ToList();
+                pchealths = dataBlocks[2].Split("|").ToList();
             }
             GameManager.instance.utility.RemoveEmptyListItems(availableFighters);
             GameManager.instance.utility.RemoveEmptyListItems(fighterHealths);
+            GameManager.instance.utility.RemoveEmptyListItems(pchealths);
         }
         LoadAvailableFighters();
         //GetAllPartyMembers();
@@ -165,6 +184,15 @@ public class ArmyDataManager : BasicDataManager
         fighterHealths.Add("-1");
         LoadAvailableFighters();
         GetAllPartyMembers();
+    }
+
+    public void FullPartyHeal()
+    {
+        for (int i = 0; i < allPartyMembers.Count; i++)
+        {
+            allPartyMembers[i].UpdateCurrentHealth();
+        }
+        UpdateAvailableHealths();
     }
 
     protected void LoadAvailableFighters()

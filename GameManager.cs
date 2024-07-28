@@ -87,6 +87,7 @@ public class GameManager : MonoBehaviour
 
     public void ReturnToVillage()
     {
+        armyData.FullPartyHeal();
         StartCoroutine(LoadAsyncScene("Village"));
         SaveData();
     }

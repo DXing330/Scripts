@@ -34,6 +34,8 @@ public class DungeonGenerator : ScriptableObject
         // Get treasure locations.
             // Inside 1+ randomly selected room(s).
         int treasure = GetRandomPointInRoom(Random.Range(0, roomDetails.Count), end);
+        // Put traps inside rooms.
+            // Explosives, poison, fire, spikes, etc.
         // Get enemies.
             // Starting amount equal to size or sqrt(size)?
             // Enemies moves every turn and spawn every X turns.
@@ -318,7 +320,7 @@ public class DungeonGenerator : ScriptableObject
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        if (!(j == 0 || j == width - 1))
+                        if (!(i == 0 || i == width - 1))
                         {
                             roomTiles.Add(nextTile);
                         }
@@ -333,7 +335,7 @@ public class DungeonGenerator : ScriptableObject
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        if (!(j == 0 || j == width - 1))
+                        if (!(i == 0 || i == width - 1))
                         {
                             roomTiles.Add(nextTile);
                         }
@@ -348,7 +350,7 @@ public class DungeonGenerator : ScriptableObject
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        if (!(j == 0 || j == width - 1))
+                        if (!(i == 0 || i == width - 1))
                         {
                             roomTiles.Add(nextTile);
                         }
@@ -363,7 +365,7 @@ public class DungeonGenerator : ScriptableObject
                 {
                     for (int j = 0; j < width; j++)
                     {
-                        if (!(j == 0 || j == width - 1))
+                        if (!(i == 0 || i == width - 1))
                         {
                             roomTiles.Add(nextTile);
                         }

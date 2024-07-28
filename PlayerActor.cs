@@ -23,10 +23,10 @@ public class PlayerActor : AllStats
     public int currentHealth = -1;
     public int ReturnCurrentHealth()
     {
-        if (typeName == "Player" || typeName == "Familiar")
+        /*if (typeName == "Player" || typeName == "Familiar")
         {
             return baseHealth+((currentLevel-1) * healthPerLevel);
-        }
+        }*/
         if (currentHealth < 0){return baseHealth;}
         else {return currentHealth;}
     }
