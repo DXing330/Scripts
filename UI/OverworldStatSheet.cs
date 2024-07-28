@@ -8,8 +8,10 @@ using UnityEngine.SceneManagement;
 public class OverworldStatSheet : MonoBehaviour
 {
     public TMP_Text actorName;
-    public RectTransform greenHealthBar;
+    public RectTransform healthBar;
     public TMP_Text healthBarText;
+    public RectTransform energyBar;
+    public TMP_Text energyBarText;
     public List<TMP_Text> statTexts;
     public Image actorSprite;
     public ActorSprites spriteDictionary;
@@ -22,18 +24,22 @@ public class OverworldStatSheet : MonoBehaviour
         actorName.text = actor.ReturnName();
         List<int> allStats = actor.ReturnStatList();
         List<int> equipStats = actor.allEquipment.ReturnStatList();
-        float xScale = 0;
+        float hxScale = 0;
+        float exScale = 0;
         if (!baseStats)
         {
             healthBarText.text = (actor.ReturnCurrentHealth()+equipStats[0])+"/"+(allStats[0]+equipStats[0]);
-            xScale = ((float) (actor.ReturnCurrentHealth()+equipStats[0]))/((float) (allStats[0]+equipStats[0]));
+            hxScale = ((float) (actor.ReturnCurrentHealth()+equipStats[0]))/((float) (allStats[0]+equipStats[0]));
         }
         else
         {
             healthBarText.text = (actor.ReturnCurrentHealth())+"/"+(allStats[0]);
-            xScale = ((float) actor.ReturnCurrentHealth())/((float) allStats[0]);
+            hxScale = ((float) actor.ReturnCurrentHealth())/((float) allStats[0]);
         }
-        greenHealthBar.localScale = new Vector3(xScale, 1, 0);
+        healthBar.localScale = new Vector3(hxScale, 1, 0);
+        energyBarText.text = (actor.ReturnCurrentEnergy())+"/"+(allStats[4]);
+        exScale = ((float) actor.ReturnCurrentEnergy())/((float) allStats[4]);
+        energyBar.localScale = new Vector3(exScale, 1, 0);
         for (int i = 0; i < statTexts.Count; i++)
         {
             if (baseStats)
