@@ -130,8 +130,8 @@ public class TerrainMap : MonoBehaviour
         terrainEffectManager.SetTileEffects(terrainEffects);
         UpdateCenterTile(1);
         UpdateMap();
-        simulator.UpdateSimulation();
-        simulator.RunNSimulations();
+        //simulator.UpdateSimulation();
+        //simulator.RunNSimulations();
         actionLog.ClearActionLog();
     }
 
@@ -896,6 +896,10 @@ public class TerrainMap : MonoBehaviour
     public void AddActor(TacticActor newActor, bool start = true)
     {
         allActors.Add(newActor);
+        for (int i = 0; i < allActors.Count; i++)
+        {
+            Debug.Log(allActors[i].ReturnName()+" : "+allActors[i].health);
+        }
     }
 
     public void RemoveActors(bool win = false)

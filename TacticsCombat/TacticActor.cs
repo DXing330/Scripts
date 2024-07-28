@@ -56,6 +56,11 @@ public class TacticActor : AllStats
         return cost;
     }
     public int health;
+    public int ReturnHealth()
+    {
+        if (health <= 0){return baseHealth;}
+        return health;
+    }
     public void ReceiveAttackPassives(TacticActor attacker, int distance = 1)
     {
         if (passiveSkillNames.Count <= 0){return;}
@@ -101,6 +106,11 @@ public class TacticActor : AllStats
         if (health <= 0){Death();}
     }
     public int energy;
+    public int ReturnEnergy()
+    {
+        if (energy <= 0){return baseEnergy;}
+        return energy;
+    }
     public int currentMovespeed;
     public int actionsLeft;
     public int actionsToAttack = 1;
@@ -255,13 +265,8 @@ public class TacticActor : AllStats
     public TacticBuffsStatuses buffDebuff;
     public TacticPassiveSkill passiveSkill;
 
-    void Start()
-    {
-        health = baseHealth;
-    }
-
     // Since the text is loading before start is called.
-    public void QuickStart()
+    public void QuickStart(TacticActor quickStartActor = null)
     {
         health = baseHealth;
         weight = size;
@@ -271,6 +276,9 @@ public class TacticActor : AllStats
         defense = baseDefense;
         currentAttackRange = attackRange;
         initiative = baseInitiative;
+        if (quickStartActor == null){return;}
+        health = Mathf.Min(health, quickStartActor.health);
+        energy = Mathf.Min(energy, quickStartActor.energy);
     }
 
     public void CopyStats(TacticActor actorToCopy)
@@ -280,10 +288,12 @@ public class TacticActor : AllStats
         locationIndex = actorToCopy.locationIndex;
         typeName = actorToCopy.typeName;
         baseHealth = actorToCopy.baseHealth;
+        health = Mathf.Min(baseHealth, actorToCopy.ReturnHealth());
         baseMovement = actorToCopy.baseMovement;
         baseAttack = actorToCopy.baseAttack;
         baseDefense = actorToCopy.baseDefense;
         baseEnergy = actorToCopy.baseEnergy;
+        energy = Mathf.Min(baseEnergy, actorToCopy.ReturnEnergy());
         baseActions = actorToCopy.baseActions;
         attackRange = actorToCopy.attackRange;
         movementType = actorToCopy.moveType;

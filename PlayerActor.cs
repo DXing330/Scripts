@@ -35,6 +35,17 @@ public class PlayerActor : AllStats
         if (newHealth < 0){currentHealth = baseHealth;}
         else {currentHealth = newHealth;}
     }
+    public int currentEnergy = -1;
+    public void UpdateCurrentEnergy(int newEnergy = -1)
+    {
+        if (newEnergy < 0){currentEnergy = baseEnergy;}
+        else {currentEnergy = newEnergy;}
+    }
+    public int ReturnCurrentEnergy()
+    {
+        if (currentEnergy < 0){return baseEnergy;}
+        else {return currentEnergy;}
+    }
     public int healthPerLevel = 3;
     public int energyPerLevel = 1;
     public string species = "Undead";
@@ -131,14 +142,12 @@ public class PlayerActor : AllStats
         playerActor.level = currentLevel;
         playerActor.CopyAllStats(this);
         playerActor.movementCosts = movementCosts;
-        if (currentHealth < 0 || currentHealth >= baseHealth)
-        {
-            playerActor.baseHealth = baseHealth+((currentLevel-1) * healthPerLevel);
-        }
-        else
-        {
-            playerActor.baseHealth = currentHealth;
-        }
+        // Set the max and current health.
+        playerActor.baseHealth = baseHealth+((currentLevel-1) * healthPerLevel);
+        playerActor.health = ReturnCurrentHealth();
+        // Set the max and current energy.
+        playerActor.baseEnergy = baseEnergy+((currentLevel-1)) * energyPerLevel;
+        playerActor.energy = ReturnCurrentEnergy();
         playerActor.species = species;
         UpdateActives();
         UpdatePassives();
@@ -152,11 +161,9 @@ public class PlayerActor : AllStats
         GameManager.instance.actorData.LoadActorData(playerActor, typeName);
         CopyAllStats(playerActor);
         playerActor.typeName = typeName;
-        if (currentHealth >= 0)
-        {
-            playerActor.baseHealth = Mathf.Min(currentHealth, playerActor.baseHealth);
-            allEquipment.UpdateActorStats(playerActor);
-        }
+        allEquipment.UpdateActorStats(playerActor);
+        playerActor.health = Mathf.Min(ReturnCurrentHealth(), playerActor.baseHealth);
+        playerActor.energy = Mathf.Min(ReturnCurrentEnergy(), playerActor.baseEnergy);
     }
 
     public void SetName(string newName)

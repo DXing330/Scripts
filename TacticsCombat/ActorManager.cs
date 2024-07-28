@@ -259,12 +259,12 @@ public class ActorManager : MonoBehaviour
     {
         TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
         newActor.CopyStats(actorToCopy);
+        newActor.QuickStart(actorToCopy);
         newActor.InitialLocation(location);
         UpdateActorSprite(newActor, actorToCopy.typeName);
         newActor.team = team;
         newActor.SetMap(terrainMap);
         terrainMap.AddActor(newActor);
-        newActor.QuickStart();
     }
 
     public void GenerateActor(int location, string name = "Mob", int team = 0, bool start = true)
@@ -289,7 +289,7 @@ public class ActorManager : MonoBehaviour
     {
         TacticActor newActor = Instantiate(actorPrefab, transform.position, new Quaternion(0, 0, 0, 0));
         newActor.CopyStats(copiedActor);
-        newActor.QuickStart();
+        newActor.QuickStart(copiedActor);
         return newActor;
     }
 
@@ -325,17 +325,19 @@ public class ActorManager : MonoBehaviour
     {
         List<string> partyMembers = new List<string>();
         List<int> partyHealth = new List<int>();
+        List<int> partyEnergy = new List<int>();
         for (int i = 0; i < terrainMap.actors.Count; i++)
         {
             if (terrainMap.actors[i].team == 0 && terrainMap.actors[i].health > 0)
             {
                 partyMembers.Add(terrainMap.actors[i].typeName);
                 partyHealth.Add(terrainMap.actors[i].health);
+                partyEnergy.Add(terrainMap.actors[i].energy);
             }
         }
         // Need some way to track duplicate types, ie two wolves.
         // Deal with it in the actual manager.
-        GameManager.instance.armyData.UpdatePartyHealth(partyMembers, partyHealth);
+        GameManager.instance.armyData.UpdatePartyHealth(partyMembers, partyHealth, partyEnergy);
     }
 
     public void SetWinReward(string newReward)
