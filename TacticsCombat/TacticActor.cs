@@ -336,7 +336,7 @@ public class TacticActor : AllStats
         defense = baseDefense;
         currentMovespeed = baseMovement;
         currentAttackRange = attackRange;
-        energy = Mathf.Min(energy+1, baseEnergy);
+        //energy = Mathf.Min(energy+1, baseEnergy);
         counterAttacksLeft = Mathf.Min(counterAttacksLeft+1, 1);
         attackAdvantage = 0;
         // After getting a full round of access to temp skills/passives remove them.
