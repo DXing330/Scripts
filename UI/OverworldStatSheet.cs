@@ -36,9 +36,11 @@ public class OverworldStatSheet : MonoBehaviour
             healthBarText.text = (actor.ReturnCurrentHealth())+"/"+(allStats[0]);
             hxScale = ((float) actor.ReturnCurrentHealth())/((float) allStats[0]);
         }
+        hxScale = Mathf.Clamp(hxScale, 0f, 1.0f);
         healthBar.localScale = new Vector3(hxScale, 1, 0);
         energyBarText.text = (actor.ReturnCurrentEnergy())+"/"+(allStats[4]);
         exScale = ((float) actor.ReturnCurrentEnergy())/((float) allStats[4]);
+        exScale = Mathf.Clamp(exScale, 0f, 1.0f);
         energyBar.localScale = new Vector3(exScale, 1, 0);
         for (int i = 0; i < statTexts.Count; i++)
         {

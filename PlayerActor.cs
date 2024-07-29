@@ -7,6 +7,48 @@ public class PlayerActor : AllStats
 {
     public TacticActor playerActor;
     public string allBaseStats;
+    public string currentStatString;
+    public string UpdateCurrentStats()
+    {
+        string newStats = "";
+        List<int> basicStats = ReturnStatList(false);
+        for (int i = 0; i < basicStats.Count; i++)
+        {
+            newStats += basicStats[i]+"|";
+        }
+        newStats += "@";
+        for (int i = 0; i < learntSkills.Count; i++)
+        {
+            if (learntSkills.Count <= 0){break;}
+            if (learntSkills[i].Length < 1){continue;}
+            newStats += learntSkills[i]+",";
+        }
+        newStats += "@";
+        for (int i = 0; i < learntPassives.Count; i++)
+        {
+            if (learntPassives.Count <= 0){break;}
+            if (learntPassives[i].Length < 1){continue;}
+            newStats += learntPassives[i]+",";
+        }
+        newStats += "@"+ReturnCurrentHealth()+"@"+ReturnCurrentEnergy();
+        SetCurrentStats(newStats);
+        return newStats;
+    }
+    public void SetCurrentStats(string newStats)
+    {
+        currentStatString = newStats;
+        string[] blocks = currentStatString.Split("@");
+        LoadStatsFromStringList(blocks[0].Split("|").ToList());
+        learntSkills = blocks[1].Split(",").ToList();
+        learntPassives = blocks[2].Split(",").ToList();
+        UpdateCurrentHealth(int.Parse(blocks[3]));
+        UpdateCurrentEnergy(int.Parse(blocks[4]));
+    }
+    public string ReturnCurrentStats()
+    {
+        UpdateCurrentStats();
+        return currentStatString;
+    }
     public string typeName;
     public string personalName;
     public void SetPersonalName(string newName){personalName = newName;}
@@ -128,11 +170,26 @@ public class PlayerActor : AllStats
         {
             allStatList.Add(baseEnergy);
         }
+        allStatList.Add(moveType);
         allStatList.Add(attackRange);
         allStatList.Add(baseActions);
         allStatList.Add(size);
         allStatList.Add(baseInitiative);
         return allStatList;
+    }
+
+    public override void LoadStatsFromStringList(List<string> allStats)
+    {
+        baseHealth = int.Parse(allStats[0]);
+        baseAttack = int.Parse(allStats[1]);
+        baseDefense = int.Parse(allStats[2]);
+        baseMovement = int.Parse(allStats[3]);
+        baseEnergy = int.Parse(allStats[4]);
+        moveType = int.Parse(allStats[5]);
+        attackRange = int.Parse(allStats[6]);
+        baseActions = int.Parse(allStats[7]);
+        size = int.Parse(allStats[8]);
+        baseInitiative = int.Parse(allStats[9]);
     }
 
     public void UpdateStats()
@@ -154,7 +211,13 @@ public class PlayerActor : AllStats
         allEquipment.UpdateActorStats(playerActor);
     }
 
+    public void UpdateEquipStats()
+    {
+        allEquipment.UpdateActorStats(playerActor);
+    }
+
     // Mob characters don't get any level bonuses, just equipment bonuses.
+    // Only new characters use this otherwise use their previously saved stat string.
     public void SideCharacterUpdateStats()
     {
         GameManager.instance.actorData.LoadPlayerActorData(this, typeName);

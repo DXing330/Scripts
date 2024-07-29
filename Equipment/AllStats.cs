@@ -12,6 +12,10 @@ public class AllStats : MonoBehaviour
     public int attackRange = 1;
     public int baseActions = 2;
     public int moveType = 0;
+    public int ReturnMoveType()
+    {
+        return moveType;
+    }
     public int size = 1;
     public int baseInitiative = 10;
     public List<int> allStatList;

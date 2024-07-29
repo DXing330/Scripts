@@ -119,6 +119,10 @@ public class EquipmentContainer : AllStats
     {
         GetEquipStats();
         actor.baseHealth += baseHealth;
+        if (actor.health >= actor.baseHealth - baseHealth)
+        {
+            actor.health = Mathf.Min(actor.health + baseHealth, actor.baseHealth);
+        }
         actor.baseAttack += baseAttack;
         actor.baseDefense += baseDefense;
         actor.baseMovement += baseMovement;

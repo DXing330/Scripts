@@ -81,8 +81,8 @@ public class ScriptableDetailsViewer : ScriptableObject
         switch (dummyPassive.effect)
         {
             case "Health":
-                if (amount > 0){return "regain "+amount+" health.";}
-                else{return "lose "+Math.Abs(amount)+" health.";}
+                if (amount > 0){return "regain "+amount+" health";}
+                else{return "lose "+Math.Abs(amount)+" health";}
             case "Decrease":
                 return "decrease the damage by "+(amount)+"";
             case "Increase%":

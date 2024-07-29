@@ -7,6 +7,8 @@ using TMPro;
 public class MoreStatsSheet : OverworldStatSheet
 {
     public List<TMP_Text> equipStatTexts;
+    public Image moveSprite;
+    public SpriteContainer moveSprites;
 
     void Start()
     {
@@ -25,6 +27,12 @@ public class MoreStatsSheet : OverworldStatSheet
         UpdateEquipStats();
     }
 
+    protected void UpdateMoveSprite()
+    {
+        int moveType = statActor.ReturnMoveType();
+        moveSprite.sprite = moveSprites.allSprites[moveType];
+    }
+
     protected void UpdateEquipStats()
     {
         List<int> equipStats = statActor.allEquipment.ReturnStatList();
@@ -32,12 +40,13 @@ public class MoreStatsSheet : OverworldStatSheet
         {
             equipStatTexts[i].text = equipStats[i+1].ToString();
         }
-        equipStatTexts[equipStatTexts.Count - 1].text = equipStats[0].ToString();
+        equipStatTexts[equipStatTexts.Count - 1].text = "+"+equipStats[0].ToString();
     }
 
     public override void UpdateStatSheet(PlayerActor actor, bool baseStats = false)
     {
         base.UpdateStatSheet(actor, true);
         UpdateEquipStats();
+        UpdateMoveSprite();
     }
 }

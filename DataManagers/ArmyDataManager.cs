@@ -7,8 +7,27 @@ using UnityEngine;
 
 public class ArmyDataManager : BasicDataManager
 {
+    public List<string> PCstats;
+    protected void SavePCStats()
+    {
+        PCstats.Clear();
+        PCstats.Add(GameManager.instance.player.ReturnCurrentStats());
+        PCstats.Add(GameManager.instance.familiar.ReturnCurrentStats());
+    }
     // Extra party members, excluding player and familiar.
     public List<PlayerActor> partyMembers;
+    public List<string> partyMemberNames;
+    public List<string> partyMemberStats;
+    protected void SavePartyMemberStats()
+    {
+        partyMemberStats.Clear();
+        partyMemberNames.Clear();
+        for (int i = 0; i < partyMembers.Count; i++)
+        {
+            partyMemberNames.Add(partyMembers[i].typeName);
+            partyMemberStats.Add(partyMembers[i].ReturnCurrentStats());
+        }
+    }
     // All party members, including PC and familiar.
     public List<PlayerActor> allPartyMembers;
     public void GetAllPartyMembers()
@@ -23,12 +42,11 @@ public class ArmyDataManager : BasicDataManager
             if (partyMembers[i].typeName.Length <= 0 || partyMembers[i].currentHealth <= 0){continue;}
             allPartyMembers.Add(partyMembers[i]);
         }
-        if (pcenergy.Count <= 0){return;}
+        if (PCstats.Count <= 0){return;}
         // Update the PC health if possible.
-        for (int i = 0; i < pcenergy.Count; i++)
+        for (int i = 0; i < PCstats.Count; i++)
         {
-            allPartyMembers[i].UpdateCurrentHealth(int.Parse(pchealths[i]));
-            allPartyMembers[i].UpdateCurrentEnergy(int.Parse(pcenergy[i]));
+            allPartyMembers[i].SetCurrentStats(PCstats[i]);
         }
     }
     protected void GetPartyMembersAndStats()
@@ -79,11 +97,6 @@ public class ArmyDataManager : BasicDataManager
         }
         UpdateAvailableHealths();
     }
-    public List<string> pchealths = new List<string>(0);
-    public List<string> pcenergy = new List<string>(0);
-    public List<string> availableFighters = new List<string>(0);
-    public List<string> fighterHealths = new List<string>(0);
-    public List<string> fighterEnergy = new List<string>(0);
     public PlayerActor viewStatsActor;
     public int viewStatsIndex = -1;
     public void SetViewStatsIndex(int index)
@@ -101,18 +114,13 @@ public class ArmyDataManager : BasicDataManager
     // This function should remove party members that have no more health.
     protected void UpdateAvailableHealths()
     {
-        pchealths.Clear();
-        pcenergy.Clear();
-        availableFighters.Clear();
-        fighterHealths.Clear();
-        fighterEnergy.Clear();
+        PCstats.Clear();
         List<int> deadMembers = new List<int>();
         for (int i = 0; i < allPartyMembers.Count; i++)
         {
             if (allPartyMembers[i].typeName == "Player" || allPartyMembers[i].typeName == "Familiar")
             {
-                pchealths.Add(Mathf.Max(1, allPartyMembers[i].ReturnCurrentHealth()).ToString());
-                pcenergy.Add(Mathf.Max(1, allPartyMembers[i].ReturnCurrentEnergy()).ToString());
+                PCstats.Add(allPartyMembers[i].ReturnCurrentStats());
                 continue;
             }
             int currentHealth = allPartyMembers[i].ReturnCurrentHealth();
@@ -122,9 +130,8 @@ public class ArmyDataManager : BasicDataManager
                 deadMembers.Insert(0, i);
                 continue;
             }
-            availableFighters.Add(allPartyMembers[i].typeName);
-            fighterHealths.Add(currentHealth.ToString());
-            fighterEnergy.Add(currentEnergy.ToString());
+            partyMemberNames.Add(allPartyMembers[i].typeName);
+            partyMemberStats.Add(allPartyMembers[i].ReturnCurrentStats());
         }
         LoadAvailableFighters();
         GetPartyMembersAndStats();
@@ -142,7 +149,8 @@ public class ArmyDataManager : BasicDataManager
             }
             else
             {
-                allPartyMembers[i].SideCharacterUpdateStats();
+                //allPartyMembers[i].SideCharacterUpdateStats();
+                allPartyMembers[i].UpdateEquipStats();
             }
         }
     }
@@ -154,8 +162,8 @@ public class ArmyDataManager : BasicDataManager
         {
             File.Delete (saveDataPath+fileName);
         }
-        availableFighters.Clear();
-        fighterHealths.Clear();
+        partyMemberNames.Clear();
+        partyMemberStats.Clear();
         LoadAvailableFighters();
         GetAllPartyMembers();
         Save();
@@ -164,12 +172,12 @@ public class ArmyDataManager : BasicDataManager
     public override void Save()
     {
         UpdateAvailableHealths();
+        SavePCStats();
+        SavePartyMemberStats();
         saveDataPath = Application.persistentDataPath;
-        string fighterData = GameManager.instance.utility.ConvertListToString(availableFighters);
-        fighterData += "#"+GameManager.instance.utility.ConvertListToString(fighterHealths);
-        fighterData += "#"+GameManager.instance.utility.ConvertListToString(fighterEnergy);
-        fighterData += "#"+GameManager.instance.utility.ConvertListToString(pchealths);
-        fighterData += "#"+GameManager.instance.utility.ConvertListToString(pcenergy);
+        string fighterData = GameManager.instance.utility.ConvertListToString(PCstats, "$");
+        fighterData += "#"+GameManager.instance.utility.ConvertListToString(partyMemberStats, "$");
+        fighterData += "#"+GameManager.instance.utility.ConvertListToString(partyMemberNames);
         File.WriteAllText(saveDataPath+fileName, fighterData);
     }
 
@@ -182,26 +190,24 @@ public class ArmyDataManager : BasicDataManager
             string[] dataBlocks = loadedData.Split("#");
             if (dataBlocks.Length >= 2)
             {
-                availableFighters = dataBlocks[0].Split("|").ToList();
-                fighterHealths = dataBlocks[1].Split("|").ToList();
-                fighterEnergy = dataBlocks[2].Split("|").ToList();
-                pchealths = dataBlocks[3].Split("|").ToList();
-                pcenergy = dataBlocks[4].Split("|").ToList();
+                PCstats = dataBlocks[0].Split("$").ToList();
+                partyMemberStats = dataBlocks[1].Split("$").ToList();
+                partyMemberNames = dataBlocks[2].Split("|").ToList();
             }
-            GameManager.instance.utility.RemoveEmptyListItems(availableFighters);
-            GameManager.instance.utility.RemoveEmptyListItems(fighterHealths, 0);
-            GameManager.instance.utility.RemoveEmptyListItems(fighterEnergy, 0);
-            GameManager.instance.utility.RemoveEmptyListItems(pchealths, 0);
-            GameManager.instance.utility.RemoveEmptyListItems(pcenergy, 0);
+            GameManager.instance.utility.RemoveEmptyListItems(PCstats, 0);
+            GameManager.instance.utility.RemoveEmptyListItems(partyMemberStats, 0);
+            GameManager.instance.utility.RemoveEmptyListItems(partyMemberNames, 0);
         }
         LoadAvailableFighters();
-        //GetAllPartyMembers();
+        GetAllPartyMembers();
     }
 
     public void GainFighter(string fighterName)
     {
-        availableFighters.Add(fighterName);
-        fighterHealths.Add("-1");
+        partyMemberNames.Add(fighterName);
+        // Update their base stats from the data manager for the first time.
+        partyMembers[partyMemberNames.Count - 1].SideCharacterUpdateStats();
+        partyMemberStats.Add(partyMembers[partyMemberNames.Count - 1].ReturnCurrentStats());
         LoadAvailableFighters();
         GetAllPartyMembers();
     }
@@ -218,9 +224,9 @@ public class ArmyDataManager : BasicDataManager
 
     protected void LoadAvailableFighters()
     {
-        if (availableFighters.Count <= 0)
+        if (partyMemberNames.Count <= 0)
         {
-            for (int i = 0; i < Mathf.Min(availableFighters.Count, partyMembers.Count); i++)
+            for (int i = 0; i < partyMembers.Count; i++)
             {
                 partyMembers[i].typeName = "";
                 partyMembers[i].UpdateCurrentHealth();
@@ -228,13 +234,11 @@ public class ArmyDataManager : BasicDataManager
             }
             return;
         }
-        for (int i = 0; i < Mathf.Min(availableFighters.Count, partyMembers.Count); i++)
+        for (int i = 0; i < Mathf.Min(partyMemberNames.Count, partyMembers.Count); i++)
         {
-            if (availableFighters[i].Length <= 0){continue;}
-            partyMembers[i].typeName = availableFighters[i];
-            partyMembers[i].SideCharacterUpdateStats();
-            partyMembers[i].UpdateCurrentHealth(int.Parse(fighterHealths[i]));
-            partyMembers[i].UpdateCurrentEnergy(int.Parse(fighterEnergy[i]));
+            if (partyMemberNames[i].Length <= 0){continue;}
+            partyMembers[i].typeName = partyMemberNames[i];
+            partyMembers[i].SetCurrentStats(partyMemberStats[i]);
         }
     }
 }
