@@ -20,12 +20,17 @@ public class ArmyDataManager : BasicDataManager
     public List<string> partyMemberStats;
     protected void SavePartyMemberStats()
     {
-        partyMemberStats.Clear();
-        partyMemberNames.Clear();
-        for (int i = 0; i < partyMembers.Count; i++)
+        if (partyMemberNames.Count <= 0)
         {
-            partyMemberNames.Add(partyMembers[i].typeName);
-            partyMemberStats.Add(partyMembers[i].ReturnCurrentStats());
+            return;
+        }
+        for (int i = partyMemberNames.Count - 1; i > -1; i--)
+        {
+            if (partyMembers[i].typeName.Length < 1 || partyMembers[i].ReturnCurrentHealth() <= 0)
+            {
+                partyMemberNames.RemoveAt(i);
+                partyMemberStats.RemoveAt(i);
+            }
         }
     }
     // All party members, including PC and familiar.
@@ -56,11 +61,22 @@ public class ArmyDataManager : BasicDataManager
     }
     public void PartyMemberDefeated(string memberName)
     {
+        if (memberName == "Player")
+        {
+            allPartyMembers[0].UpdateCurrentHealth(1);
+            return;
+        }
+        if (memberName == "Familiar")
+        {
+            allPartyMembers[1].UpdateCurrentHealth(1);
+            return;
+        }
         for (int i = 0; i < partyMembers.Count; i++)
         {
             if (partyMembers[i].typeName == memberName)
             {
                 // If they're already defeated find the next one with the same name.
+                Debug.Log(i);
                 if (partyMembers[i].currentHealth == 0){continue;}
                 partyMembers[i].currentHealth = 0;
                 return;
@@ -114,6 +130,8 @@ public class ArmyDataManager : BasicDataManager
     // This function should remove party members that have no more health.
     protected void UpdateAvailableHealths()
     {
+        partyMemberNames.Clear();
+        partyMemberStats.Clear();
         PCstats.Clear();
         List<int> deadMembers = new List<int>();
         for (int i = 0; i < allPartyMembers.Count; i++)
@@ -149,8 +167,7 @@ public class ArmyDataManager : BasicDataManager
             }
             else
             {
-                //allPartyMembers[i].SideCharacterUpdateStats();
-                allPartyMembers[i].UpdateEquipStats();
+                allPartyMembers[i].UpdateStats(false);
             }
         }
     }
@@ -202,12 +219,21 @@ public class ArmyDataManager : BasicDataManager
         GetAllPartyMembers();
     }
 
-    public void GainFighter(string fighterName)
+    public void TestGainFighter(string fighterName)
+    {
+        GainFighter(fighterName);
+    }
+
+    public void GainFighter(string fighterName, string stats = null)
     {
         partyMemberNames.Add(fighterName);
         // Update their base stats from the data manager for the first time.
-        partyMembers[partyMemberNames.Count - 1].SideCharacterUpdateStats();
-        partyMemberStats.Add(partyMembers[partyMemberNames.Count - 1].ReturnCurrentStats());
+        if (stats == null)
+        {
+            partyMembers[partyMemberNames.Count - 1].SideCharacterUpdateStats(fighterName);
+            partyMemberStats.Add(partyMembers[partyMemberNames.Count - 1].ReturnCurrentStats());
+        }
+        else{partyMemberStats.Add(stats);}
         LoadAvailableFighters();
         GetAllPartyMembers();
     }
@@ -234,7 +260,7 @@ public class ArmyDataManager : BasicDataManager
             }
             return;
         }
-        for (int i = 0; i < Mathf.Min(partyMemberNames.Count, partyMembers.Count); i++)
+        for (int i = 0; i < partyMemberNames.Count; i++)
         {
             if (partyMemberNames[i].Length <= 0){continue;}
             partyMembers[i].typeName = partyMemberNames[i];

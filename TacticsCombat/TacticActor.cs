@@ -352,8 +352,13 @@ public class TacticActor : AllStats
     {
         if (passiveSkillNames.Count <= 0){return;}
         // Go through all the passives.
-        for (int i = 0; i < passiveSkillNames.Count; i++)
+        for (int i = passiveSkillNames.Count - 1; i > -1; i--)
         {
+            if (passiveSkillNames[i].Length < 1)
+            {
+                passiveSkillNames.RemoveAt(i);
+                continue;
+            }
             terrainMap.actorManager.LoadPassiveData(passiveSkill, passiveSkillNames[i]);
             // Try to apply the start of turn ones.
             if (passiveSkill.timing != timing){continue;}

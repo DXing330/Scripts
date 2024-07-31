@@ -164,6 +164,7 @@ public class TerrainMap : MonoBehaviour
         {
             // Slightly different victory screen saying that the enemy has fled.
             battleStarted = false;
+            RemoveActors();
             actorManager.ReturnToHub(true, true);
             return;
         }
@@ -853,7 +854,7 @@ public class TerrainMap : MonoBehaviour
 
     IEnumerator DelayEndTurn()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.5f);
         ActorEndTurn();
     }
 
@@ -896,10 +897,6 @@ public class TerrainMap : MonoBehaviour
     public void AddActor(TacticActor newActor, bool start = true)
     {
         allActors.Add(newActor);
-        for (int i = 0; i < allActors.Count; i++)
-        {
-            Debug.Log(allActors[i].ReturnName()+" : "+allActors[i].health);
-        }
     }
 
     public void RemoveActors(bool win = false)

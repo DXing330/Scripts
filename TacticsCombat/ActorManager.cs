@@ -145,7 +145,8 @@ public class ActorManager : MonoBehaviour
     public void RemoveFromPlayerTeam(TacticActor actor)
     {
         if (actor == null){return;}
-        if (actor.typeName == "Player" || actor.typeName == "Familiar" || actor.typeName == ""){return;}
+        //if (actor.typeName == "Player" || actor.typeName == "Familiar" || actor.typeName == ""){return;}
+        //Debug.Log(actor.typeName);
         GameManager.instance.armyData.PartyMemberDefeated(actor.typeName);
     }
 
@@ -261,6 +262,7 @@ public class ActorManager : MonoBehaviour
         newActor.CopyStats(actorToCopy);
         newActor.QuickStart(actorToCopy);
         newActor.InitialLocation(location);
+        if (newActor.movementCosts.Count < 9){actorData.UpdateActorMoveCosts(newActor);}
         UpdateActorSprite(newActor, actorToCopy.typeName);
         newActor.team = team;
         newActor.SetMap(terrainMap);

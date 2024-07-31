@@ -192,9 +192,10 @@ public class PlayerActor : AllStats
         baseInitiative = int.Parse(allStats[9]);
     }
 
-    public void UpdateStats()
+    public void UpdateStats(bool main = true)
     {
-        currentLevel = GameManager.instance.playerLevel;
+        if (main){currentLevel = GameManager.instance.playerLevel;}
+        else {currentLevel = 1;}
         playerActor.typeName = typeName;
         playerActor.level = currentLevel;
         playerActor.CopyAllStats(this);
@@ -218,21 +219,22 @@ public class PlayerActor : AllStats
 
     // Mob characters don't get any level bonuses, just equipment bonuses.
     // Only new characters use this otherwise use their previously saved stat string.
-    public void SideCharacterUpdateStats()
+    public void SideCharacterUpdateStats(string newName)
     {
+        typeName = newName;
         GameManager.instance.actorData.LoadPlayerActorData(this, typeName);
         GameManager.instance.actorData.LoadActorData(playerActor, typeName);
-        CopyAllStats(playerActor);
-        playerActor.typeName = typeName;
+        currentHealth = baseHealth;
+        currentEnergy = baseEnergy;
+        playerActor.CopyAllStats(this);
         allEquipment.UpdateActorStats(playerActor);
-        playerActor.health = Mathf.Min(ReturnCurrentHealth(), playerActor.baseHealth);
-        playerActor.energy = Mathf.Min(ReturnCurrentEnergy(), playerActor.baseEnergy);
+        playerActor.health = playerActor.baseHealth;
+        playerActor.energy = playerActor.baseEnergy;
     }
 
     public void SetName(string newName)
     {
         if (newName == "none" || newName.Length < 1){return;}
-        typeName = newName;
-        SideCharacterUpdateStats();
+        SideCharacterUpdateStats(newName);
     }
 }

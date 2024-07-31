@@ -89,12 +89,16 @@ public class ActorDataManager : MonoBehaviour
     public void LoadPlayerActorData(PlayerActor actor, string newName)
     {
         int index = actorNames.IndexOf(newName);
+        Debug.Log(newName);
+        Debug.Log(index);
         if (index < 0)
         {
             return;
         }
         actor.baseHealth = int.Parse(actorHealths[index]);
         actor.baseAttack = int.Parse(actorAttacks[index]);
+        Debug.Log(actor.baseDefense);
+        Debug.Log(actorDefenses[index]);
         actor.baseDefense = int.Parse(actorDefenses[index]);
         actor.baseEnergy = int.Parse(actorEnergies[index]);
         actor.baseMovement = int.Parse(actorMovements[index]);
@@ -122,7 +126,7 @@ public class ActorDataManager : MonoBehaviour
         return baseStats;
     }
 
-    protected void UpdateActorMoveCosts(TacticActor actor)
+    public void UpdateActorMoveCosts(TacticActor actor)
     {
         string costs = ReturnActorMoveCosts(actor.movementType);
         actor.SetMoveCosts(ReturnActorMoveCostsList(costs));
