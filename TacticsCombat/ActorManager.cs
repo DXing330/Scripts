@@ -146,7 +146,6 @@ public class ActorManager : MonoBehaviour
     {
         if (actor == null){return;}
         //if (actor.typeName == "Player" || actor.typeName == "Familiar" || actor.typeName == ""){return;}
-        //Debug.Log(actor.typeName);
         GameManager.instance.armyData.PartyMemberDefeated(actor.typeName);
     }
 

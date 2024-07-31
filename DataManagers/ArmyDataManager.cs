@@ -76,7 +76,6 @@ public class ArmyDataManager : BasicDataManager
             if (partyMembers[i].typeName == memberName)
             {
                 // If they're already defeated find the next one with the same name.
-                Debug.Log(i);
                 if (partyMembers[i].currentHealth == 0){continue;}
                 partyMembers[i].currentHealth = 0;
                 return;
